@@ -44,6 +44,7 @@ jobs:
         run: |
           cd reveal-md
           npm install
+          npm audit fix --force
           cd ..
 
       - name: Copy markdown files to Reveal-MD
