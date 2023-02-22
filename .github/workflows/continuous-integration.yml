@@ -31,7 +31,6 @@ jobs:
   # Build static site using Reveal-MD
   build-revealmd:
     name: Build R-MD
-    needs: [pr-ci]
     if: ${{ inputs.ss-solution == 'reveal-md' }}
     uses: ./.github/workflows/reuse-build-revealmd.yml
     secrets: inherit
