@@ -63,15 +63,17 @@ jobs:
 
       # If this tests fail the NPM error will fail this job
       - name: Run tests from Reveal-MD
-        run: npm run test
+        run: cd reveal-md && npm run test
 
       - name: GitHub Step Summary for Test
         run: |
           echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
-          echo "$(npm run test)" >> $GITHUB_STEP_SUMMARY
+          echo "$(cd reveal-md && npm run test)" >> $GITHUB_STEP_SUMMARY
 
       - name: Run Reveal-MD build
-        run: npm run build
+        run: |
+          cd reveal-md
+          reveal-md markdown/placeholder.md --static _site2 --template template.html --glob 'markdown/*.md'
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
