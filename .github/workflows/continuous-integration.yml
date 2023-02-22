@@ -32,7 +32,7 @@ jobs:
   build-revealmd:
     name: Build R-MD
     needs: [pr-ci]
-    if: ${{ inputs.ss-solution == 'reveal-md'} }
+    if: ${{ inputs.ss-solution == 'reveal-md' }}
     uses: ./.github/workflows/reuse-build-revealmd.yml
     secrets: inherit
     with: 
