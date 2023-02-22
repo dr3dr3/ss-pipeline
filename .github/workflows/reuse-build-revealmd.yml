@@ -1,0 +1,118 @@
+# Build Reveal-MD slide decks
+name: build-revealmd
+
+on:
+  workflow_call:
+    inputs:
+      target-ref:
+        required: true
+        type: string
+      deploy-target:
+        required: true
+        type: string
+        # values: 'ci', 'stg', 'prd' (do we need one for Canary?)
+        default: 'ci'
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+
+jobs:
+  # Build static site using Reveal-MD
+  build:
+    name: Build
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository }} # Repo of where workflow called from
+          ref: ${{ inputs.target-ref }}
+          #token: ${{ secrets.GITHUB_TOKEN }} ### REMOVE?
+
+      - name: Setup Node.JS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Clone Reveal-MD
+        run: git clone https://github.com/webpro/reveal-md.git
+
+      - name: Install Reveal-MD
+        run: |
+          cd reveal-md
+          npm install
+          cd ..
+
+      - name: Copy markdown files to Reveal-MD
+        run: rsync -avh markdown reveal-md
+
+      - name: Copy slide template to Reveal-MD
+        run: rsync -avh build-files/template.html reveal-md
+        
+      - name: Copy version slide to Reveal-MD
+        run: rsync -avh ${{ format('{0}{1}{2}', 'build-files/version-', inputs.deploy-target, '.md') }} reveal-md/markdown/version.md
+
+      - name: Add version and build date
+        run: |
+          echo -e "Build Commit SHA: ${{ inputs.target-ref }} \n" >> reveal-md/markdown/version.md
+          echo -e "Build Date/Time Stamp: $(date +%F-%T) \n" >> reveal-md/markdown/version.md
+
+      # If this tests fail the NPM error will fail this job
+      - name: Run tests from Reveal-MD
+        run: npm run test
+
+      - name: GitHub Step Summary for Test
+        run: |
+          echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "$(npm run test)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Run Reveal-MD build
+        run: npm run build
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', inputs.target-ref) }}
+          path: reveal-md/_site
+          retention-days: 2
+
+  job-check:
+    name: Jobs Check
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: success() # only run when all shards have passed
+    # store success output flag for ci job
+    outputs:
+      success: ${{ steps.setoutput.outputs.SUCCESS }}
+    steps:
+
+      - name: Set Output
+        id: setoutput
+        run: echo "SUCCESS=true" >> $GITHUB_OUTPUT
+
+      - name: GitHub Step Summary for Job success
+        run: |
+          echo "### Workflow Jobs Completed" >> $GITHUB_STEP_SUMMARY
+          echo "Success is ${{steps.setoutput.outputs.SUCCESS}}" >> $GITHUB_STEP_SUMMARY
+          echo "Head commit message: ${{ github.event.head_commit.message }}" >> $GITHUB_STEP_SUMMARY
+
+  build-check:
+    name: Build PR Check
+    runs-on: ubuntu-latest
+    if: always() # always run, so we never skip the check
+    needs: [build, job-check]
+    steps:
+
+      - name: GitHub Step Summary
+        run: |
+          passed="${{ needs.job-check.outputs.success }}"
+          if [[ $passed == "true" ]]; then
+            echo "### Build Success! :thumbsup:" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          else
+            echo "### Build Failed! :thumbsdown:" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi

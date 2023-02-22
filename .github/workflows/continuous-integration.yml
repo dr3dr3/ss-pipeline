@@ -1,0 +1,75 @@
+# Continuous integration for all static site solutions
+name: continuous-integration
+
+on:
+
+  # Called from solution repo on pull request event
+  workflow_call:
+    inputs:
+      ss-solution:
+        required: true
+        type: string
+        # string must be one of:
+        # 'reveal-md'
+        # 'dora-metrix'
+
+jobs:
+
+  # See configuration in ./.github/labeler.yml
+  labeler:
+    name: Add Labels to PR
+    # if: event is workflow call (PR event)
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/labeler@v4
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+
+  # Build static site using Reveal-MD
+  build-revealmd:
+    name: Build R-MD
+    needs: [pr-ci]
+    if: ${{ inputs.ss-solution == 'reveal-md'} }
+    uses: ./.github/workflows/reuse-build-revealmd.yml
+    secrets: inherit
+    with: 
+      target-ref: ${{ github.sha }}
+      deploy-target: 'ci'
+
+  # Check builds ok. Is a required check on the PR (setup in GitHub). 
+  merge-ready:
+    name: Ready for Merge?
+    needs: [build-revealmd] ### ADD MORE SS SOLUTIONS
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest 
+    steps:
+      - name: Ready message
+        run: echo "### Merge Ready :thumbsup:" >> $GITHUB_STEP_SUMMARY     
+
+  # Merge PR. GitHub setup to delete SLFB after merge completed.
+  pr-merge: 
+    name: PR Merge
+    #if: ${{ ??? }} ###
+    needs: [merge-ready]
+    runs-on: ubuntu-latest    
+    steps:
+
+      - name: Checkout Feature Branch
+        uses: actions/checkout@v3
+
+      - name: Merge Pull Request
+        run: gh pr merge ${{ github.ref_name }} --squash --subject "${{ github.ref_name }}" --body "Automerged by GitHub Action" --auto
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHA_PAT }}
+          # Use PAT so that "on: push: branch: [main]" will trigger next action
+
+      - name: GitHub Step Summary
+        run: echo "### PR Merge Success! :thumbsup:" >> $GITHUB_STEP_SUMMARY
+
+# End of workflow
