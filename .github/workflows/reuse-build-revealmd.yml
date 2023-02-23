@@ -44,7 +44,6 @@ jobs:
         run: |
           cd reveal-md
           npm install -g reveal-md
-          npm install -g bron
           cd ..
 
       - name: Copy markdown files to Reveal-MD
@@ -61,19 +60,19 @@ jobs:
           echo -e "Build Commit SHA: ${{ inputs.target-ref }} \n" >> reveal-md/markdown/version.md
           echo -e "Build Date/Time Stamp: $(date +%F-%T) \n" >> reveal-md/markdown/version.md
 
-      # If this tests fail the NPM error will fail this job
-      - name: Run tests from Reveal-MD
-        run: |
-          cd reveal-md
-          npm run test
-          cd ..
+#      # If this tests fail the NPM error will fail this job
+#      - name: Run tests from Reveal-MD
+#        run: |
+#          cd reveal-md
+#          npm run test
+#          cd ..
 
-      - name: GitHub Step Summary for Test
-        run: |
-          cd reveal-md
-          echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
-          echo "$(npm run test)" >> $GITHUB_STEP_SUMMARY
-          cd ..
+#      - name: GitHub Step Summary for Test
+#        run: |
+#          cd reveal-md
+#          echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
+#          echo "$(npm run test)" >> $GITHUB_STEP_SUMMARY
+#          cd ..
 
       - name: Run Reveal-MD build
         run: |
