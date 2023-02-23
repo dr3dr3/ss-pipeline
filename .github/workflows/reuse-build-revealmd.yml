@@ -43,7 +43,8 @@ jobs:
       - name: Install Reveal-MD
         run: |
           cd reveal-md
-          npm install -g reveal-md --omit=dev
+          npm install -g reveal-md
+          npm install -g bron
           cd ..
 
       - name: Copy markdown files to Reveal-MD
