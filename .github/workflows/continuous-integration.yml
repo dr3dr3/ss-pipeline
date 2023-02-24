@@ -46,7 +46,9 @@ jobs:
     name: PR Merge
     #if: ${{ ??? }} ###
     needs: [merge-ready]
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write  
     steps:
 
       - name: Checkout Feature Branch
