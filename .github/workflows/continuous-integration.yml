@@ -65,8 +65,9 @@ jobs:
     name: Deploy CI
     needs: [pr-merge]
     uses: ./.github/workflows/deploy-github-pages.yml
-    with: 
-      target-ref: ${{ github.sha }}
+    with:
+      artefact-ref: ${{ github.sha }}
+      target-ref: 'main'
       deploy-target: 'ci'
 
 # End of workflow

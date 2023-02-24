@@ -8,6 +8,9 @@ on:
       target-ref:
         required: true
         type: string
+      artefact-ref:
+        required: true
+        type: string
       deploy-target:
         required: true
         type: string
@@ -42,12 +45,12 @@ jobs:
         with:
           repository: ${{ github.repository }} # Repo of where workflow called from
           ref: ${{ inputs.target-ref }}
-          token: ${{ github.token }}        
+          token: ${{ github.token }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', inputs.target-ref) }}
+          name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', inputs.artefact-ref) }}
           path: _site
 
       - name: Upload Pages artifacts
