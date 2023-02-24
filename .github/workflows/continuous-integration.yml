@@ -58,7 +58,7 @@ jobs:
       - name: Merge Pull Request
         run: gh pr merge ${{ inputs.slfb }} --squash --subject "${{ inputs.slfb }}" --body "Short-lived feature branch ${{ inputs.slfb }} automerged by GitHub Action" --auto
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHA_PAT }}
           # Use PAT so that "on: push: branch: [main]" will trigger next action
 
       - name: GitHub Step Summary
