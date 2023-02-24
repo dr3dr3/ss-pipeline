@@ -44,7 +44,6 @@ jobs:
   # Merge PR. GitHub setup to delete SLFB after merge completed.
   pr-merge: 
     name: PR Merge
-    #if: ${{ ??? }} ###
     needs: [merge-ready]
     runs-on: ubuntu-latest
     steps:
@@ -66,8 +65,8 @@ jobs:
     needs: [pr-merge]
     uses: ./.github/workflows/deploy-github-pages.yml
     with:
-      artefact-ref: ${{ github.sha }}
       target-ref: 'main'
+      artefact-ref: ${{ github.sha }}
       deploy-target: 'ci'
 
 # End of workflow
