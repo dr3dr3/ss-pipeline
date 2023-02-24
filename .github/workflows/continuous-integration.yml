@@ -56,7 +56,7 @@ jobs:
           ref: ${{ inputs.slfb }}        
 
       - name: Merge Pull Request
-        run: gh pr merge ${{ github.SHA }} --squash --subject "${{ inputs.slfb }}" --body "Short-lived feature branch ${{ inputs.slfb }} automerged by GitHub Action" --auto
+        run: gh pr merge ${{ inputs.slfb }} --squash --subject "${{ inputs.slfb }}" --body "Short-lived feature branch ${{ inputs.slfb }} automerged by GitHub Action" --auto
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Use PAT so that "on: push: branch: [main]" will trigger next action
