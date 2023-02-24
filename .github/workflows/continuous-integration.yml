@@ -12,6 +12,9 @@ on:
         # string must be one of:
         # 'reveal-md'
         # 'dora-metrix'
+      slfb: # Short-lived Feature Branch name
+        required: true
+        type: string
 
 jobs:
 
@@ -27,7 +30,7 @@ jobs:
 
   # Check builds ok. Is a required check on the PR (setup in GitHub). 
   merge-ready:
-    name: Ready for Merge?
+    name: Ready for Merge
     needs: [build-revealmd] ### ADD MORE SS SOLUTIONS
     if: |
       always() &&
@@ -50,7 +53,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Merge Pull Request
-        run: gh pr merge ${{ github.ref_name }} --squash --subject "${{ github.ref_name }}" --body "Automerged by GitHub Action" --auto
+        run: gh pr merge ${{ github.SHA }} --squash --subject "${{ inputs.slfb }}" --body "Short-lived feature branch ${{ inputs.slfb }} automerged by GitHub Action" --auto
         env:
           GITHUB_TOKEN: ${{ secrets.GHA_PAT }}
           # Use PAT so that "on: push: branch: [main]" will trigger next action
