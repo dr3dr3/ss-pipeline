@@ -60,13 +60,13 @@ jobs:
         run: echo "### PR Merge Success! :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
   # Deploy CI to GitHub Pages
-  deploy-ci:
-    name: Deploy CI
-    needs: [pr-merge]
-    uses: ./.github/workflows/deploy-github-pages.yml
-    with:
-      target-ref: 'main'
-      artefact-ref: ${{ github.sha }}
-      deploy-target: 'ci'
+  #deploy-ci:
+  #  name: Deploy CI
+  #  needs: [pr-merge]
+  #  uses: ./.github/workflows/deploy-github-pages.yml
+  #  with:
+  #    target-ref: 'main'
+  #    artefact-ref: ${{ github.sha }}
+  #    deploy-target: 'ci'
 
 # End of workflow
