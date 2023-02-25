@@ -58,8 +58,17 @@ jobs:
       - name: Copy reveal-md.json (configuration) to Reveal-MD
         run: rsync -avh build-files/reveal.json reveal-md
 
-      - name: Update reveal-md.json based on environment
+      - name: Update reveal-md.json for Stage
+        if: $(( inputs.deploy-target == 'stg' }}
         run: jq '.theme = "dracula"' build-files/reveal-md.json > reveal-md/reveal-md.json
+        
+      - name: Update reveal-md.json for Canary
+        if: $(( inputs.deploy-target == 'can' }}
+        run: jq '.theme = "league"' build-files/reveal-md.json > reveal-md/reveal-md.json
+        
+      - name: Update reveal-md.json for Production
+        if: $(( inputs.deploy-target == 'prd' }}
+        run: jq '.theme = "solarized"' build-files/reveal-md.json > reveal-md/reveal-md.json
         
       - name: Copy version slide to Reveal-MD
         run: rsync -avh ${{ format('{0}{1}{2}', 'build-files/version-', inputs.deploy-target, '.md') }} reveal-md/markdown/version.md
