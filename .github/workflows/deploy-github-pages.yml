@@ -43,7 +43,7 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
         with:
-          repository: ${{ github.repository }} # Repo of where workflow called from
+          repository: 'dr3dr3/devops-demo'
           ref: 'main'
           token: ${{ github.token }}
 

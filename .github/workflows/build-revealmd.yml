@@ -28,7 +28,7 @@ jobs:
       - name: Checkout Soln Repo
         uses: actions/checkout@v3
         with:
-          repository: 'dr3dr3/devops-demo' # Repo of where workflow called from
+          repository: 'dr3dr3/devops-demo'
           ref: ${{ inputs.target-ref }}
           token: ${{ secrets.GHA_PAT }}
 
@@ -79,9 +79,6 @@ jobs:
           cd reveal-md
           reveal-md --static _site --template template.html --glob 'markdown/*.md'
           cd ..
-
-      - name: Checkout 🛎️
-        uses: actions/checkout@v3
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
