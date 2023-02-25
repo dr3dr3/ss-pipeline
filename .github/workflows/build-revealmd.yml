@@ -67,15 +67,21 @@ jobs:
 
       - name: Update reveal-md.json for Stage
         if: ${{ inputs.deploy-target == 'stg' }}
-        run: jq '.theme = "serif"' reveal-md/reveal-md.json
+        run: | 
+          jq '.theme = "serif"' reveal-md/reveal-md.json > reveal-md.json
+          rsync -avh reveal-md.json reveal-md
         
       - name: Update reveal-md.json for Canary
         if: ${{ inputs.deploy-target == 'can' }}
-        run: jq '.theme = "beige"' reveal-md/reveal-md.json
+        run: | 
+          jq '.theme = "moon"' reveal-md/reveal-md.json > reveal-md.json
+          rsync -avh reveal-md.json reveal-md
         
       - name: Update reveal-md.json for Production
         if: ${{ inputs.deploy-target == 'prd' }}
-        run: jq '.theme = "moon"' reveal-md/reveal-md.json
+        run: | 
+          jq '.theme = "sky"' reveal-md/reveal-md.json > reveal-md.json
+          rsync -avh reveal-md.json reveal-md
         
       - name: Copy version slide to Reveal-MD
         run: rsync -avh ${{ format('{0}{1}{2}', 'build-files/version-', inputs.deploy-target, '.md') }} reveal-md/markdown/version.md
