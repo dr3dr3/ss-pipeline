@@ -32,6 +32,13 @@ jobs:
           ref: ${{ inputs.target-ref }}
           token: ${{ secrets.GHA_PAT }}
 
+      - name: Get latest commit SHA
+        id: commit-sha
+        run: |
+          commitsha="$(git log -n 1 --pretty=format:"%H")" || 0
+          echo "Last commit SHA: $commitsha"
+          echo "SHA=$commitsha" >> $GITHUB_OUTPUT
+
       - name: Setup Node.JS
         uses: actions/setup-node@v3
         with:
@@ -56,26 +63,26 @@ jobs:
         run: rsync -avh build-files/reveal.json reveal-md
 
       - name: Copy reveal-md.json (configuration) to Reveal-MD
-        run: rsync -avh build-files/reveal.json reveal-md
+        run: rsync -avh build-files/reveal-md.json reveal-md
 
       - name: Update reveal-md.json for Stage
         if: ${{ inputs.deploy-target == 'stg' }}
-        run: jq '.theme = "beige"' build-files/reveal-md.json > reveal-md/reveal-md.json
+        run: jq '.theme = "serif"' reveal-md/reveal-md.json
         
       - name: Update reveal-md.json for Canary
         if: ${{ inputs.deploy-target == 'can' }}
-        run: jq '.theme = "league"' build-files/reveal-md.json > reveal-md/reveal-md.json
+        run: jq '.theme = "beige"' reveal-md/reveal-md.json
         
       - name: Update reveal-md.json for Production
         if: ${{ inputs.deploy-target == 'prd' }}
-        run: jq '.theme = "solarized"' build-files/reveal-md.json > reveal-md/reveal-md.json
+        run: jq '.theme = "moon"' reveal-md/reveal-md.json
         
       - name: Copy version slide to Reveal-MD
         run: rsync -avh ${{ format('{0}{1}{2}', 'build-files/version-', inputs.deploy-target, '.md') }} reveal-md/markdown/version.md
 
       - name: Add version and build date
         run: |
-          echo -e "Build Commit SHA: ${{ inputs.target-ref }} \n" >> reveal-md/markdown/version.md
+          echo -e "Build Commit SHA: ${{ steps.commit-sha.outputs.SHA }} \n" >> reveal-md/markdown/version.md
           echo -e "Build Date/Time Stamp: $(date +%F-%T) \n" >> reveal-md/markdown/version.md
 
 #      # If this tests fail the NPM error will fail this job
