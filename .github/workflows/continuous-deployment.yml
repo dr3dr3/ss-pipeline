@@ -1,6 +1,6 @@
-# Continuous Delivery pipeline to deploy to target environment (GitHub repos for GitHub Pages)
-name: continuous-delivery
-run-name: CD Dispatcher
+# Continuous deployment to target environment (GitHub repos for GitHub Pages)
+name: continuous-deployment
+run-name: Continuous Deployment Dispatch to ${{ inputs.deploy-target }}
 
 on:
 
@@ -12,7 +12,11 @@ on:
       deploy-target:
         required: true
         type: string
-        default: 'ci'
+        default: 'stg'
+        # string must be one of:
+        # 'stg' - Stage Environment
+        # 'can' - Canary Environment
+        # 'prd' - Production Environment
 
   workflow_dispatch:
     inputs:
@@ -24,10 +28,9 @@ on:
       deploy-target:
         description: 'Deployment target'
         required: true
-        default: 'ci'
+        default: 'stg'
         type: choice
         options:
-        - ci
         - stg
         - can
         - prd
@@ -43,44 +46,27 @@ jobs:
     steps:
 
       - name: Checkout 🛎️
-        if: ${{ inputs.deploy-target != 'ci' }}
         uses: actions/checkout@v3
         with: 
           repository: ${{ format('{0}-{1}', 'dr3dr3/devops-demo', inputs.deploy-target) }}
           ref: 'main'
-
-      - name: Checkout CI
-        if: ${{ inputs.deploy-target == 'ci' }}
-        uses: actions/checkout@v3
-        with: 
-          repository: 'dr3dr3/devops-via-preso'
-          ref: 'main'
+          token: ${{ secrets.GHA_PAT }}
 
       - name: Check Paused
-        if: ${{ inputs.deploy-target != 'ci' }}
         id: check
         # Get issues with labels from STG/CAN/PRD repo
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}         
+          GH_TOKEN: ${{ secrets.GHA_PAT }}         
         run: |
           issues="$(gh issue list --label "deploy-paused" --state open)" || 0
           echo "$issues"
           echo "CHECK=$issues" >> $GITHUB_OUTPUT
 
       - name: Dispatch
-        if: ${{ steps.check.outputs.CHECK == 0 && inputs.deploy-target != 'ci' }}
+        if: ${{ steps.check.outputs.CHECK == 0 }}
         run: |
           curl -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.GHA_PAT }}" \
           --request POST --data '{"event_type": "deploy", "client_payload": {"paused": false, "target_ref": "${{ inputs.target-ref }}"}}' \
           https://api.github.com/repos/${{ github.repository_owner }}/${{ format('{0}-{1}', 'devops-demo', inputs.deploy-target) }}/dispatches
-          echo "Success"
-
-      - name: Dispatch CI
-        if: ${{ inputs.deploy-target == 'ci' }}
-        run: |
-          curl -H "Accept: application/vnd.github.everest-preview+json" \
-          -H "Authorization: token ${{ secrets.GHA_PAT }}" \
-          --request POST --data '{"event_type": "deploy", "client_payload": {"paused": false, "target_ref": "${{ inputs.target-ref }}"}}' \
-          https://api.github.com/repos/${{ github.repository_owner }}/devops-via-preso/dispatches
           echo "Success"
