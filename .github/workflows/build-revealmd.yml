@@ -60,7 +60,7 @@ jobs:
 
       - name: Update reveal-md.json for Stage
         if: ${{ inputs.deploy-target == 'stg' }}
-        run: jq '.theme = "dracula"' build-files/reveal-md.json > reveal-md/reveal-md.json
+        run: jq '.theme = "beige"' build-files/reveal-md.json > reveal-md/reveal-md.json
         
       - name: Update reveal-md.json for Canary
         if: ${{ inputs.deploy-target == 'can' }}
