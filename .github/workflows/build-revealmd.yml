@@ -25,12 +25,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Checkout 🛎️
+      - name: Checkout Soln Repo
         uses: actions/checkout@v3
         with:
-          repository: ${{ github.repository }} # Repo of where workflow called from
+          repository: 'dr3dr3/devops-demo' # Repo of where workflow called from
           ref: ${{ inputs.target-ref }}
-          #token: ${{ secrets.GITHUB_TOKEN }} ### REMOVE?
+          token: ${{ secrets.GHA_PAT }}
 
       - name: Setup Node.JS
         uses: actions/setup-node@v3
@@ -79,6 +79,9 @@ jobs:
           cd reveal-md
           reveal-md --static _site --template template.html --glob 'markdown/*.md'
           cd ..
+
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
