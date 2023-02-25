@@ -64,10 +64,6 @@ jobs:
     name: Deploy CI
     needs: [pr-merge]
     uses: ./.github/workflows/deploy-github-pages.yml
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     with:
       target-ref: 'main'
       artefact-ref: ${{ github.sha }}
