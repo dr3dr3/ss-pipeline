@@ -52,6 +52,9 @@ jobs:
       - name: Copy slide template to Reveal-MD
         run: rsync -avh build-files/template.html reveal-md
         
+      - name: Copy reveal.json (configuration) to Reveal-MD
+        run: rsync -avh build-files/reveal.json reveal-md
+        
       - name: Copy version slide to Reveal-MD
         run: rsync -avh ${{ format('{0}{1}{2}', 'build-files/version-', inputs.deploy-target, '.md') }} reveal-md/markdown/version.md
 
