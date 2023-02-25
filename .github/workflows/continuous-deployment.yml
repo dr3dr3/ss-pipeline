@@ -73,8 +73,8 @@ jobs:
 
       - name: GitHub Step Summary - Success
         if: ${{ steps.check.outputs.CHECK == 0 }}
-        run: echo "### Deploy Dispatched to ${{ inputs.deploy-target }}! :thumbsup:" >> $GITHUB_STEP_SUMMARY
+        run: echo "### Deploy Dispatched (${{ inputs.deploy-target }})! :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
       - name: GitHub Step Summary - Blocked
         if: ${{ steps.check.outputs.CHECK != 0 }}
-        run: echo "### Deploy Blocked for ${{ inputs.deploy-target }}! :thumbsdown:" >> $GITHUB_STEP_SUMMARY
+        run: echo "### Deploy Blocked (${{ inputs.deploy-target }})! :thumbsdown:" >> $GITHUB_STEP_SUMMARY
