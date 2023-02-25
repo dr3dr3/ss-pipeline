@@ -74,7 +74,7 @@ jobs:
   # Dispatch to Deploy to Stage Environment
   dispatch-stg:
     name: Dispatch STG
-    needs: [pr-merge]
+    needs: [merge-ready]
     uses: ./.github/workflows/continuous-deployment.yml
     with:
       target-ref: 'main'
