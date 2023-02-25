@@ -56,7 +56,7 @@ jobs:
         id: check
         # Get issues with labels from STG/CAN/PRD repo
         env:
-          GH_TOKEN: ${{ secrets.GHA_PAT }}         
+          GH_TOKEN: ${{ secrets.PR_MERGE }}         
         run: |
           issues="$(gh issue list --label "deploy-paused" --state open)" || 0
           echo "$issues"
