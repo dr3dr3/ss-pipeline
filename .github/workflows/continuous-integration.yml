@@ -26,6 +26,7 @@ jobs:
     secrets: inherit
     with: 
       target-ref: ${{ github.sha }}
+      artefact-ref: ${{ github.sha }}
       deploy-target: 'ci'
 
   # Check builds ok. Is a required check on the PR (setup in GitHub). 
@@ -80,4 +81,5 @@ jobs:
       target-ref: 'main'
       deploy-target: 'stg'
     secrets: inherit
+
 # End of workflow

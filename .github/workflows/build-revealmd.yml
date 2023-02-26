@@ -7,6 +7,9 @@ on:
       target-ref:
         required: true
         type: string
+      artefact-ref:
+        required: true
+        type: string        
       deploy-target:
         required: true
         type: string
@@ -114,7 +117,7 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', inputs.target-ref) }}
+          name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', inputs.artefact-ref) }}
           path: reveal-md/_site
           retention-days: 2
 

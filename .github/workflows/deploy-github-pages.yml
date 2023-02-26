@@ -42,10 +42,10 @@ jobs:
 
       - name: Checkout 🛎️
         uses: actions/checkout@v3
-        with:
-          repository: 'dr3dr3/devops-demo'
-          ref: 'main'
-          token: ${{ github.token }}
+#        with:
+#          repository: 'dr3dr3/devops-demo'
+#          ref: 'main'
+#          token: ${{ github.token }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v3
