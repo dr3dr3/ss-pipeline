@@ -44,17 +44,17 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: 'stg-build_revealmd' #######################
+          name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', 'reveal-md') }}
           path: _site/slides
 
       # Add placeholder index.html
       - name: index.html
-        run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Testing</p></body></html>" > _site/index.html
+        run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Deploy target ${{ inputs.deploy-target }}</p></body></html>" > _site/index.html
           
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: 'stg-build_compiled' #######################
+          name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', 'compiled') }}
           path: _site
           retention-days: 2
 
@@ -70,5 +70,5 @@ jobs:
     with:
       target-ref: ${{ github.event.client_payload.target_ref }}
       artefact-ref: 'compiled'      
-      deploy-target: 'stg' ####################
+      deploy-target: ${{ inputs.deploy-target }}
     secrets: inherit
