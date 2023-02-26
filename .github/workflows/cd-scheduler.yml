@@ -1,5 +1,5 @@
 # Continuous Delivery Scheduled Deployments
-name: continuous-delivery-scheduler
+name: CONTINUOUS-DEPLOYMENT-SCHEDULER
 run-name: Scheduled Deployments
 
 on:

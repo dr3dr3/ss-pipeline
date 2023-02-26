@@ -1,5 +1,5 @@
 # Continuous integration for all static site solutions
-name: continuous-integration
+name: CONTINUOUS-INTEGRATION
 
 on:
 

@@ -1,5 +1,5 @@
 # Continuous deployment to target environment (GitHub repos for GitHub Pages)
-name: continuous-deployment
+name: CONTINUOUS-DEPLOYMENT
 run-name: Continuous Deployment Dispatch to ${{ inputs.deploy-target }}
 
 on:

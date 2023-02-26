@@ -1,5 +1,5 @@
 # Build Reveal-MD slide decks
-name: build-revealmd
+name: BUILD-REVEALMD
 
 on:
   workflow_call:

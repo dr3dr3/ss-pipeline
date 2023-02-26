@@ -1,5 +1,5 @@
 # Continuous Deployment Workflow for Stage
-name: continuous-delivery
+name: CONTINUOUS-DELIVERY
 run-name: Continuous delivery
 
 on:
