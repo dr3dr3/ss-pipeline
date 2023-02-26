@@ -1,0 +1,74 @@
+# Continuous Deployment Workflow for Stage
+name: continuous-delivery
+run-name: Continuous delivery
+
+on:
+
+  workflow_call:
+    inputs:
+      target-ref:
+        required: true
+        type: string
+      deploy-target:
+        required: true
+        type: string
+        default: 'stg'
+        # string must be one of:
+        # 'stg' - Stage Environment
+        # 'can' - Canary Environment
+        # 'prd' - Production Environment
+
+jobs:
+
+  # Build static site using Reveal-MD
+  build:
+    name: Build
+    uses: dr3dr3/ss-pipeline/.github/workflows/build-revealmd.yml@main
+    with: 
+      target-ref: ${{ github.event.client_payload.target_ref }}
+      artefact-ref: 'revealmd'
+      deploy-target: 'stg'
+    secrets: inherit
+
+  compile:
+    name: Compile
+    needs: [build-stg]
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      # Reveal-MD Slides
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: 'stg-build_revealmd' #######################
+          path: _site/slides
+
+      # Add placeholder index.html
+      - name: index.html
+        run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Testing</p></body></html>" > _site/index.html
+          
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'stg-build_compiled' #######################
+          path: _site
+          retention-days: 2
+
+  # Deploy to GitHub Pages on the Stage Repo
+  deploy-to-github-pages:
+    name: Deploy GHP
+    needs: [compile]
+    uses: dr3dr3/ss-pipeline/.github/workflows/deploy-github-pages.yml@main
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    with:
+      target-ref: ${{ github.event.client_payload.target_ref }}
+      artefact-ref: 'compiled'      
+      deploy-target: 'stg' ####################
+    secrets: inherit
