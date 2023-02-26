@@ -119,7 +119,7 @@ jobs:
         with:
           name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', inputs.artefact-ref) }}
           path: reveal-md/_site
-          retention-days: 2
+          retention-days: 1
 
   job-check:
     name: Jobs Check
