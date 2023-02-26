@@ -27,7 +27,7 @@ jobs:
     with: 
       target-ref: ${{ github.event.client_payload.target_ref }}
       artefact-ref: 'revealmd'
-      deploy-target: 'stg'
+      deploy-target: ${{ inputs.deploy-target }}
     secrets: inherit
 
   compile:
