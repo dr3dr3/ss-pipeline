@@ -29,7 +29,7 @@ jobs:
       - name: Issue Develop
         run: gh issue develop ${{github.event.issue.number}} --base main --name "${{ steps.slfb-name.outputs.SLFB }}"
         env:
-          GH_TOKEN: ${{ secrets.PAT }}
+          GH_TOKEN: ${{ secrets.GHA_PAT }}
 
       - name: Message
         run: echo "### SLFB Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
