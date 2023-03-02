@@ -10,7 +10,10 @@ jobs:
 
   create-slfb:
     name: Create Branch
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
     steps:
 
       - name: Checkout Feature Branch
@@ -24,7 +27,7 @@ jobs:
           echo "SLFB=$slfb" >> $GITHUB_OUTPUT
 
       - name: Issue Develop
-        run: gh issue develop --base main --name "${{ steps.slfb-name.outputs.SLFB }}"
+        run: gh issue develop ${{github.event.issue.number}} --base main --name "${{ steps.slfb-name.outputs.SLFB }}"
         env:
           GH_TOKEN: ${{ github.token }}
 
