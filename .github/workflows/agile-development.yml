@@ -37,7 +37,7 @@ jobs:
       - name: Setup Codespace
         run: gh codespace create --display-name "${{ steps.slfb-name.outputs.SLFB }}" --repo "${{ github.repository }}" --branch "${{ steps.slfb-name.outputs.SLFB }}" --machine "basicLinux32gb" --retention-period "48h" --default-permissions
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PR_MERGE }}
 
       - name: Message Codespace
         run: echo "### Codespace Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
