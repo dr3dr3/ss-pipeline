@@ -20,7 +20,7 @@ jobs:
         id: slfb-name
         run: |
           slfb=$(echo ${{ github.event.issue.title }} | tr " " "-")
-          echo "SLFB=${{ format('{0}-{1}', github.event.issue.id, ${slfb}) }}" >> $GITHUB_OUTPUT
+          echo "SLFB=${{ format('{0}-{1}', github.event.issue.id, $( echo $slfb ) }) }}" >> $GITHUB_OUTPUT
 
       - name: Test
         run: echo ${{ steps.slfb-name.outputs.SLFB }}
