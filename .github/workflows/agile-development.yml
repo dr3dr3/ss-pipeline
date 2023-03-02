@@ -16,12 +16,19 @@ jobs:
       - name: Checkout Feature Branch
         uses: actions/checkout@v3
 
-      - name: Issue Develop
+      - name: Set SLFB Name
+        id: slfb-name
         run: |
           slfb=$(echo ${{ github.event.issue.title }} | tr " " "-")
-          gh issue develop --base main --name "${{ format('{0}-{1}', github.event.issue.id, $slfb) }}"
-        env:
-          GH_TOKEN: ${{ github.token }}
+          echo "SLFB=${{ format('{0}-{1}', github.event.issue.id, ${slfb}) }}" >> $GITHUB_OUTPUT
+
+      - name: Test
+        run: echo ${{ steps.slfb-name.outputs.SLFB }}
+
+#      - name: Issue Develop
+#        run: gh issue develop --base main --name ""
+#        env:
+#          GH_TOKEN: ${{ github.token }}
 
       - name: Message
         run: echo "### Test Passed :thumbsup:" >> $GITHUB_STEP_SUMMARY
