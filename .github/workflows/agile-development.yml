@@ -20,7 +20,7 @@ jobs:
         id: slfb-name
         run: |
           name=$(echo ${{ github.event.issue.title }} | tr " " "-")
-          slfb=$(echo ${{github.event.issue.number}}+=$slfb)
+          slfb=$(echo "${{github.event.issue.number}}-${slfb}" )
           echo "SLFB=$slfb" >> $GITHUB_OUTPUT
 
       - name: Test
