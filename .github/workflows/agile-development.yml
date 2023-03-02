@@ -8,8 +8,8 @@ on:
 
 jobs: 
 
-  create-slfb:
-    name: Create Branch
+  slfb:
+    name: Setup Dev for SLFB
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -26,10 +26,18 @@ jobs:
           slfb=$(echo "${{github.event.issue.number}}-${name}" )
           echo "SLFB=$slfb" >> $GITHUB_OUTPUT
 
-      - name: Issue Develop
+      - name: Setup SLFB
         run: gh issue develop ${{github.event.issue.number}} --base main --name "${{ steps.slfb-name.outputs.SLFB }}"
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: Message
+      - name: Message SLFB
         run: echo "### SLFB Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
+
+      - name: Setup Codespace
+        run: gh codespace create --display-name "${{ steps.slfb-name.outputs.SLFB }}" --branch "${{ steps.slfb-name.outputs.SLFB }}" --retention-period "48h" --default-permissions
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Message Codespace
+        run: echo "### Codespace Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
