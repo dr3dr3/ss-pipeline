@@ -23,13 +23,10 @@ jobs:
           slfb=$(echo "${{github.event.issue.number}}-${name}" )
           echo "SLFB=$slfb" >> $GITHUB_OUTPUT
 
-      - name: Test
-        run: echo ${{ steps.slfb-name.outputs.SLFB }}
-
-#      - name: Issue Develop
-#        run: gh issue develop --base main --name ""
-#        env:
-#          GH_TOKEN: ${{ github.token }}
+      - name: Issue Develop
+        run: gh issue develop --base main --name "${{ steps.slfb-name.outputs.SLFB }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Message
-        run: echo "### Test Passed :thumbsup:" >> $GITHUB_STEP_SUMMARY
+        run: echo "### SLFB Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
