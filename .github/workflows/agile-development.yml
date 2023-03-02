@@ -12,7 +12,7 @@ jobs:
     name: Create Branch
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       issues: write
     steps:
 
@@ -29,7 +29,7 @@ jobs:
       - name: Issue Develop
         run: gh issue develop ${{github.event.issue.number}} --base main --name "${{ steps.slfb-name.outputs.SLFB }}"
         env:
-          GH_TOKEN: ${{ secrets.GHA_PAT }}
+          GH_TOKEN: ${{ github.token }}
 
       - name: Message
         run: echo "### SLFB Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
