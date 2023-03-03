@@ -38,11 +38,11 @@ jobs:
           comment="
           ### Check out SLFB in your Dev environment
 
-          ```
+          ```sh
           git fetch origin
           git checkout ${{ steps.slfb-name.outputs.SLFB }}
           ```
-          
+
           "
           gh issue comment ${{github.event.issue.number}} --body "$comment"
 
