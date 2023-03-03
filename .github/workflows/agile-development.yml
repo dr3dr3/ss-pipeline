@@ -31,6 +31,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: Comment for Branch Checkout
+        run: |
+          comment="
+          ### Check out SLFB in your Dev environment
+          `git fetch origin`
+          `git checkout ${{ steps.slfb-name.outputs.SLFB }}`
+          "
+          gh issue comment ${{github.event.issue.number}} --body "$comment"
+
       - name: Message SLFB
         run: echo "### SLFB Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
@@ -42,7 +51,7 @@ jobs:
 #      - name: Message Codespace
 #        run: echo "### Codespace Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
-      - name: Create/Reopen Pull Request
-        run: gh pr edit ${{ steps.slfb-name.outputs.SLFB }} -b "Reopened by Github action" -t ${{ steps.slfb-name.outputs.SLFB }} && gh pr reopen ${{ steps.slfb-name.outputs.SLFB }} || gh pr create -t ${{ steps.slfb-name.outputs.SLFB }} -b "Created by Github Action (AGILE-DEVELOPMENT)"
-        env:
-          GH_TOKEN: ${{ github.token }}
+#      - name: Create/Reopen Pull Request
+#        run: gh pr edit ${{ steps.slfb-name.outputs.SLFB }} -b "Reopened by Github action" -t ${{ steps.slfb-name.outputs.SLFB }} && gh pr reopen ${{ steps.slfb-name.outputs.SLFB }} || gh pr create -t ${{ steps.slfb-name.outputs.SLFB }} -b "Created by Github Action (AGILE-DEVELOPMENT)"
+#        env:
+#          GH_TOKEN: ${{ github.token }}
