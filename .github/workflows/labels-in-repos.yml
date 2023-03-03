@@ -19,8 +19,7 @@ jobs:
 
       - name: Action Label Syncer
         uses: micnncim/action-label-syncer@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
         with:
           manifest: .github/labels.yml
-          repository: |
-              dr3dr3/devops-demo
-          token: ${{ secrets.GHA_PAT }}
