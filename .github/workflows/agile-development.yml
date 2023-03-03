@@ -35,7 +35,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          echo "### Check out SLFB in your Dev environment \n\ngit fetch origin \n\ngit checkout ${{ steps.slfb-name.outputs.SLFB }}\n\n" > comment.md
+          echo "### Check out SLFB in your Dev environment" > comment.md
+          echo "\`\`\`" >> comment.md
+          echo "git fetch origin" >> comment.md
+          echo "git checkout ${{ steps.slfb-name.outputs.SLFB }}" >> comment.md
+          echo "\`\`\`" >> comment.md
           gh issue comment ${{github.event.issue.number}} --body-file comment.md
 
       - name: Message SLFB
