@@ -38,7 +38,9 @@ jobs:
           `git fetch origin`
           `git checkout ${{ steps.slfb-name.outputs.SLFB }}`
           "
-          gh issue comment ${{github.event.issue.number}} --body "$comment"
+          echo $comment
+
+#          gh issue comment ${{github.event.issue.number}} --body "$comment"
 
       - name: Message SLFB
         run: echo "### SLFB Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
