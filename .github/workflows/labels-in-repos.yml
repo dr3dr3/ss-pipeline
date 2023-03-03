@@ -1,0 +1,26 @@
+name: LABELS-IN-REPOS
+run-name: Setup labels in relevant repositories
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/labels.yml
+
+jobs:
+  setup-labels:
+    name: Setup Labels
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Feature Branch
+        uses: actions/checkout@v3
+
+      - name: Action Label Syncer
+        uses: micnncim/action-label-syncer@v1
+        with:
+          manifest: .github/labels.yml
+          repository: |
+              dr3dr3/devops-demo
+          token: ${{ secrets.GHA_PAT }}
