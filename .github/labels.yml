@@ -5,7 +5,7 @@
   color: "990000"
 
 - name: "type-chore"
-  description: "General maintenance, reorganizing folder structure, and other necessary (but less impactful) tasks."
+  description: "General maintenance and other necessary (but less impactful) tasks."
   color: "fbca04"
 
 - name: "type-feature"
@@ -33,26 +33,26 @@
   color: d73a4a
 
 - name: "type-design"
-  description: "Related to presentation layer, user interface, styling, and user experience."
+  description: "Related to presentation layer, user interface, styling, and UX."
   color: eb6420
 
 # PRIORITY
 
 - name: "priority-low"
   description: "Low priority"
-  color: 009800
+  color: ff8a80
 
 - name: "priority-medium"
   description: "Medium priority"
-  color: fbca04
+  color: ff5252
 
 - name: "priority-high"
   description: "High priority"
-  color: eb6420
+  color: ff1744
 
 - name: "priority-critical"
   description: "Critical (top priority)"
-  color: e11d21
+  color: d50000
 
 # STATUS - Decision state of the issue or pull request
 
