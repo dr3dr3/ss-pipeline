@@ -2,39 +2,39 @@
 
 - name: "type-breaking"
   description: "Introduces a breaking change."
-  color: "990000"
+  color: d50000
 
 - name: "type-chore"
   description: "General maintenance and other necessary (but less impactful) tasks."
-  color: "fbca04"
+  color: 90caf9
 
 - name: "type-feature"
   description: "Brand new functionality, features, pages, workflows, endpoints, etc."
-  color: "009800"
+  color: 01579b
 
 - name: "type-fix"
   description: "Iterations on existing features or infrastructure."
-  color: "e11d21"
+  color: 1e88e5
 
 - name: "type-discussion"
   description: "Questions, proposals and info that requires discussion."
-  color: "cc317c"
+  color: 64b5f6
 
 - name: "type-documentation"
   description: "Related to documentation and information."
-  color: 207de5
+  color: 42a5f5
 
 - name: "type-quality"
   description: "Related to testing and improving quality assurance."
-  color: fbca04
+  color: 1976d2
 
 - name: "type-security"
   description: "Something is vulnerable or not secure."
-  color: d73a4a
+  color: 0277bd
 
 - name: "type-design"
   description: "Related to presentation layer, user interface, styling, and UX."
-  color: eb6420
+  color: 2196f3
 
 # PRIORITY
 
@@ -66,11 +66,11 @@
 
 - name: "status-blocked"
   description: "Decision made this issue is currently blocked"
-  color: "990000"
+  color: d50000
 
 - name: "status-slfb"
   description: "Decision made to setup short-lived feature branch"
-  color: "990000"
+  color: 558b2f
 
 # WORK - Describes the kind of work involved in resolving the issue
 # Uses the Cynefin Framework
@@ -78,16 +78,16 @@
 
 - name: "work-chaotic"
   description: "The situation is chaotic, novel practices used."
-  color: fbca04
+  color: ffab00
 
 - name: "work-complex"
   description: "The situation is complex, emergent practices used."
-  color: d4c5f9
+  color: ffc400
 
 - name: "work-complicated"
   description: "The situation is complicated, good practices used."
-  color: ffb8c6
+  color: ffd740
 
 - name: "work-obvious"
   description: "The situation is obvious, best practices used."
-  color: 91ca55
+  color: ffe57f
