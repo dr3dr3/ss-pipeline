@@ -1,3 +1,93 @@
-- name: feature
-  description: This is a feature
-  color: d73a4c
+# TYPE: Describes the type of issue or pull request
+
+- name: "type-breaking"
+  description: "Introduces a breaking change."
+  color: "990000"
+
+- name: "type-chore"
+  description: "General maintenance, reorganizing folder structure, and other necessary (but less impactful) tasks."
+  color: "fbca04"
+
+- name: "type-feature"
+  description: "Brand new functionality, features, pages, workflows, endpoints, etc."
+  color: "009800"
+
+- name: "type-fix"
+  description: "Iterations on existing features or infrastructure."
+  color: "e11d21"
+
+- name: "type-discussion"
+  description: "Questions, proposals and info that requires discussion."
+  color: "cc317c"
+
+- name: "type-documentation"
+  description: "Related to documentation and information."
+  color: 207de5
+
+- name: "type-quality"
+  description: "Related to testing and improving quality assurance."
+  color: fbca04
+
+- name: "type-security"
+  description: "Something is vulnerable or not secure."
+  color: d73a4a
+
+- name: "type-design"
+  description: "Related to presentation layer, user interface, styling, and user experience."
+  color: eb6420
+
+# PRIORITY
+
+- name: "priority-low"
+  description: "Low priority"
+  color: 009800
+
+- name: "priority-medium"
+  description: "Medium priority"
+  color: fbca04
+
+- name: "priority-high"
+  description: "High priority"
+  color: eb6420
+
+- name: "priority-critical"
+  description: "Critical (top priority)"
+  color: e11d21
+
+# STATUS - Decision state of the issue or pull request
+
+- name: "status-wont-fix"
+  description: "Decision made to not fix this issue"
+  color: cccccc
+
+- name: "status-duplicate"
+  description: "Decision made this is a duplicate of an existing issue"
+  color: cccccc
+
+- name: "status-blocked"
+  description: "Decision made this issue is currently blocked"
+  color: "990000"
+
+- name: "status-slfb"
+  description: "Decision made to setup short-lived feature branch"
+  color: "990000"
+
+# WORK - Describes the kind of work involved in resolving the issue
+# Uses the Cynefin Framework
+# https://en.wikipedia.org/wiki/Cynefin_framework
+
+- name: "work-chaotic"
+  description: "The situation is chaotic, novel practices used."
+  color: fbca04
+
+- name: "work-complex"
+  description: "The situation is complex, emergent practices used."
+  color: d4c5f9
+
+- name: "work-complicated"
+  description: "The situation is complicated, good practices used."
+  color: ffb8c6
+
+- name: "work-obvious"
+  description: "The situation is obvious, best practices used."
+  color: 91ca55
