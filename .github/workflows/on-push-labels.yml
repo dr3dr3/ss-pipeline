@@ -1,4 +1,4 @@
-name: LABELS-IN-REPOS
+name: ON-PUSH-LABELS
 run-name: Setup labels in relevant repositories
 
 on:
@@ -8,6 +8,8 @@ on:
     paths:
       - .github/labels.yml
       - .github/workflows/labels-in-repos.yml
+
+  workflow_call:
 
 jobs:
   setup-labels:
