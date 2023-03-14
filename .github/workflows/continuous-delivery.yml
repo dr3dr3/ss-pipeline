@@ -38,15 +38,22 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      # Get target-ref as per GitOps Config
+#      # Get target-ref as per GitOps Config
+#      - name: Get Config RMD
+#        id: config-rmd
+#        uses: mikefarah/yq@master
+#        with:
+#          cmd: yq '.deploy.revealmd.build.stg' 'config.yml'
+
       - name: Get Config RMD
         id: config-rmd
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq '.deploy.revealmd.build.stg' 'config.yml'
+        run: |
+          value="$(yq '.deploy.revealmd.build.stg' 'config.yml')" || 'ERROR'
+          echo "$value"
+          echo "BUILD_RMD=$value" >> $GITHUB_OUTPUT
 
       - name: Echo Test
-        run: echo ${{ steps.config-rmd.outpus.result }}
+        run: echo ${{ steps.config-rmd.outpus.BUILD_RMD }}
 
       # DO FOR EACH SOLUTION
       - name: Reveal-MD Build Artefact
