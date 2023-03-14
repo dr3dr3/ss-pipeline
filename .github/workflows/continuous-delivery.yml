@@ -5,15 +5,13 @@ run-name: Continuous delivery
 on:
 
   workflow_call:
-#   inputs:
-#      target-soln:
-#        required: true
-#        type: string
-#        default: 'none'
-#      target-ref:
-#        required: true
-#        type: string
-#        default: 'main'
+    inputs:
+      from-soln:
+        required: true
+        type: string
+      target-ref:
+        required: true
+        type: string
 #      target-deploy:
 #        required: true
 #        type: string
@@ -38,21 +36,20 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-#      # Get target-ref as per GitOps Config
-#      - name: Get Config RMD
-#        id: config-rmd
-#        uses: mikefarah/yq@master
-#        with:
-#          cmd: yq '.deploy.revealmd.build.stg' 'config.yml'
+      # DO FOR EACH SOLUTION
 
-      - name: Get Config RMD
-        id: config-rmd
+      - name: Config RMD
+        if: ${{ input.from-soln != 'dr3dr3/devops-demo' }}
         run: |
           value="$(yq '.deploy.revealmd.build.stg' 'config.yml')" || 'ERROR'
           echo "$value"
           echo "BUILD_RMD=$value" >> $GITHUB_OUTPUT
 
-      # DO FOR EACH SOLUTION
+      - name: Override RMD
+        if: ${{ input.from-soln == 'dr3dr3/devops-demo' }}
+        run: |
+          echo "BUILD_RMD=${{ inputs.target-ref }}" >> $GITHUB_OUTPUT
+
       - name: Reveal-MD Build Artefact
         run: |
           wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ steps.config-rmd.outputs.BUILD_RMD }}/build.tar.gz"
