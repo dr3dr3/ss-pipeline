@@ -67,12 +67,12 @@ jobs:
       - name: Add version and build date
         run: |
           echo -e "Target Ref: ${{ inputs.target-ref }} \n" >> reveal-md/markdown/version.md
-          echo -e "Build Date/Time Stamp: $(date '+%Y.%m.%d.%H.%M') \n" >> reveal-md/markdown/version.md
+          echo -e "Build: ${{ inputs.artefact-ref }} \n" >> reveal-md/markdown/version.md
 
       # If this tests fail the NPM error will fail this job
       - name: Run tests from Reveal-MD
         run: npm run test
-        
+
       - name: GitHub Step Summary for Test
         run: |
           cd reveal-md

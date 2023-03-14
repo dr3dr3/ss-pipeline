@@ -29,7 +29,7 @@ jobs:
           token: ${{ secrets.GHA_PAT }}
       
       - name: GitHub Release
-        run: gh release create "${{ inputs.tag }}" --target ${{ inputs.target-ref }} --title ${{ inputs.feature }} --body "Get from issue"
+        run: gh release create "${{ inputs.tag }}" --target ${{ inputs.target-ref }} --title ${{ inputs.feature }} --notes "Get from issue"
         env:
           GH_TOKEN: ${{ secrets.GHA_PAT }}
 
