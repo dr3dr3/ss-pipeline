@@ -39,16 +39,15 @@ jobs:
       # DO FOR EACH SOLUTION
 
       - name: Config RMD
-        if: ${{ inputs.from-soln != 'dr3dr3/devops-demo' }}
+        id: config-rmd
         run: |
           value="$(yq '.deploy.revealmd.build.stg' 'config.yml')" || 'ERROR'
           echo "$value"
-          echo "BUILD_RMD=$value" >> $GITHUB_OUTPUT
-
-      - name: Override RMD
-        if: ${{ inputs.from-soln == 'dr3dr3/devops-demo' }}
-        run: |
-          echo "BUILD_RMD=${{ inputs.target-ref }}" >> $GITHUB_OUTPUT
+          if [[ ${{ inputs.from-soln }} == 'dr3dr3/devops-demo' ]]; then
+            echo "BUILD_RMD=${{ inputs.target-ref }}" >> $GITHUB_OUTPUT
+          else
+            echo "BUILD_RMD=$value" >> $GITHUB_OUTPUT
+          fi
 
       - name: Reveal-MD Build Artefact
         run: |
