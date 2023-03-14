@@ -42,8 +42,8 @@ jobs:
         id: config-rmd
         run: |
           value="$(yq '.deploy.revealmd.build.stg' 'config.yml')" || 'ERROR'
-          echo ${{ inputs.from-soln }}
-          echo ${{ inputs.target-ref }}
+          echo "Trigger: ${{ inputs.from-soln }}"
+          echo "Target: ${{ inputs.target-ref }}"
           echo "$value"
           if [[ ${{ inputs.from-soln }} == 'dr3dr3/devops-demo' ]]; then
             echo "BUILD_RMD=${{ inputs.target-ref }}" >> $GITHUB_OUTPUT
