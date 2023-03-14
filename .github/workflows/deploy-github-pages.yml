@@ -43,7 +43,7 @@ jobs:
 #          token: ${{ github.token }}
 
       - name: Download Build Artefact
-        run: curl -sS "https://github.com/dr3dr3/devops-demo/releases/download/${{ inputs.tag }}/build.tar.gz" > build.tar.gz
+        run: wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ inputs.tag }}/build.tar.gz"
 
       - name: Extract Build Artefacts
         run: tar -xvf build.tar.gz
