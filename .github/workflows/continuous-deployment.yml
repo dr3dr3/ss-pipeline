@@ -6,6 +6,10 @@ on:
 
   workflow_call:
     inputs:
+      from-soln:
+        required: true
+        type: string
+        default: 'dr3dr3/devops-demo'
       target-ref:
         required: true
         type: string
@@ -68,7 +72,7 @@ jobs:
         run: |
           curl -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.GHA_PAT }}" \
-          --request POST --data '{"event_type": "deploy", "client_payload": {"from_soln": "${{ github.repository }}", "target_ref": "${{ inputs.target-ref }}"}}' \
+          --request POST --data '{"event_type": "deploy", "client_payload": {"from_soln": "${{ inputs.from-soln }}", "target_ref": "${{ inputs.target-ref }}"}}' \
           https://api.github.com/repos/${{ github.repository_owner }}/${{ format('{0}-{1}', 'devops-demo', inputs.deploy-target) }}/dispatches
           echo "Success"
 
