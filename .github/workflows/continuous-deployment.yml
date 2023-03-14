@@ -35,7 +35,7 @@ on:
         required: true
         default: 'main'
         type: string
-      deploy-target:
+      target-deploy:
         description: 'Deployment target'
         required: true
         default: 'stg'
@@ -58,7 +58,7 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
         with: 
-          repository: ${{ format('{0}-{1}', 'dr3dr3/devops-demo', inputs.deploy-target) }}
+          repository: ${{ format('{0}-{1}', 'dr3dr3/devops-demo', inputs.target-deploy) }}
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
@@ -78,13 +78,13 @@ jobs:
           curl -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.GHA_PAT }}" \
           --request POST --data '{"event_type": "deploy", "client_payload": {"from_soln": "${{ inputs.from-soln }}", "target_ref": "${{ inputs.target-ref }}"}}' \
-          https://api.github.com/repos/${{ github.repository_owner }}/${{ format('{0}-{1}', 'devops-demo', inputs.deploy-target) }}/dispatches
+          https://api.github.com/repos/${{ github.repository_owner }}/${{ format('{0}-{1}', 'devops-demo', inputs.target-deploy) }}/dispatches
           echo "Success"
 
       - name: GitHub Step Summary - Success
         if: ${{ steps.check.outputs.CHECK == 0 }}
-        run: echo "### Deploy Dispatched (${{ inputs.deploy-target }})! :thumbsup:" >> $GITHUB_STEP_SUMMARY
+        run: echo "### Deploy Dispatched (${{ inputs.target-deploy }})! :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
       - name: GitHub Step Summary - Blocked
         if: ${{ steps.check.outputs.CHECK != 0 }}
-        run: echo "### Deploy Blocked (${{ inputs.deploy-target }})! :thumbsdown:" >> $GITHUB_STEP_SUMMARY
+        run: echo "### Deploy Blocked (${{ inputs.target-deploy }})! :thumbsdown:" >> $GITHUB_STEP_SUMMARY

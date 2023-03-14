@@ -12,18 +12,10 @@ on:
       target-ref:
         required: true
         type: string
-#      target-deploy:
-#        required: true
-#        type: string
-#        default: 'stg'
-        # string must be one of:
-        # 'stg' - Stage Environment
-        # 'can' - Canary Environment
-        # 'prd' - Production Environment
 
 jobs:
 
-  get-builds-artefacts:
+  get-build-artefacts:
     name: Get Build Artefacts
     timeout-minutes: 10
     runs-on: ubuntu-latest
@@ -36,15 +28,13 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      # DO FOR EACH SOLUTION
+      # Reveal-MD Solution
 
       - name: Config RMD
         id: config-rmd
         run: |
           value="$(yq '.deploy.revealmd.build.stg' 'config.yml')" || 'ERROR'
-          echo "Trigger: ${{ inputs.from-soln }}"
-          echo "Target: ${{ inputs.target-ref }}"
-          echo "$value"
+          echo "Build from config: $value"
           if [[ ${{ inputs.from-soln }} == 'dr3dr3/devops-demo' ]]; then
             echo "BUILD_RMD=${{ inputs.target-ref }}" >> $GITHUB_OUTPUT
           else
@@ -54,9 +44,8 @@ jobs:
       - name: Reveal-MD Build Artefact
         run: |
           wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ steps.config-rmd.outputs.BUILD_RMD }}/build.tar.gz"
-          tar -xvf build.tar.gz
+          tar -xzvf build.tar.gz --directory _site/slides
 
-      # need to output to _site/slides
 
 
 
@@ -64,14 +53,6 @@ jobs:
       - name: index.html
         run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Reveal-MD ${{ steps.config-rmd.outputs.BUILD_RMD }}</p></body></html>" > _site/index.html
           
-#      ### REMOVE
-#      - name: Checkout STG
-#        uses: actions/checkout@v3
-#        with:
-#          repository: 'dr3dr3/devops-demo'
-#          ref: ${{ inputs.target-ref }} ## || version as per config
-#          token: ${{ secrets.GHA_PAT }}
-
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -82,16 +63,14 @@ jobs:
   # Deploy to GitHub Pages on the Stage Repo
   deploy-to-github-pages:
     name: Deploy GHP
-    needs: [get-builds-artefacts]
+    needs: [get-build-artefacts]
     uses: dr3dr3/ss-pipeline/.github/workflows/deploy-github-pages.yml@main
     permissions:
       contents: read
       pages: write
       id-token: write
     with:
-      #target-ref: ${{ github.event.client_payload.target_ref }}
       artefact-ref: ${{ format('{0}_{1}', 'deploy', github.run_id ) }}     
-      #deploy-target: ${{ inputs.target-deploy }}
     secrets: inherit
 
 # Do different testing (smoke, PVT, etc)

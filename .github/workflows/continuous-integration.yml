@@ -93,17 +93,15 @@ jobs:
     uses: ./.github/workflows/deploy-github-pages.yml
     with:
       artefact-ref: ${{ needs.define-tag.outputs.tag }}
-      #target-ref: ${{ inputs.target-ref }}
-      #deploy-target: 'ci'     
 
-#  # Dispatch to Deploy to Stage Environment
-#  dispatch-stg:
-#    name: Dispatch STG
-#    needs: [define-tag, tag-release]
-#    uses: ./.github/workflows/continuous-deployment.yml
-#    with:
-#      target-ref: ${{ needs.define-tag.outputs.tag }}
-#      deploy-target: 'stg'
-#    secrets: inherit
+  # Dispatch to Deploy to Stage Environment
+  dispatch-stg:
+    name: Dispatch STG
+    needs: [define-tag, tag-release]
+    uses: ./.github/workflows/continuous-deployment.yml
+    with:
+      target-ref: ${{ needs.define-tag.outputs.tag }}
+      target-deploy: 'stg'
+    secrets: inherit
 
 # End of workflow
