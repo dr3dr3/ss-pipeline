@@ -45,10 +45,13 @@ jobs:
       - name: Download Build Artefact
         run: curl -sS "https://github.com/dr3dr3/devops-demo/releases/download/${{ inputs.tag }}/build.tar.gz" > build.tar.gz
 
+      - name: Extract Build Artefacts
+        run: tar -xvf build.tar.gz
+
       - name: Upload Pages artifacts
         uses: actions/upload-pages-artifact@v1
         with:
-          path: build.tar.gz
+          path: _site
           
       - name: Setup Pages
         uses: actions/configure-pages@v3
