@@ -86,14 +86,14 @@ jobs:
       feature: ${{ inputs.feature }}
     secrets: inherit
 
-#  # Deploy CI to GitHub Pages
-#  deploy-ci:
-#    name: Deploy CI
-#    needs: [tag-release]
-#    uses: ./.github/workflows/deploy-github-pages.yml
-#    with:
-#      target-ref: ${{ inputs.target-ref }}
-#      tag: ${{ inputs.target-ref }}
+  # Deploy CI to GitHub Pages
+  deploy-ci:
+    name: Deploy CI
+    needs: [tag-release]
+    uses: ./.github/workflows/deploy-github-pages.yml
+    with:
+      tag: ${{ needs.define-tag.outputs.tag }}
+      target-ref: ${{ inputs.target-ref }}
 
 #  # Dispatch to Deploy to Stage Environment
 #  dispatch-stg:
