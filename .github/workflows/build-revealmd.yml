@@ -50,11 +50,11 @@ jobs:
       - name: Copy slide template to Reveal-MD
         run: rsync -avh build-files/template.html reveal-md
         
-      - name: Copy reveal.json (configuration) to Reveal-MD
-        run: rsync -avh build-files/reveal.json reveal-md
+#      - name: Copy reveal.json (configuration) to Reveal-MD
+#        run: rsync -avh build-files/reveal.json reveal-md
 
-      - name: Copy reveal-md.json (configuration) to Reveal-MD
-        run: rsync -avh build-files/reveal-md.json reveal-md
+#      - name: Copy reveal-md.json (configuration) to Reveal-MD
+#        run: rsync -avh build-files/reveal-md.json reveal-md
 
 #      - name: Update reveal-md.json
 #        run: | 
@@ -71,11 +71,8 @@ jobs:
 
       # If this tests fail the NPM error will fail this job
       - name: Run tests from Reveal-MD
-        run: |
-          cd reveal-md
-          npm run test
-          cd ..
-
+        run: npm run test
+        
       - name: GitHub Step Summary for Test
         run: |
           cd reveal-md
