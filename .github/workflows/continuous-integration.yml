@@ -84,6 +84,7 @@ jobs:
       tag: ${{ needs.define-tag.outputs.tag }}
       target-ref: ${{ inputs.target-ref }}
       feature: ${{ inputs.feature }}
+    secrets: inherit
 
 #  # Deploy CI to GitHub Pages
 #  deploy-ci:
