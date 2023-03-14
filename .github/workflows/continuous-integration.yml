@@ -99,10 +99,10 @@ jobs:
 #  # Dispatch to Deploy to Stage Environment
 #  dispatch-stg:
 #    name: Dispatch STG
-#    needs: [tag-release]
+#    needs: [define-tag, tag-release]
 #    uses: ./.github/workflows/continuous-deployment.yml
 #    with:
-#      target-ref: ${{ inputs.target-ref }}
+#      target-ref: ${{ needs.define-tag.outputs.tag }}
 #      deploy-target: 'stg'
 #    secrets: inherit
 

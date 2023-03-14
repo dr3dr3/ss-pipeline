@@ -5,19 +5,19 @@ run-name: Continuous delivery
 on:
 
   workflow_call:
-    inputs:
-      target-soln:
-        required: true
-        type: string
-        default: 'none'
-      target-ref:
-        required: true
-        type: string
-        default: 'main'
-      deploy-target:
-        required: true
-        type: string
-        default: 'stg'
+#   inputs:
+#      target-soln:
+#        required: true
+#        type: string
+#        default: 'none'
+#      target-ref:
+#        required: true
+#        type: string
+#        default: 'main'
+#      target-deploy:
+#        required: true
+#        type: string
+#        default: 'stg'
         # string must be one of:
         # 'stg' - Stage Environment
         # 'can' - Canary Environment
@@ -31,14 +31,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      # Get GITOPS Config here
-      # Target-ref for each soln = what is in config... UNLESS provided as input
+      - name: Checkout GitOps
+        uses: actions/checkout@v3
+        with:
+          repository: 'dr3dr3/ss-gitops'
+          ref: 'main'
+          token: ${{ secrets.GHA_PAT }}
+
+      # Get target-ref as per GitOps Config
+      - name: Get Config RMD
+        id: config-rmd
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq 'deploy.revealmd.sha.stg' 'config.yml'
+
+      - name: Echo Test
+        run: echo ${{ steps.config-rmd.outpus.result }}
 
       # DO FOR EACH SOLUTION
       - name: Reveal-MD Build Artefact
         run: |
-          wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ inputs.tag }}/build.tar.gz"
+          wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ steps.config-rmd.outpus.result }}/build.tar.gz"
           tar -xvf build.tar.gz
+
+      # need to output to _site/slides
 
 
 
@@ -46,13 +62,13 @@ jobs:
       - name: index.html
         run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Deploy target ${{ inputs.deploy-target }}</p></body></html>" > _site/index.html
           
-      ### REMOVE
-      - name: Checkout STG
-        uses: actions/checkout@v3
-        with:
-          repository: 'dr3dr3/devops-demo'
-          ref: ${{ inputs.target-ref }} ## || version as per config
-          token: ${{ secrets.GHA_PAT }}
+#      ### REMOVE
+#      - name: Checkout STG
+#        uses: actions/checkout@v3
+#        with:
+#          repository: 'dr3dr3/devops-demo'
+#          ref: ${{ inputs.target-ref }} ## || version as per config
+#          token: ${{ secrets.GHA_PAT }}
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
@@ -71,9 +87,9 @@ jobs:
       pages: write
       id-token: write
     with:
-      target-ref: ${{ github.event.client_payload.target_ref }}
+      #target-ref: ${{ github.event.client_payload.target_ref }}
       artefact-ref: ${{ format('{0}_{1}', 'deploy', github.run_id ) }}     
-      deploy-target: ${{ inputs.deploy-target }}
+      #deploy-target: ${{ inputs.target-deploy }}
     secrets: inherit
 
 # Do different testing (smoke, PVT, etc)
