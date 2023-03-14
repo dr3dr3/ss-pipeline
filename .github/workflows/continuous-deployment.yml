@@ -25,6 +25,11 @@ on:
   # Need to ensure build artefact is here... as "build once, deploy many"
   workflow_dispatch:
     inputs:
+      from-soln:
+        description: 'Solution Repo'
+        required: true
+        default: 'dr3dr3/devops-demo'
+        type: string
       target-ref:
         description: 'Tag or Main'
         required: true
