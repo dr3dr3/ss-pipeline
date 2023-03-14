@@ -80,7 +80,7 @@ jobs:
   # Deploy to GitHub Pages on the Stage Repo
   deploy-to-github-pages:
     name: Deploy GHP
-    needs: [compile]
+    needs: [get-builds-artefacts]
     uses: dr3dr3/ss-pipeline/.github/workflows/deploy-github-pages.yml@main
     permissions:
       contents: read
