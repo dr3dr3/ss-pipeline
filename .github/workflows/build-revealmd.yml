@@ -50,17 +50,6 @@ jobs:
       - name: Copy slide template to Reveal-MD
         run: rsync -avh build-files/template.html reveal-md
         
-#      - name: Copy reveal.json (configuration) to Reveal-MD
-#        run: rsync -avh build-files/reveal.json reveal-md
-
-#      - name: Copy reveal-md.json (configuration) to Reveal-MD
-#        run: rsync -avh build-files/reveal-md.json reveal-md
-
-#      - name: Update reveal-md.json
-#        run: | 
-#          jq '.theme = "moon"' reveal-md/reveal-md.json > reveal-md.json
-#          rsync -avh reveal-md.json reveal-md
-        
       - name: Copy version slide to Reveal-MD
         run: rsync -avh build-files/version.md reveal-md/markdown/version.md
 
@@ -79,6 +68,19 @@ jobs:
           echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
           echo "$(npm run test)" >> $GITHUB_STEP_SUMMARY
           cd ..
+
+      ### NOTE: Reveal.json and Reveal-md.json not passing tests but still working
+
+      - name: Copy reveal.json (configuration) to Reveal-MD
+        run: rsync -avh build-files/reveal.json reveal-md
+
+      - name: Copy reveal-md.json (configuration) to Reveal-MD
+        run: rsync -avh build-files/reveal-md.json reveal-md
+
+      - name: Update reveal-md.json
+        run: | 
+          jq '.theme = "moon"' reveal-md/reveal-md.json > reveal-md.json
+          rsync -avh reveal-md.json reveal-md
 
       - name: Run Reveal-MD build
         run: |
