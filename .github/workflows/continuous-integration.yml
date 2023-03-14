@@ -89,7 +89,7 @@ jobs:
   # Deploy CI to GitHub Pages
   deploy-ci:
     name: Deploy CI
-    needs: [tag-release]
+    needs: [define-tag, tag-release]
     uses: ./.github/workflows/deploy-github-pages.yml
     with:
       tag: ${{ needs.define-tag.outputs.tag }}
