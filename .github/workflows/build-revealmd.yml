@@ -87,9 +87,9 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ format('{0}_{1}', 'build', inputs.artefact-ref ) }}
+          name: ${{ inputs.artefact-ref }}
           path: reveal-md/_site
-          retention-days: 7
+          retention-days: 1
 
   job-check:
     name: Jobs Check

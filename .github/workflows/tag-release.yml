@@ -27,9 +27,18 @@ jobs:
           repository: ${{ github.repository }}
           ref: ${{ inputs.target-ref }}
           token: ${{ secrets.GHA_PAT }}
+
+      - name: Download Build Artefacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.tag }}
+          path: _site
+
+      - name: Bundle Artefacts
+        run: tar czf build.tar.gz _site
       
       - name: GitHub Release
-        run: gh release create "${{ inputs.tag }}" --target ${{ inputs.target-ref }} --title ${{ inputs.feature }} --notes "Get from issue"
+        run: gh release create "${{ inputs.tag }}" "./build.tar.gz#Build-Artefact" --target ${{ inputs.target-ref }} --title ${{ inputs.feature }} --notes "Get from issue"
         env:
           GH_TOKEN: ${{ secrets.GHA_PAT }}
 
