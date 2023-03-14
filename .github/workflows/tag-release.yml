@@ -36,7 +36,7 @@ jobs:
           path: _site
 
       - name: Bundle Artefacts
-        run: tar czf build.tar.gz _site
+        run: tar -cvzf build.tar.gz _site
       
       - name: GitHub Release
         run: gh release create "${{ inputs.tag }}" "./build.tar.gz#Build-Artefact" --target "${{ inputs.target-ref }}" --title "${{ inputs.tag }}" --notes "${{ inputs.tag }}"
