@@ -34,19 +34,11 @@ jobs:
       # Get GITOPS Config here
       # Target-ref for each soln = what is in config... UNLESS provided as input
 
-      - name: Checkout RMD
-        uses: actions/checkout@v3
-        with:
-          repository: 'dr3dr3/devops-demo'
-          ref: ${{ inputs.target-ref }} ## || version as per config
-          token: ${{ secrets.GHA_PAT }}
-
-      # Reveal-MD Slides
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ format('{0}_{1}', 'build', 'revealmd') }}
-          path: _site/slides
+      # DO FOR EACH SOLUTION
+      - name: Reveal-MD Build Artefact
+        run: |
+          wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ inputs.tag }}/build.tar.gz"
+          tar -xvf build.tar.gz
 
       # Add placeholder index.html
       - name: index.html
@@ -55,9 +47,9 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', 'compiled') }}
+          name: ${{ format('{0}_{1}', 'deploy', github.run_id ) }}
           path: _site
-          retention-days: 2
+          retention-days: 1
 
   # Deploy to GitHub Pages on the Stage Repo
   deploy-to-github-pages:
@@ -70,7 +62,7 @@ jobs:
       id-token: write
     with:
       target-ref: ${{ github.event.client_payload.target_ref }}
-      artefact-ref: 'compiled'      
+      artefact-ref: ${{ format('{0}_{1}', 'deploy', github.run_id ) }}     
       deploy-target: ${{ inputs.deploy-target }}
     secrets: inherit
 

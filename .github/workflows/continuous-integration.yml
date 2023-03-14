@@ -92,8 +92,9 @@ jobs:
     needs: [define-tag, tag-release]
     uses: ./.github/workflows/deploy-github-pages.yml
     with:
-      tag: ${{ needs.define-tag.outputs.tag }}
+      artefact-ref: ${{ needs.define-tag.outputs.tag }}
       target-ref: ${{ inputs.target-ref }}
+      deploy-target: 'ci'     
 
 #  # Dispatch to Deploy to Stage Environment
 #  dispatch-stg:
