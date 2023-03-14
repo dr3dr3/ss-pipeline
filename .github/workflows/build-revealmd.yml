@@ -10,11 +10,6 @@ on:
       artefact-ref:
         required: true
         type: string        
-      deploy-target:
-        required: true
-        type: string
-        # values: 'ci', 'stg', 'prd' (do we need one for Canary?)
-        default: 'ci'
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -31,16 +26,9 @@ jobs:
       - name: Checkout Soln Repo
         uses: actions/checkout@v3
         with:
-          repository: 'dr3dr3/devops-demo'
+          repository: ${{ github.repository }}
           ref: ${{ inputs.target-ref }}
           token: ${{ secrets.GHA_PAT }}
-
-      - name: Get latest commit SHA
-        id: commit-sha
-        run: |
-          commitsha="$(git log -n 1 --pretty=format:"%H")" || 0
-          echo "Last commit SHA: $commitsha"
-          echo "SHA=$commitsha" >> $GITHUB_OUTPUT
 
       - name: Setup Node.JS
         uses: actions/setup-node@v3
@@ -53,7 +41,7 @@ jobs:
       - name: Install Reveal-MD
         run: |
           cd reveal-md
-          npm install -g reveal-md
+          npm install
           cd ..
 
       - name: Copy markdown files to Reveal-MD
@@ -68,58 +56,43 @@ jobs:
       - name: Copy reveal-md.json (configuration) to Reveal-MD
         run: rsync -avh build-files/reveal-md.json reveal-md
 
-      - name: Update reveal-md.json for Stage
-        if: ${{ inputs.deploy-target == 'stg' }}
-        run: | 
-          jq '.theme = "serif"' reveal-md/reveal-md.json > reveal-md.json
-          rsync -avh reveal-md.json reveal-md
-        
-      - name: Update reveal-md.json for Canary
-        if: ${{ inputs.deploy-target == 'can' }}
-        run: | 
-          jq '.theme = "moon"' reveal-md/reveal-md.json > reveal-md.json
-          rsync -avh reveal-md.json reveal-md
-        
-      - name: Update reveal-md.json for Production
-        if: ${{ inputs.deploy-target == 'prd' }}
-        run: | 
-          jq '.theme = "sky"' reveal-md/reveal-md.json > reveal-md.json
-          rsync -avh reveal-md.json reveal-md
+#      - name: Update reveal-md.json
+#        run: | 
+#          jq '.theme = "moon"' reveal-md/reveal-md.json > reveal-md.json
+#          rsync -avh reveal-md.json reveal-md
         
       - name: Copy version slide to Reveal-MD
-        run: rsync -avh ${{ format('{0}{1}{2}', 'build-files/version-', inputs.deploy-target, '.md') }} reveal-md/markdown/version.md
+        run: rsync -avh build-files/version.md reveal-md/markdown/version.md
 
       - name: Add version and build date
         run: |
-          echo -e "Build Commit SHA: ${{ steps.commit-sha.outputs.SHA }} \n" >> reveal-md/markdown/version.md
-          echo -e "Build Date/Time Stamp: $(date +%F-%T) \n" >> reveal-md/markdown/version.md
+          echo -e "Target Ref: ${{ inputs.target-ref }} \n" >> reveal-md/markdown/version.md
+          echo -e "Build Date/Time Stamp: $(date '+%Y.%m.%d.%H.%M') \n" >> reveal-md/markdown/version.md
 
-#      # If this tests fail the NPM error will fail this job
-#      - name: Run tests from Reveal-MD
-#        run: |
-#          cd reveal-md
-#          npm run test
-#          cd ..
+      # If this tests fail the NPM error will fail this job
+      - name: Run tests from Reveal-MD
+        run: |
+          cd reveal-md
+          npm run test
+          cd ..
 
-#      - name: GitHub Step Summary for Test
-#        run: |
-#          cd reveal-md
-#          echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
-#          echo "$(npm run test)" >> $GITHUB_STEP_SUMMARY
-#          cd ..
+      - name: GitHub Step Summary for Test
+        run: |
+          cd reveal-md
+          echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "$(npm run test)" >> $GITHUB_STEP_SUMMARY
+          cd ..
 
       - name: Run Reveal-MD build
         run: |
-          cd reveal-md
-          reveal-md --static _site --template template.html --glob 'markdown/*.md'
-          cd ..
+          npm run build
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', inputs.artefact-ref) }}
+          name: ${{ format('{0}_{1}', 'build', inputs.artefact-ref ) }}
           path: reveal-md/_site
-          retention-days: 1
+          retention-days: 7
 
   job-check:
     name: Jobs Check
@@ -138,9 +111,9 @@ jobs:
       - name: GitHub Step Summary for Job success
         run: |
           echo "### Workflow Jobs Completed" >> $GITHUB_STEP_SUMMARY
-          echo "Success is ${{steps.setoutput.outputs.SUCCESS}}" >> $GITHUB_STEP_SUMMARY
 
   build-check:
+    # Used where raise PR to merge to Main. Used in branch protection settings. 
     name: Build PR Check
     runs-on: ubuntu-latest
     if: always() # always run, so we never skip the check

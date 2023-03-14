@@ -1,0 +1,37 @@
+# Add release and tag in GitHub for commits on Main
+name: TAG-RELEASE
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+      target-ref:
+        required: true
+        type: string
+      feature:
+        required: true
+        type: string
+
+jobs:
+  tag-release:
+    name: Tag Release
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Soln Repo
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ inputs.target-ref }}
+          token: ${{ secrets.GHA_PAT }}
+      
+      - name: GitHub Release
+        run: gh release create "${{ inputs.tag }}" --target ${{ inputs.target-ref }} --title ${{ inputs.feature }} --body "Get from issue"
+        env:
+          GH_TOKEN: ${{ secrets.GHA_PAT }}
+
+### ADD: Upload build artefacts to release (will use in deploys). First need to download build artefacts.
+### ADD: Get release notes from related issue (if issue ID in commit message) and put into body of release

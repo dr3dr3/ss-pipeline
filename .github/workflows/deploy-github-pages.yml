@@ -11,11 +11,6 @@ on:
       artefact-ref:
         required: true
         type: string
-      deploy-target:
-        required: true
-        type: string
-        default: 'ci'
-        # values: 'ci', 'stg', 'can', 'prd'
      
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
@@ -42,15 +37,16 @@ jobs:
 
       - name: Checkout 🛎️
         uses: actions/checkout@v3
-#        with:
-#          repository: 'dr3dr3/devops-demo'
-#          ref: 'main'
-#          token: ${{ github.token }}
+        with:
+          repository: 'dr3dr3/devops-demo'
+          ref: ${{ inputs.target-ref }}
+          token: ${{ github.token }}
 
+      ### REMOVE: Replace with download artefacts attached to release. Could also remove checkout.
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', inputs.artefact-ref) }}
+          name: ${{ format('{0}_{1}', 'build', inputs.artefact-ref ) }}
           path: _site
 
       - name: Upload Pages artifacts

@@ -6,9 +6,14 @@ on:
 
   workflow_call:
     inputs:
+      target-soln:
+        required: true
+        type: string
+        default: 'none'
       target-ref:
         required: true
         type: string
+        default: 'main'
       deploy-target:
         required: true
         type: string
@@ -20,31 +25,27 @@ on:
 
 jobs:
 
-  # Build static site using Reveal-MD
-  build:
-    name: Build
-    uses: dr3dr3/ss-pipeline/.github/workflows/build-revealmd.yml@main
-    with: 
-      target-ref: ${{ github.event.client_payload.target_ref }}
-      artefact-ref: 'revealmd'
-      deploy-target: ${{ inputs.deploy-target }}
-    secrets: inherit
-
-  compile:
-    name: Compile
-    needs: [build]
+  get-builds-artefacts:
+    name: Get Build Artefacts
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
 
-      - name: Checkout 🛎️
+      # Get GITOPS Config here
+      # Target-ref for each soln = what is in config... UNLESS provided as input
+
+      - name: Checkout RMD
         uses: actions/checkout@v3
+        with:
+          repository: 'dr3dr3/devops-demo'
+          ref: ${{ inputs.target-ref }} ## || version as per config
+          token: ${{ secrets.GHA_PAT }}
 
       # Reveal-MD Slides
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ${{ format('{0}-{1}_{2}', inputs.deploy-target, 'build', 'revealmd') }}
+          name: ${{ format('{0}_{1}', 'build', 'revealmd') }}
           path: _site/slides
 
       # Add placeholder index.html
@@ -72,3 +73,7 @@ jobs:
       artefact-ref: 'compiled'      
       deploy-target: ${{ inputs.deploy-target }}
     secrets: inherit
+
+# Do different testing (smoke, PVT, etc)
+# If pass... trigger next environment
+# But firstly update config for version of solution that has updated

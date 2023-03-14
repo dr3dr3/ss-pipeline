@@ -6,32 +6,46 @@ on:
   # Called from solution repo on pull request event
   workflow_call:
     inputs:
-      ss-solution:
+      feature: # Name of feature (for this short-lived change)
         required: true
         type: string
-        # string must be one of:
-        # 'reveal-md'
-        # 'dora-metrix'
-      slfb: # Short-lived Feature Branch name
+      target-ref:
         required: true
         type: string
 
 jobs:
 
+  define-tag:
+    name: Define Tag
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.setoutput.outputs.TAG }}
+    steps:
+      
+      - name: Output Tag
+        id: setoutput
+        run: |
+          build="BUILD-$(date '+%Y.%m.%d.%H.%M')" || 'ERROR'
+          echo "$build"
+          echo "TAG=$build" >> $GITHUB_OUTPUT          
+
   # Build static site using Reveal-MD
   build-revealmd:
-    name: Build R-MD
-    if: ${{ inputs.ss-solution == 'reveal-md' }}
+    name: Build RMD
+    needs: [define-tag]
+    if: ${{ github.repository == 'dr3dr3/devops-demo' }}
     uses: ./.github/workflows/build-revealmd.yml
     secrets: inherit
     with: 
-      target-ref: ${{ github.sha }}
-      artefact-ref: ${{ github.sha }}
-      deploy-target: 'ci'
+      target-ref: ${{ inputs.target-ref }}
+      artefact-ref: ${{ needs.define-tag.outputs.tag }}
+
+  # Other solutions builds here
 
   # Check builds ok. Is a required check on the PR (setup in GitHub). 
-  merge-ready:
-    name: Ready for Merge
+  builds-complete:
+    name: Builds Completed
     needs: [build-revealmd] ### ADD MORE SS SOLUTIONS
     if: |
       always() &&
@@ -40,13 +54,13 @@ jobs:
     runs-on: ubuntu-latest 
     steps:
       - name: Ready message
-        run: echo "### Merge Ready :thumbsup:" >> $GITHUB_STEP_SUMMARY     
+        run: echo "### Builds Completed :thumbsup:" >> $GITHUB_STEP_SUMMARY     
 
   # Merge PR. GitHub setup to delete SLFB after merge completed.
   pr-merge: 
     name: PR Merge
-    needs: [merge-ready]
-    if: ${{ github.event_name != 'workflow_dispatch' }}
+    needs: [builds-complete]
+    if: ${{ github.event_name == 'ON-PR-APPROVED' }}
     runs-on: ubuntu-latest
     steps:
 
@@ -56,30 +70,38 @@ jobs:
       - name: Merge Pull Request
         run: gh pr merge ${{ inputs.slfb }} --squash --subject "${{ inputs.slfb }}" --body "Short-lived feature branch ${{ inputs.slfb }} automerged by GitHub Action" --auto
         env:
-          GH_TOKEN: ${{ secrets.PR_MERGE }}
+          GH_TOKEN: ${{ secrets.PR_MERGE }} ### MAYBE CHANGE TO GHA_PAT?
 
       - name: GitHub Step Summary
         run: echo "### PR Merge Success! :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
-  # Deploy CI to GitHub Pages
-  # Only run if workflow trigger was not workflow_dispatch (needs: pr-merge)
-  deploy-ci:
-    name: Deploy CI
-    needs: [pr-merge]
-    uses: ./.github/workflows/deploy-github-pages.yml
+  ## TAG RELEASE
+  tag-release:
+    name: Tag Release
+    needs: [define-tag, builds-complete]
+    uses: ./.github/workflows/tag-release.yml
     with:
-      target-ref: 'main'
-      artefact-ref: ${{ github.sha }}
-      deploy-target: 'ci'
+      tag: ${{ needs.define-tag.outputs.tag }}
+      target-ref: ${{ inputs.target-ref }}
+      feature: ${{ inputs.feature }}
 
-  # Dispatch to Deploy to Stage Environment
-  dispatch-stg:
-    name: Dispatch STG
-    needs: [merge-ready]
-    uses: ./.github/workflows/continuous-deployment.yml
-    with:
-      target-ref: 'main'
-      deploy-target: 'stg'
-    secrets: inherit
+#  # Deploy CI to GitHub Pages
+#  deploy-ci:
+#    name: Deploy CI
+#    needs: [tag-release]
+#    uses: ./.github/workflows/deploy-github-pages.yml
+#    with:
+#      target-ref: ${{ inputs.target-ref }}
+#      tag: ${{ inputs.target-ref }}
+
+#  # Dispatch to Deploy to Stage Environment
+#  dispatch-stg:
+#    name: Dispatch STG
+#    needs: [tag-release]
+#    uses: ./.github/workflows/continuous-deployment.yml
+#    with:
+#      target-ref: ${{ inputs.target-ref }}
+#      deploy-target: 'stg'
+#    secrets: inherit
 
 # End of workflow
