@@ -39,7 +39,7 @@ jobs:
         run: tar -cvzf build.tar.gz _site
       
       - name: GitHub Release
-        run: gh release create "${{ inputs.tag }}" "./build.tar.gz#Build-Artefact" --target "${{ inputs.target-ref }}" --title "${{ inputs.tag }}" --notes "${{ inputs.tag }}"
+        run: gh release create "${{ inputs.tag }}" "./build.tar.gz#Build-Artefact" --target "${{ inputs.target-ref }}" --title "${{ inputs.tag }}" --notes "${{ inputs.feature }}"
         env:
           GH_TOKEN: ${{ secrets.GHA_PAT }}
 

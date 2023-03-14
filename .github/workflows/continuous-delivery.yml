@@ -44,6 +44,7 @@ jobs:
       - name: Reveal-MD Build Artefact
         run: |
           wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ steps.config-rmd.outputs.BUILD_RMD }}/build.tar.gz"
+          mkdir _site/slides
           tar -xzvf build.tar.gz --directory _site/slides
 
 
