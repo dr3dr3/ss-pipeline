@@ -43,7 +43,7 @@ jobs:
         id: config-rmd
         uses: mikefarah/yq@master
         with:
-          cmd: yq 'deploy.revealmd.build.stg' 'config.yml'
+          cmd: yq '.deploy.revealmd.build.stg' 'config.yml'
 
       - name: Echo Test
         run: echo ${{ steps.config-rmd.outpus.result }}
