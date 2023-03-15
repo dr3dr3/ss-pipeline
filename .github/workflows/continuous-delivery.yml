@@ -44,13 +44,12 @@ jobs:
       - name: Reveal-MD Build Artefact
         run: |
           wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ steps.config-rmd.outputs.BUILD_RMD }}/build.tar.gz"
-          mkdir _site/slides
-          tar -xzvf build.tar.gz --directory _site/slides
+          tar -xzvf build.tar.gz
 
 
 
 
-      # Add placeholder index.html
+      # Add placeholder index.html (overwrites index.html created by Reveal-MD)
       - name: index.html
         run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Reveal-MD ${{ steps.config-rmd.outputs.BUILD_RMD }}</p></body></html>" > _site/index.html
           

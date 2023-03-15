@@ -68,7 +68,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}         
         run: |
-          issues="$(gh issue list --label "deploy-paused" --state open)" || 0
+          issues="$(gh issue list --label "status-deploy-paused" --state open)" || 0
           echo "$issues"
           echo "CHECK=$issues" >> $GITHUB_OUTPUT
 

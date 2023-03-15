@@ -96,7 +96,7 @@ jobs:
 
   # Dispatch to Deploy to Stage Environment
   dispatch-stg:
-    name: Dispatch STG
+    name: Dispatch to Stage
     needs: [define-tag, tag-release]
     uses: ./.github/workflows/continuous-deployment.yml
     with:
