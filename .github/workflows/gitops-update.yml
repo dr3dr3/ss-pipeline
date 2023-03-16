@@ -37,8 +37,9 @@ jobs:
           token: ${{ secrets.GHA_PAT }}
 
       - name: Update config yaml
-        if: ${{ startsWith( inputs.config-item, '.deploy.revealmd.build.stg') }}
-        run: yq -i '.${{ inputs.config-item }} = "${{ inputs.config-value }}"' config.yml
+        if: ${{ startsWith( inputs.config-item, '.deploy.revealmd.build.stg') }} 
+        #  && endsWith( github.repository, vars.GHP_ENV)
+        run: yq -i '${{ inputs.config-item }} = "${{ inputs.config-value }}"' config.yml
 
       - name: Commit Changes
         if: ${{ success() }}
