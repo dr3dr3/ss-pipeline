@@ -41,8 +41,8 @@ jobs:
 
       - name: Commit Changes
         run: |
-          git config --global user.email "1818388+dr3dr3@users.noreply.github.com"
-          git config --global user.name "GHA GitOps Update"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           git add config.yml
           git commit -m "Config.yml updated for ${{ inputs.config-item }} to value ${{ inputs.config-value }} by ${{ github.actor }}"
           git push
