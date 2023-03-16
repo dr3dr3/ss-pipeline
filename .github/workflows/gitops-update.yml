@@ -38,7 +38,7 @@ jobs:
           token: ${{ secrets.GHA_PAT }}
 
       - name: Update config of build for continuous delivery
-        if: ${{ startsWith( inputs.config-item, '.deploy.revealmd.build.stg' ) && endsWith( github.repository, vars.GHP_ENV ) }} 
+        if: ${{ startsWith( inputs.config-item, '.deploy.revealmd.build' ) && endsWith( github.repository, vars.GHP_ENV ) }} 
         run: yq -i '${{ inputs.config-item }} = "${{ inputs.config-value }}"' config.yml
 
       - name: Manual update config by dr3dr3
