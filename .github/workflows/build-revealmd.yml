@@ -69,7 +69,7 @@ jobs:
           echo "$(npm run test)" >> $GITHUB_STEP_SUMMARY
           cd ..
 
-      ### NOTE: Reveal.json and Reveal-md.json not passing tests but still working
+      ### NOTE: Reveal.json and Reveal-md.json not passing tests but still working (so run these steps post reveal-md tests)
 
       - name: Copy reveal.json (configuration) to Reveal-MD
         run: rsync -avh build-files/reveal.json reveal-md
@@ -79,7 +79,7 @@ jobs:
 
       - name: Update reveal-md.json
         run: | 
-          jq '.theme = "moon"' reveal-md/reveal-md.json > reveal-md.json
+          jq '.theme = "serif"' reveal-md/reveal-md.json > reveal-md.json
           rsync -avh reveal-md.json reveal-md
 
       - name: Run Reveal-MD build

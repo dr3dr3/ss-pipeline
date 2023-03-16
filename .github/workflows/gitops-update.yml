@@ -1,0 +1,29 @@
+# Update config held in GitOps Repository
+name: GITOPS-UPDATE
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+      target-ref:
+        required: true
+        type: string
+      feature:
+        required: true
+        type: string
+
+jobs:
+  update-config:
+    name: Tag Release
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout GitOps
+        uses: actions/checkout@v3
+        with:
+          repository: 'dr3dr3/ss-gitops'
+          ref: 'main'
+          token: ${{ secrets.GHA_PAT }}
