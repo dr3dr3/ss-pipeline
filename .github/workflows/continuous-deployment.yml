@@ -50,7 +50,7 @@ jobs:
 
   # Dispatch send to trigger deployment
   dispatcher:
-    name: Dispatcher
+    name: 📨
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:

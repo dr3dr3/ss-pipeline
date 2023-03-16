@@ -15,8 +15,8 @@ on:
 
 jobs:
 
-  define-tag:
-    name: Define Tag
+  set-tag:
+    name: Set Tag
     timeout-minutes: 10
     runs-on: ubuntu-latest
     outputs:
@@ -32,20 +32,20 @@ jobs:
 
   # Build static site using Reveal-MD
   build-revealmd:
-    name: Build RMD
-    needs: [define-tag]
+    name: RMD
+    needs: [set-tag]
     if: ${{ github.repository == 'dr3dr3/devops-demo' }}
     uses: ./.github/workflows/build-revealmd.yml
     secrets: inherit
     with: 
       target-ref: ${{ inputs.target-ref }}
-      artefact-ref: ${{ needs.define-tag.outputs.tag }}
+      artefact-ref: ${{ needs.set-tag.outputs.tag }}
 
   # Other solutions builds here
 
   # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-complete:
-    name: Builds Completed
+    name: Builds👍
     needs: [build-revealmd] ### ADD MORE SS SOLUTIONS
     if: |
       always() &&
@@ -77,31 +77,31 @@ jobs:
 
   ## TAG RELEASE
   tag-release:
-    name: Tag Release
-    needs: [define-tag, builds-complete]
+    name: 🔖
+    needs: [set-tag, builds-complete]
     uses: ./.github/workflows/tag-release.yml
     with:
-      tag: ${{ needs.define-tag.outputs.tag }}
+      tag: ${{ needs.set-tag.outputs.tag }}
       target-ref: ${{ inputs.target-ref }}
       feature: ${{ inputs.feature }}
     secrets: inherit
 
   # Deploy CI to GitHub Pages
   deploy-ci:
-    name: Deploy CI
-    needs: [define-tag, tag-release]
+    name: CI
+    needs: [set-tag, tag-release]
     uses: ./.github/workflows/deploy-github-pages.yml
     with:
-      artefact-ref: ${{ needs.define-tag.outputs.tag }}
+      artefact-ref: ${{ needs.set-tag.outputs.tag }}
 
   # Dispatch to Deploy to Stage Environment
   dispatch-stg:
-    name: Dispatch to Stage
-    needs: [define-tag, tag-release]
+    name: STG
+    needs: [set-tag, tag-release]
     uses: ./.github/workflows/continuous-deployment.yml
     with:
       from-soln: ${{ github.repository }}
-      target-ref: ${{ needs.define-tag.outputs.tag }}
+      target-ref: ${{ needs.set-tag.outputs.tag }}
       target-deploy: 'stg'
     secrets: inherit
 

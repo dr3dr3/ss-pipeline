@@ -18,7 +18,7 @@ permissions:
 jobs:
   # Build static site using Reveal-MD
   build:
-    name: Build
+    name: 🔨 Build
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -94,7 +94,7 @@ jobs:
           retention-days: 1
 
   job-check:
-    name: Jobs Check
+    name: Jobs👍
     needs: [build]
     runs-on: ubuntu-latest
     if: success() # only run when all shards have passed
@@ -113,7 +113,7 @@ jobs:
 
   build-check:
     # Used where raise PR to merge to Main. Used in branch protection settings. 
-    name: Build PR Check
+    name: Build👍
     runs-on: ubuntu-latest
     if: always() # always run, so we never skip the check
     needs: [build, job-check]

@@ -30,21 +30,13 @@ concurrency:
 jobs:
 
   deploy:
-    name: Deploy 🚀
+    name: 🚀
     timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-
-#      ### REMOVE
-#      - name: Checkout 🛎️
-#        uses: actions/checkout@v3
-#        with:
-#          repository: ${{ format('{0}-{1}', 'dr3dr3/devops-demo', inputs.deploy-target) }} || 'dr3dr3/devops-demo'
-#          ref: ${{ inputs.target-ref }}
-#          token: ${{ github.token }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v3
