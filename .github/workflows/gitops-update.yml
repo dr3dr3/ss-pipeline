@@ -37,9 +37,11 @@ jobs:
           token: ${{ secrets.GHA_PAT }}
 
       - name: Update config yaml
+        if: ${{ startsWith( inputs.config-item, '.deploy.revealmd.build.stg') }}
         run: yq -i '.${{ inputs.config-item }} = "${{ inputs.config-value }}"' config.yml
 
       - name: Commit Changes
+        if: ${{ success() }}
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
