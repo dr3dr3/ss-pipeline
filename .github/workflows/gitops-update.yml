@@ -39,8 +39,8 @@ jobs:
       - name: Update config yaml
         run: yq -i '.${{ inputs.config-item }} = "${{ inputs.config-value }}"' config.yml
 
-      - name: Test
-        id: test
+      - name: Commit Changes
         run: |
-          value="$(yq '.${{ inputs.config-item }}' 'config.yml')" || 'ERROR'
-          echo "Build from config: $value"
+          git add config.yml
+          git commit -m "Config.yml updated for ${{ inputs.config-item }} to value ${{ inputs.config-value }} by ${{ github.actor }}"
+          git push
