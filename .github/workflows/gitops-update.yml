@@ -1,5 +1,6 @@
 # Update config held in GitOps Repository
 name: GITOPS-UPDATE
+run-name: GitOps Configuration Update by ${{ github.actor }}
 
 on:
   workflow_call:
@@ -36,9 +37,12 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      - name: Update config yaml
-        if: ${{ startsWith( inputs.config-item, '.deploy.revealmd.build.stg') }} 
-        #  && endsWith( github.repository, vars.GHP_ENV)
+      - name: Update config of build for continuous delivery
+        if: ${{ startsWith( inputs.config-item, '.deploy.revealmd.build.stg' ) && endsWith( github.repository, vars.GHP_ENV ) }} 
+        run: yq -i '${{ inputs.config-item }} = "${{ inputs.config-value }}"' config.yml
+
+      - name: Manual update config by dr3dr3
+        if: ${{ github.actor == 'dr3dr3' }} 
         run: yq -i '${{ inputs.config-item }} = "${{ inputs.config-value }}"' config.yml
 
       - name: Commit Changes
