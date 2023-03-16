@@ -24,7 +24,7 @@ on:
 
 jobs:
   update-config:
-    name: Tag Release
+    name: Update GitOps Config
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +37,7 @@ jobs:
           token: ${{ secrets.GHA_PAT }}
 
       - name: Update config yaml
-        run: yq -i ".${{ inputs.config-item }} = ${{ inputs.config-value }}" config.yml
+        run: yq -i '.${{ inputs.config-item }} = "${{ inputs.config-value }}"' config.yml
 
       - name: Test
         id: test
