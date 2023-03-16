@@ -4,13 +4,21 @@ name: GITOPS-UPDATE
 on:
   workflow_call:
     inputs:
-      tag:
+      config-item:
         required: true
         type: string
-      target-ref:
+      config-value:
         required: true
         type: string
-      feature:
+
+  workflow_dispatch:
+    inputs:
+      config-item:
+        description: Configuration Item
+        required: true
+        type: string
+      config-value:
+        description: Configuration Item
         required: true
         type: string
 
@@ -27,3 +35,12 @@ jobs:
           repository: 'dr3dr3/ss-gitops'
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
+
+      - name: Update config yaml
+        run: yq -i "${{ inputs.config-item }} = ${{ inputs.config-value }}" config.yml
+
+      - name: Test
+        id: test
+        run: |
+          value="$(yq '.${{ inputs.config-item }}' 'config.yml')" || 'ERROR'
+          echo "Build from config: $value"

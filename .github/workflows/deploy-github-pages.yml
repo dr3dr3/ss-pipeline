@@ -8,13 +8,6 @@ on:
       artefact-ref:
         required: true
         type: string
-#      target-ref:
-#        required: true
-#        type: string
-#      deploy-target:
-#        required: false
-#        type: string
-     
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:

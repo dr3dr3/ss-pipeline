@@ -88,7 +88,7 @@ jobs:
 
   # Deploy CI to GitHub Pages
   deploy-ci:
-    name: CI
+    name: Deploy CI
     needs: [set-tag, tag-release]
     uses: ./.github/workflows/deploy-github-pages.yml
     with:
@@ -96,7 +96,7 @@ jobs:
 
   # Dispatch to Deploy to Stage Environment
   dispatch-stg:
-    name: STG
+    name: Dispatch STG
     needs: [set-tag, tag-release]
     uses: ./.github/workflows/continuous-deployment.yml
     with:

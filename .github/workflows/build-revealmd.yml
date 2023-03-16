@@ -79,7 +79,7 @@ jobs:
 
       - name: Update reveal-md.json
         run: | 
-          jq '.theme = "serif"' reveal-md/reveal-md.json > reveal-md.json
+          jq '.theme = "moon"' reveal-md/reveal-md.json > reveal-md.json
           rsync -avh reveal-md.json reveal-md
 
       - name: Run Reveal-MD build
