@@ -32,8 +32,8 @@ jobs:
       - name: Get project data
         env:
           GITHUB_TOKEN: ${{ secrets.PROJECT_OPS }}
-          ORGANIZATION: 'datafaced'
-          PROJECT_NUMBER: 1
+          ORGANIZATION: 'dr3dr3'
+          PROJECT_NUMBER: 2
         run: |
           gh api graphql -f query='
             query($org: String!, $number: Int!) {
