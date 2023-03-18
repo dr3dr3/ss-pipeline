@@ -31,7 +31,7 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      # Reveal-MD Solution
+      ### Reveal-MD Solution
 
       - name: Config RMD
         id: config-rmd
@@ -54,7 +54,7 @@ jobs:
 
       # Add placeholder index.html (overwrites index.html created by Reveal-MD)
       - name: index.html
-        run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Reveal-MD ${{ steps.config-rmd.outputs.BUILD_RMD }}</p></body></html>" > _site/index.html
+        run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Reveal-MD ${{ steps.config-rmd.outputs.BUILD_RMD }}</p><p>Environment = ${{ inputs.target-deploy }}</p></body></html>" > _site/index.html
           
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
