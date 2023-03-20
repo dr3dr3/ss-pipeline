@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
     inputs:
       target-deploy:
-        description: 'Deployment target'
+        description: 'Deployment Target'
         required: true
         default: 'stg'
         type: choice
@@ -26,7 +26,6 @@ on:
         - stg
         - can
         - prd
-
 
 jobs:
 

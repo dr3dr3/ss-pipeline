@@ -1,5 +1,4 @@
 name: CONTINUOUS-INTEGRATION
-run-name: Continuous Integration - Triggered by ${{ github.event_name }}
 
 on:
 
@@ -10,13 +9,6 @@ on:
         required: true
         type: string
       target-ref:
-        required: true
-        type: string
-
-  workflow_dispatch:
-    inputs:
-      target-ref:
-        description: 'Target Commit SHA or Tag'
         required: true
         type: string
 

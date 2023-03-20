@@ -1,6 +1,5 @@
 # Deploy static site to GitHub Pages
 name: DEPLOY-GITHUB-PAGES
-run-name: Deploying static site to GitHub Pages
 
 on:
   workflow_call:

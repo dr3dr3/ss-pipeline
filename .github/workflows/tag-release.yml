@@ -17,7 +17,6 @@ on:
 jobs:
   tag-release:
     name: Release
-    if: ${{ github.event_name != 'workflow_dispatch' }}
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:

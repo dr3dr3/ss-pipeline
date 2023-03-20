@@ -32,12 +32,12 @@ jobs:
       - name: Get project data
         env:
           GITHUB_TOKEN: ${{ secrets.PROJECT_OPS }}
-          OWNER: 'dr3dr3'
-          PROJECT_NUMBER: 2
+          ORGANIZATION: 'datafaced'
+          PROJECT_NUMBER: 1
         run: |
           gh api graphql -f query='
-            query($owner: String!, $number: Int!) {
-              owner(login: $owner){
+            query($org: String!, $number: Int!) {
+              organization(login: $org){
                 projectV2(number: $number) {
                   id
                   fields(first:20) {
@@ -58,13 +58,13 @@ jobs:
                   }
                 }
               }
-            }' -f owner=$OWNER -F number=$PROJECT_NUMBER > project_data.json
+            }' -f org=$ORGANIZATION -F number=$PROJECT_NUMBER > project_data.json
 
-          echo 'PROJECT_ID='$(jq '.data.owner.projectV2.id' project_data.json) >> $GITHUB_ENV
-          echo 'DATE_FIELD_ID='$(jq '.data.owner.projectV2.fields.nodes[] | select(.name== "Date posted") | .id' project_data.json) >> $GITHUB_ENV
-          echo 'STATUS_FIELD_ID='$(jq '.data.owner.projectV2.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
+          echo 'PROJECT_ID='$(jq '.data.organization.projectV2.id' project_data.json) >> $GITHUB_ENV
+          echo 'DATE_FIELD_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Date posted") | .id' project_data.json) >> $GITHUB_ENV
+          echo 'STATUS_FIELD_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
 
-#          echo 'TODO_OPTION_ID='$(jq '.data.owner.projectV2.fields.nodes[] | select(.name== "Status") | .options[] | select(.name=="Todo") |.id' project_data.json) >> $GITHUB_ENV
+#          echo 'TODO_OPTION_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .options[] | select(.name=="Todo") |.id' project_data.json) >> $GITHUB_ENV
 
       - name: Add card to project
         env:
