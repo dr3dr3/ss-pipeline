@@ -44,13 +44,16 @@ jobs:
           else
             echo "RMD=1" >> $GITHUB_OUTPUT
           fi
+      
+      - name: Decision Output
+        run: |
           echo "RMD Deploy Decision: ${{ steps.prd-deploy.outputs.RMD }}"
 
   # Scheduled dispatch to Production
   scheduled-deploy-production:
     name: Scheduled Deploy to Production
     needs: [prd-config]
-    if: ${{ needs.prd-config.outpus.rmd >= 1 }}
+    if: ${{ needs.prd-config.outputs.rmd >= 1 }}
     uses: ./.github/workflows/continuous-deployment.yml
     with:
       from-soln: 'none'
