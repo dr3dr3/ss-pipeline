@@ -1,15 +1,22 @@
-# Continuous integration for all static site solutions
 name: CONTINUOUS-INTEGRATION
+run-name: Continuous Integration - Triggered by ${{ github.event_name }}
 
 on:
 
-  # Called from solution repo on pull request event
+  # Called from solution repo 
   workflow_call:
     inputs:
-      feature: # Name of feature (for this short-lived change)
+      feature:
         required: true
         type: string
       target-ref:
+        required: true
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      target-ref:
+        description: 'Target Commit SHA or Tag'
         required: true
         type: string
 
