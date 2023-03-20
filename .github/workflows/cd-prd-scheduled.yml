@@ -51,7 +51,8 @@ jobs:
     needs: [prd-config]
     if: ${{ needs.prd-config.outpus.rmd >= 1 }}
     uses: ./.github/workflows/continuous-deployment.yml
-    with: 
+    with:
+      from-soln: 'none'
       target-ref: 'main'
-      deploy-target: 'prd'
+      target-deploy: 'prd'
     secrets: inherit
