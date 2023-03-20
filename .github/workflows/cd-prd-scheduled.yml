@@ -1,0 +1,57 @@
+name: CD-PRODUCTION-SCHEDULED
+run-name: Scheduled Deployment to Production
+
+on:
+  schedule:
+    - cron: '55 19 * * 1,2,3,4,5'  # Daily run of deployments 5:55am Brisbane
+
+  workflow_dispatch:
+
+jobs:
+
+  prd-config:
+    name: Get Config for PRD
+    outputs:
+      rmd: ${{ steps.prd-deploy.outputs.RMD }}    
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout GitOps
+        uses: actions/checkout@v3
+        with:
+          repository: 'dr3dr3/ss-gitops'
+          ref: 'main'
+          token: ${{ secrets.GHA_PAT }}
+
+      - name: Canary Build Version for RMD
+        id: can-build
+        run: |
+          value="$(yq '.deploy.revealmd.build.can' 'config.yml')" || 'ERROR'
+          echo "RMD=$value" >> $GITHUB_OUTPUT
+
+      - name: Production Build Version for RMD
+        id: prd-build
+        run: |
+          value="$(yq '.deploy.revealmd.build.prd' 'config.yml')" || 'ERROR'
+          echo "RMD=$value" >> $GITHUB_OUTPUT
+
+      - name: Decision on PRD deploy for RMD
+        id: prd-deploy
+        run: |
+          if [[ ${{ steps.can-build.outputs.CAN }} == ${{ steps.prd-build.outputs.CAN }} ]]; then
+            echo "RMD=0" >> $GITHUB_OUTPUT
+          else
+            echo "RMD=1" >> $GITHUB_OUTPUT
+          fi
+
+  # Scheduled dispatch to Production
+  scheduled-deploy-production:
+    name: Scheduled Deploy to Production
+    needs: [prd-config]
+    if: ${{ needs.prd-config.outpus.rmd >= 1 }}
+    uses: ./.github/workflows/continuous-deployment.yml
+    with: 
+      target-ref: 'main'
+      deploy-target: 'prd'
+    secrets: inherit
