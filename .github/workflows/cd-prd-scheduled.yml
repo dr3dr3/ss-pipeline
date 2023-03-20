@@ -24,22 +24,22 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      - name: Canary Build Version for RMD
+      - name: Canary Build Version
         id: can-build
         run: |
           value="$(yq '.deploy.revealmd.build.can' 'config.yml')" || 'ERROR'
           echo "RMD=$value" >> $GITHUB_OUTPUT
 
-      - name: Production Build Version for RMD
+      - name: Production Build Version
         id: prd-build
         run: |
           value="$(yq '.deploy.revealmd.build.prd' 'config.yml')" || 'ERROR'
           echo "RMD=$value" >> $GITHUB_OUTPUT
 
-      - name: Decision on PRD deploy for RMD
+      - name: Decision on PRD deploy
         id: prd-deploy
         run: |
-          if [[ ${{ steps.can-build.outputs.CAN }} == ${{ steps.prd-build.outputs.CAN }} ]]; then
+          if [[ ${{ steps.can-build.outputs.RMD }} == ${{ steps.prd-build.outputs.RMD }} ]]; then
             echo "RMD=0" >> $GITHUB_OUTPUT
           else
             echo "RMD=1" >> $GITHUB_OUTPUT
