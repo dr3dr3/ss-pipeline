@@ -74,7 +74,7 @@ jobs:
 
       - name: Update reveal-md.json
         run: | 
-          jq '.theme = "black"' reveal-md/reveal-md.json > reveal-md.json
+          jq '.theme = "simple"' reveal-md/reveal-md.json > reveal-md.json
           rsync -avh reveal-md.json reveal-md
 
       - name: Run Reveal-MD build
