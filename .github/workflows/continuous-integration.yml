@@ -101,6 +101,9 @@ jobs:
     name: Deploy CI
     needs: [set-tag, tag-release]
     uses: ./.github/workflows/deploy-github-pages.yml
+    permissions:
+      pages: write
+      id-token: write
     with:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
 
