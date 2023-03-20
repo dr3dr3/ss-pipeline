@@ -1,18 +1,10 @@
-# Continuous deployment to target environment (GitHub repos for GitHub Pages)
-name: CONTINUOUS-DEPLOYMENT
+name: DEPLOYMENT-DISPATCH
 run-name: Continuous Deployment Dispatch to ${{ inputs.deploy-target }}
 
 on:
 
   workflow_call:
     inputs:
-      from-soln:
-        required: true
-        type: string
-        default: 'dr3dr3/devops-demo'
-      target-ref:
-        required: true
-        type: string
       target-deploy:
         required: true
         type: string
@@ -25,16 +17,6 @@ on:
   # Need to ensure build artefact is here... as "build once, deploy many"
   workflow_dispatch:
     inputs:
-      from-soln:
-        description: 'Solution Repo'
-        required: true
-        default: 'dr3dr3/devops-demo'
-        type: string
-      target-ref:
-        description: 'Tag or Main'
-        required: true
-        default: 'main'
-        type: string
       target-deploy:
         description: 'Deployment target'
         required: true
@@ -77,7 +59,7 @@ jobs:
         run: |
           curl -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.GHA_PAT }}" \
-          --request POST --data '{"event_type": "deploy", "client_payload": {"from_soln": "${{ inputs.from-soln }}", "target_ref": "${{ inputs.target-ref }}"}}' \
+          --request POST --data '{"event_type": "deploy", "client_payload": {"value": "x"}}' \
           https://api.github.com/repos/${{ github.repository_owner }}/${{ format('{0}-{1}', 'devops-demo', inputs.target-deploy) }}/dispatches
           echo "Success"
 

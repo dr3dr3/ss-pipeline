@@ -1,4 +1,3 @@
-# Continuous Deployment Workflow for Stage
 name: CONTINUOUS-DELIVERY
 run-name: Continuous delivery
 
@@ -6,12 +5,6 @@ on:
 
   workflow_call:
     inputs:
-      from-soln:
-        required: true
-        type: string
-      target-ref:
-        required: true
-        type: string
       target-deploy:
         required: true
         type: string
@@ -20,6 +13,8 @@ jobs:
 
   get-build-artefacts:
     name: Get Build Artefacts
+    outputs:
+      build-rmd: ${{ steps.build-rmd.outputs.RMD }}   
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -34,19 +29,14 @@ jobs:
       ### Reveal-MD Solution
 
       - name: Config RMD
-        id: config-rmd
+        id: build-rmd
         run: |
-          value="$(yq '.deploy.revealmd.build.${{ inputs.target-deploy }}' 'config.yml')" || 'ERROR'
-          echo "Build from config: $value"
-          if [[ ${{ inputs.from-soln }} == 'dr3dr3/devops-demo' ]]; then
-            echo "BUILD_RMD=${{ inputs.target-ref }}" >> $GITHUB_OUTPUT
-          else
-            echo "BUILD_RMD=$value" >> $GITHUB_OUTPUT
-          fi
+          value="$(yq '.deploy.revealmd.build.target' 'config.yml')" || 'ERROR'
+          echo "RMD=$value" >> $GITHUB_OUTPUT
 
       - name: Reveal-MD Build Artefact
         run: |
-          wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ steps.config-rmd.outputs.BUILD_RMD }}/build.tar.gz"
+          wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ steps.build-rmd.outputs.RMD }}/build.tar.gz"
           tar -xzvf build.tar.gz
 
 
@@ -54,7 +44,7 @@ jobs:
 
       # Add placeholder index.html (overwrites index.html created by Reveal-MD)
       - name: index.html
-        run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Reveal-MD ${{ steps.config-rmd.outputs.BUILD_RMD }}</p><p>Environment = ${{ inputs.target-deploy }}</p></body></html>" > _site/index.html
+        run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Reveal-MD ${{ steps.build-rmd.outputs.RMD }}</p><p>Environment = ${{ inputs.target-deploy }}</p></body></html>" > _site/index.html
           
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
@@ -67,15 +57,25 @@ jobs:
   deploy-to-github-pages:
     name: Deploy GHP
     needs: [get-build-artefacts]
-    uses: dr3dr3/ss-pipeline/.github/workflows/deploy-github-pages.yml@main
+    uses: ./.github/workflows/deploy-github-pages.yml
     permissions:
       contents: read
       pages: write
       id-token: write
     with:
-      artefact-ref: ${{ format('{0}_{1}', 'deploy', github.run_id ) }}     
+      artefact-ref: ${{ format('{0}_{1}', 'deploy', github.run_id ) }}
     secrets: inherit
 
-# Do different testing (smoke, PVT, etc)
-# If pass... trigger next environment
-# But firstly update config for version of solution that has updated
+  # Do different testing (smoke, PVT, etc)
+
+  # Given successful testing then update the build for this environment in GitOps Config
+  build-rmd:
+    name: Actual Build for RMD
+    needs: [get-build-artefacts, deploy-to-github-pages]
+    uses: ./.github/workflows/gitops-update.yml
+    with:
+      config-item: '.deploy.revealmd.build.${{ inputs.target-deploy }}'
+      config-value: ${{ needs.get-build-artefacts.outputs.build-rmd }}
+    secrets: inherit
+
+    # Do for other solutions as well

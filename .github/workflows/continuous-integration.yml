@@ -30,6 +30,8 @@ jobs:
           echo "$build"
           echo "TAG=$build" >> $GITHUB_OUTPUT          
 
+  # BUILD FOR EACH SOLUTION
+
   # Build static site using Reveal-MD
   build-revealmd:
     name: RMD
@@ -42,6 +44,7 @@ jobs:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
 
   # Other solutions builds here
+  # BUILDS INCLUDE TESTING (Unit Testing, Mocked Integration Testing, etc)
 
   # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-complete:
@@ -54,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest 
     steps:
       - name: Ready message
-        run: echo "### Builds Completed :thumbsup:" >> $GITHUB_STEP_SUMMARY     
+        run: echo "### Builds Completed :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
   # Merge PR. GitHub setup to delete SLFB after merge completed.
   pr-merge: 
@@ -94,15 +97,21 @@ jobs:
     with:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
 
+  # Set target build in GitOps config (to be used in continuous deployment)
+  target-build-stg:
+    name: Set Target Build in Config
+    needs: [set-tag, builds-complete]
+    uses: ./.github/workflows/gitops-update.yml
+    with:
+      config-item: '.deploy.revealmd.build.target'
+      config-value: ${{ needs.set-tag.outputs.tag }}
+    secrets: inherit
+
   # Dispatch to Deploy to Stage Environment
   dispatch-stg:
     name: Dispatch STG
-    needs: [set-tag, tag-release]
-    uses: ./.github/workflows/continuous-deployment.yml
+    needs: [set-tag, tag-release, target-build-stg]
+    uses: ./.github/workflows/deployment-dispatch.yml
     with:
-      from-soln: ${{ github.repository }}
-      target-ref: ${{ needs.set-tag.outputs.tag }}
       target-deploy: 'stg'
     secrets: inherit
-
-# End of workflow
