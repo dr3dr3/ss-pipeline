@@ -54,7 +54,7 @@ jobs:
     name: Scheduled Deploy to Production
     needs: [prd-config]
     if: ${{ needs.prd-config.outputs.rmd >= 1 }}
-    uses: ./.github/workflows/continuous-deployment.yml
+    uses: ./.github/workflows/deployment-dispatch.yml
     with:
       target-deploy: 'prd'
     secrets: inherit
