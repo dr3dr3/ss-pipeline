@@ -102,6 +102,7 @@ jobs:
     needs: [set-tag, tag-release]
     uses: ./.github/workflows/deploy-github-pages.yml
     permissions:
+      contents: write
       pages: write
       id-token: write
     with:
