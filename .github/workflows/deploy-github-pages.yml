@@ -22,7 +22,7 @@ concurrency:
 jobs:
 
   deploy:
-    name: 🚀
+    name: 🚀 Deploy
     timeout-minutes: 10
     environment:
       name: github-pages
