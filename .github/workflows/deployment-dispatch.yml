@@ -55,7 +55,7 @@ jobs:
       - name: Results
         run: |
           data="$(echo 'count: ${{ fromJSON(steps.block.outputs.data) }}')"
-          echo ($data).count.repository.issues.totalCount
+          jq '.count.repository.issues.totalCount' $data
 
   # Dispatch send to trigger deployment
   dispatcher:
