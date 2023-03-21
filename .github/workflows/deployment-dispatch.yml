@@ -1,5 +1,5 @@
 name: DEPLOYMENT-DISPATCH
-run-name: Continuous Deployment Dispatch to ${{ inputs.deploy-target }}
+run-name: Continuous Deployment Dispatch to ${{ inputs.target-deploy }}
 
 on:
 
@@ -31,7 +31,7 @@ jobs:
 
   # Dispatch send to trigger deployment
   dispatcher:
-    name: 📨
+    name: 📨 Dispatch
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
