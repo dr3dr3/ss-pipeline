@@ -29,6 +29,29 @@ on:
 
 jobs:
 
+  blocked:
+    name: Check if blocked
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITHUB_TOKEN: ${{ secrets.GHA_PAT }}
+    steps:
+      - uses: octokit/graphql-action@v2.x
+        id: block
+        with:
+          query: |
+            query release($owner:String!,$repo:String!,$labels:String!) {
+              repository(owner:$owner,name:$repo) {
+                issues(states:OPEN, labels:$labels) {
+                  totalCount
+                }
+              }
+            }
+          owner: 'dr3dr3'
+          repo: ${{ format('{0}-{1}', 'devops-demo', inputs.target-deploy) }}
+          labels: 'status-deploy-paused'
+      - run: "echo 'count: ${{ steps.block.outputs.data }}'"
+
   # Dispatch send to trigger deployment
   dispatcher:
     name: 📨 Dispatch
@@ -49,8 +72,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}         
         run: |
-          gh issue list --search 'label:"status-deploy-paused"'
-          issues="$(gh issue list --label 'status-deploy-paused' --state open)" || 'ERROR'
+          issues="$(gh issue list --search 'label:"status-deploy-paused"')" || 'ERROR'
           echo "$issues"
           echo "CHECK=1" >> $GITHUB_OUTPUT
 
