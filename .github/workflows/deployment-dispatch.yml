@@ -31,8 +31,8 @@ jobs:
 
   blocked:
     name: Check if blocked
-    #outputs:
-    #  state: ${{ steps.results.outputs.STATE }}   
+    outputs:
+      check: ${{ steps.results.outputs.COUNT }} || 'ERROR'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -52,39 +52,23 @@ jobs:
             }
           owner: 'dr3dr3'
           repo: ${{ format('{0}-{1}', 'devops-demo', inputs.target-deploy) }}
-          labels: 'status-deploy-pausedx'
+          labels: 'status-deploy-paused'
 
       - name: Results
         run: |
-          echo 'count: ${{ steps.block.outputs.data }}'
-          echo 'count: ${{ fromJSON(steps.block.outputs.data).repository.issues.totalCount }}'
+          count="${{ fromJSON(steps.block.outputs.data).repository.issues.totalCount }}"
+          echo "COUNT=$count" >> $GITHUB_OUTPUT
 
   # Dispatch send to trigger deployment
   dispatcher:
     name: 📨 Dispatch
+    needs: [blocked]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
 
-      - name: Checkout 🛎️
-        uses: actions/checkout@v3
-        with: 
-          repository: ${{ format('{0}-{1}', 'dr3dr3/devops-demo', inputs.target-deploy) }}
-          ref: 'main'
-          token: ${{ secrets.GHA_PAT }}
-
-      - name: Check Paused
-        id: check
-        # Get issues with labels from STG/CAN/PRD repo
-        env:
-          GH_TOKEN: ${{ github.token }}         
-        run: |
-          issues="$(gh issue list --search 'label:"status-deploy-paused"')" || 'ERROR'
-          echo "$issues"
-          echo "CHECK=1" >> $GITHUB_OUTPUT
-
       - name: Dispatch
-        if: ${{ steps.check.outputs.CHECK == 0 }}
+        if: ${{ needs.blocked.outputs.check == 0 }}
         run: |
           curl -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.GHA_PAT }}" \
