@@ -31,6 +31,8 @@ jobs:
 
   blocked:
     name: Check if blocked
+    #outputs:
+    #  state: ${{ steps.results.outputs.STATE }}   
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -50,7 +52,7 @@ jobs:
             }
           owner: 'dr3dr3'
           repo: ${{ format('{0}-{1}', 'devops-demo', inputs.target-deploy) }}
-          labels: 'status-deploy-paused'
+          labels: 'status-deploy-pausedx'
 
       - name: Results
         run: |
