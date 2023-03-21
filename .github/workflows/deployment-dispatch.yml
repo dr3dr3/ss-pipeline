@@ -29,7 +29,7 @@ on:
 
 jobs:
 
-  blocked:
+  check-blocked:
     name: Check if blocked
     outputs:
       check: ${{ steps.results.outputs.COUNT }} || 'ERROR'
@@ -62,13 +62,13 @@ jobs:
   # Dispatch send to trigger deployment
   dispatcher:
     name: 📨 Dispatch
-    needs: [blocked]
+    needs: [check-blocked]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
 
       - name: Dispatch
-        if: ${{ needs.blocked.outputs.check == 0 }}
+        if: ${{ needs.check-blocked.outputs.check == 0 }}
         run: |
           curl -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.GHA_PAT }}" \
