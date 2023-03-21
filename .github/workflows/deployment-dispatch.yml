@@ -49,10 +49,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}         
         run: |
-          gh issue list --state open
+          gh issue list --search 'label:"status-deploy-paused"'
           issues="$(gh issue list --label 'status-deploy-paused' --state open)" || 'ERROR'
           echo "$issues"
-          echo "CHECK=$issues" >> $GITHUB_OUTPUT
+          echo "CHECK=1" >> $GITHUB_OUTPUT
 
       - name: Dispatch
         if: ${{ steps.check.outputs.CHECK == 0 }}

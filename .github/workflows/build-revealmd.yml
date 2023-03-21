@@ -50,7 +50,7 @@ jobs:
 
       - name: Add version and build date
         run: |
-          echo -e "Build: ${{ inputs.artefact-ref }} \n" >> reveal-md/markdown/version.md
+          echo -e "${{ inputs.artefact-ref }} \n" >> reveal-md/markdown/version.md
 
       # If this tests fail the NPM error will fail this job
       - name: Run tests from Reveal-MD
