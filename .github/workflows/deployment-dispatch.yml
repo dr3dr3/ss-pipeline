@@ -53,7 +53,9 @@ jobs:
           labels: 'status-deploy-paused'
 
       - name: Results
-        run: "echo 'count: ${{ (steps.block.outputs.data).count.repository.issues.totalCount }}'"
+        run: |
+          data="$(echo 'count: ${{ steps.block.outputs.data }}')"
+          echo $data.count
 
   # Dispatch send to trigger deployment
   dispatcher:
