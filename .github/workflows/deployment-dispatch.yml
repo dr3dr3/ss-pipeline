@@ -36,7 +36,8 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: octokit/graphql-action@v2.x
+      - name: GraphQL
+        uses: octokit/graphql-action@v2.x
         id: block
         with:
           query: |
@@ -50,7 +51,9 @@ jobs:
           owner: 'dr3dr3'
           repo: ${{ format('{0}-{1}', 'devops-demo', inputs.target-deploy) }}
           labels: 'status-deploy-paused'
-      - run: "echo 'count: ${{ steps.block.outputs.data }}'"
+
+      - name: Results
+        run: "echo 'count: ${{ steps.block.outputs.data }}'"
 
   # Dispatch send to trigger deployment
   dispatcher:
