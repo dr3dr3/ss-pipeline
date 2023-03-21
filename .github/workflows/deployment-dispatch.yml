@@ -55,6 +55,7 @@ jobs:
           labels: 'status-deploy-paused'
 
       - name: Results
+        id: results
         run: |
           count="${{ fromJSON(steps.block.outputs.data).repository.issues.totalCount }}"
           echo "COUNT=$count" >> $GITHUB_OUTPUT
@@ -75,11 +76,3 @@ jobs:
           --request POST --data '{"event_type": "deploy", "client_payload": {"value": "x"}}' \
           https://api.github.com/repos/${{ github.repository_owner }}/${{ format('{0}-{1}', 'devops-demo', inputs.target-deploy) }}/dispatches
           echo "Success"
-
-      - name: GitHub Step Summary - Success
-        if: ${{ steps.check.outputs.CHECK == 0 }}
-        run: echo "### Deploy Dispatched (${{ inputs.target-deploy }})! :thumbsup:" >> $GITHUB_STEP_SUMMARY
-
-      - name: GitHub Step Summary - Blocked
-        if: ${{ steps.check.outputs.CHECK != 0 }}
-        run: echo "### Deploy Blocked (${{ inputs.target-deploy }})! :thumbsdown:" >> $GITHUB_STEP_SUMMARY
