@@ -64,12 +64,12 @@ jobs:
   dispatcher:
     name: 📨 Dispatch
     needs: [check-blocked]
+    if: ${{ needs.check-blocked.outputs.check == 0 }}
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
 
       - name: Dispatch
-        if: ${{ needs.check-blocked.outputs.check == 0 }}
         run: |
           curl -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.GHA_PAT }}" \
