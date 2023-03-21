@@ -29,10 +29,10 @@ on:
 
 jobs:
 
-  check-blocked:
+  blocked:
     name: Check if blocked
     outputs:
-      check: ${{ steps.results.outputs.COUNT }} || 'ERROR'
+      check: ${{ steps.results.outputs.COUNT }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -63,8 +63,8 @@ jobs:
   # Dispatch send to trigger deployment
   dispatcher:
     name: 📨 Dispatch
-    needs: [check-blocked]
-    if: ${{ needs.check-blocked.outputs.check == 0 }}
+    needs: [blocked]
+    if: ${{ needs.blocked.outputs.check == 0 }}
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
