@@ -77,6 +77,7 @@ jobs:
   # Do different testing (smoke, PVT, etc)
 
   # Performance testing using Google Lighthouse
+  # https://github.com/marketplace/actions/lighthouse-ci-action
   lighthouse:
     name: Google Lighthouse Report
     if: ${{ inputs.target-deploy == 'stg' }}
@@ -100,7 +101,7 @@ jobs:
   # Given successful testing then update the build for this environment in GitOps Config
   build-rmd:
     name: Actual Build for RMD
-    needs: [get-build-artefacts, deploy-to-github-pages, lighthouse]
+    needs: [get-build-artefacts, deploy-to-github-pages]
     uses: ./.github/workflows/gitops-update.yml
     with:
       config-item: '.deploy.revealmd.build.${{ inputs.target-deploy }}'
