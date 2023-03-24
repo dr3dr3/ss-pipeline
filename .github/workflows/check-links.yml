@@ -42,7 +42,7 @@ jobs:
         run: echo "Link check success = ${{ steps.results.outputs.OUTPUT }}"
       
       - name: Fail workflow
-        if: ${{ steps.results.outputs.OUTPUT != true }}
+        if: ${{ steps.results.outputs.OUTPUT != 'true' }}
         run: exit 1
 
       - name: GitHub Step Summary
