@@ -35,7 +35,7 @@ jobs:
       - name: Check links in slide
         id: results
         run: |
-          echo $(npx linkinator "_site/markdown/*.html" --format JSON) >> links.json
+          echo $(npx linkinator "_site/*" --format JSON) >> links.json
           echo 'OUTPUT='$(jq '.passed' links.json) >> $GITHUB_OUTPUT
 
       - name: Echo Results
@@ -48,4 +48,4 @@ jobs:
       - name: GitHub Step Summary
         run: |
           echo "### Links Check! :thumbsup:" >> $GITHUB_STEP_SUMMARY
-          echo "$(npx linkinator "_site/markdown/*.html")" >> $GITHUB_STEP_SUMMARY
+          echo "$(npx linkinator "_site/*")" >> $GITHUB_STEP_SUMMARY

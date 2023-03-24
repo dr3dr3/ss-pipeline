@@ -38,7 +38,8 @@ jobs:
           wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ steps.build-rmd.outputs.RMD }}/build.tar.gz"
           tar -xzvf build.tar.gz
 
-
+      - name: Rename index.html from Reveal-MD
+        run: rsync -avh _site/index.html _site/links.html
 
 
       # Add placeholder index.html (overwrites index.html created by Reveal-MD)
