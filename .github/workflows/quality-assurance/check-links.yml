@@ -1,0 +1,47 @@
+# NOTE: Must use this in same workflow as artefact upload
+name: CHECK-LINKS
+
+on:
+  workflow_call:
+    inputs:
+      artefact-ref:
+        required: true
+        type: string        
+
+jobs:
+
+  check-links:
+    name: Linkinator
+    outputs:
+      results: ${{ steps.results.outputs.OUTPUT }}       
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artefact-ref }}
+          path: _site
+
+      - name: Setup Node.JS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install Linkinator
+        run: npm install linkinator
+
+      - name: Check links in slide
+        id: results
+        run: |
+          echo $(npx linkinator "_site/markdown/*.html" --format JSON) >> links.json
+          echo 'OUTPUT='$(jq '.passed' links.json) >> $GITHUB_OUTPUT
+
+      - name: Echo Results
+        run: echo "Link check success = ${{ steps.results.outputs.OUTPUT }}"
+
+      - name: GitHub Step Summary
+        run: |
+          echo "### Links Check! :thumbsup:" >> $GITHUB_STEP_SUMMARY
+          echo "$(npx linkinator "_site/markdown/*.html")" >> $GITHUB_STEP_SUMMARY

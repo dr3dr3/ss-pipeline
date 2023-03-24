@@ -89,6 +89,7 @@ jobs:
     secrets: inherit
 
   # Deploy CI to GitHub Pages
+  # Uses artefacts created by build jobs
   deploy-ci:
     name: Deploy CI
     needs: [set-tag, tag-release]

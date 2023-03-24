@@ -52,6 +52,10 @@ jobs:
         run: |
           echo -e "${{ inputs.artefact-ref }} \n" >> reveal-md/markdown/version.md
 
+      # If linting fails will fail this job
+      - name: Run linter from Reveal-MD
+        run: npm run lint
+
       # If this tests fail the NPM error will fail this job
       - name: Run tests from Reveal-MD
         run: npm run test
@@ -86,3 +90,11 @@ jobs:
           name: ${{ inputs.artefact-ref }}
           path: reveal-md/_site
           retention-days: 1
+
+  check-links:
+    name: Check Links
+    needs: [build]
+    uses: ./.github/workflows/quality-assurance/check-links.yml
+    secrets: inherit
+    with: 
+      artefact-ref: ${{ needs.set-tag.outputs.tag }}
