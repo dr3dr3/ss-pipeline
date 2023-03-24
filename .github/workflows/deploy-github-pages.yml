@@ -51,4 +51,6 @@ jobs:
         uses: actions/deploy-pages@v1
 
       - name: Summary
-        run: echo "### Deploy complete! :green_apple:" >> $GITHUB_STEP_SUMMARY        
+        run: |
+          echo "### Deploy complete! :green_apple:" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY

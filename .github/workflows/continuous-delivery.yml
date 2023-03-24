@@ -64,7 +64,7 @@ jobs:
   # Deploy to GitHub Pages on the Stage Repo
   deploy-to-github-pages:
     name: Deploy GHP
-    needs: [get-build-artefacts]
+    needs: [get-build-artefacts, check-links]
     uses: ./.github/workflows/deploy-github-pages.yml
     permissions:
       contents: read
