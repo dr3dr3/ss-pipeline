@@ -94,7 +94,7 @@ jobs:
   check-links:
     name: Check Links
     needs: [build]
-    uses: ./.github/workflows/quality-assurance/check-links.yml
+    uses: ./.github/workflows/check-links.yml
     secrets: inherit
     with: 
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
