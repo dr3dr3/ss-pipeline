@@ -97,4 +97,4 @@ jobs:
     uses: ./.github/workflows/check-links.yml
     secrets: inherit
     with: 
-      artefact-ref: ${{ needs.set-tag.outputs.tag }}
+      artefact-ref: ${{ inputs.artefact-ref }}

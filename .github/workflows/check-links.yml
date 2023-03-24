@@ -6,7 +6,7 @@ on:
     inputs:
       artefact-ref:
         required: true
-        type: string        
+        type: string
 
 jobs:
 
