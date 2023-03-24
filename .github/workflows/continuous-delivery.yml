@@ -94,13 +94,13 @@ jobs:
       - name: Run Lighthouse on urls and validate with lighthouserc
         uses: treosh/lighthouse-ci-action@v9
         with:
-          urls: "${{ needs.deploy-to-github-pages.outputs.url }}"
+          urls: 'https://dr3dr3.github.io/devops-demo-stg/markdown/version.html#/' #"${{ needs.deploy-to-github-pages.outputs.url }}"
           configPath: "./config/lighthouserc.json"
 
   # Given successful testing then update the build for this environment in GitOps Config
   build-rmd:
     name: Actual Build for RMD
-    needs: [get-build-artefacts, deploy-to-github-pages]
+    needs: [get-build-artefacts, deploy-to-github-pages, lighthouse]
     uses: ./.github/workflows/gitops-update.yml
     with:
       config-item: '.deploy.revealmd.build.${{ inputs.target-deploy }}'
