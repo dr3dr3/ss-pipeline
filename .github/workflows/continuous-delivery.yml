@@ -51,6 +51,15 @@ jobs:
           name: ${{ format('{0}_{1}', 'deploy', github.run_id ) }}
           path: _site
           retention-days: 1
+  
+  # Check links working in compiled deploy artefact
+  check-links:
+    name: Check Links
+    needs: [get-build-artefacts]
+    uses: ./.github/workflows/check-links.yml
+    secrets: inherit
+    with: 
+      artefact-ref: ${{ format('{0}_{1}', 'deploy', github.run_id ) }}
 
   # Deploy to GitHub Pages on the Stage Repo
   deploy-to-github-pages:
