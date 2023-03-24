@@ -76,6 +76,22 @@ jobs:
 
   # Do different testing (smoke, PVT, etc)
 
+  # Performance testing using Google Lighthouse
+  lighthouse:
+    name: Google Lighthouse Report
+    if: ${{ inputs.target-deploy == 'stg' }}
+    needs: [deploy-to-github-pages]
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run Lighthouse on urls and validate with lighthouserc
+        uses: treosh/lighthouse-ci-action@v9
+        with:
+          urls: "${{ needs.deploy-to-github-pages.outputs.url }}"
+          configPath: "./config/lighthouserc.json"
+
   # Given successful testing then update the build for this environment in GitOps Config
   build-rmd:
     name: Actual Build for RMD
@@ -86,4 +102,4 @@ jobs:
       config-value: ${{ needs.get-build-artefacts.outputs.build-rmd }}
     secrets: inherit
 
-    # Do for other solutions as well
+  # Do for other solutions as well
