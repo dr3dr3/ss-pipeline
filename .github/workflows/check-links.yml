@@ -11,7 +11,7 @@ on:
 jobs:
 
   check-links:
-    name: Linkinator
+    name: Checking Links
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
