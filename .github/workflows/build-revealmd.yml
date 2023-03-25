@@ -40,17 +40,17 @@ jobs:
           cd ..
 
       - name: Copy markdown files to Reveal-MD
-        run: rsync -avh markdown reveal-md
+        run: rsync -avh slides reveal-md
 
       - name: Copy slide template to Reveal-MD
         run: rsync -avh build-files/template.html reveal-md
         
       - name: Copy version slide to Reveal-MD
-        run: rsync -avh build-files/version.md reveal-md/markdown/version.md
+        run: rsync -avh build-files/version.md reveal-md/slides/version.md
 
       - name: Add version and build date
         run: |
-          echo -e "${{ inputs.artefact-ref }} \n" >> reveal-md/markdown/version.md
+          echo -e "${{ inputs.artefact-ref }} \n" >> reveal-md/slides/version.md
 
       # If linting fails will fail this job
       - name: Run linter from Reveal-MD
@@ -82,7 +82,8 @@ jobs:
 
       - name: Run Reveal-MD build
         run: |
-          npm run build
+          cd reveal-md
+          reveal-md --static _site --template template.html --glob 'slides/*.md' --absolute-url ${{ vars.SITE_URL }} --featured-slide 2
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
