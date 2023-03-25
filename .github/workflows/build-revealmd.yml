@@ -36,7 +36,7 @@ jobs:
       - name: Install Reveal-MD
         run: |
           cd reveal-md
-          npm install
+          npm install -g reveal-md
           cd ..
 
       - name: Copy markdown files to Reveal-MD
@@ -83,7 +83,7 @@ jobs:
       - name: Run Reveal-MD build
         run: |
           cd reveal-md
-          npx reveal-md --static _site --template template.html --glob 'slides/*.md' --absolute-url https://dr3dr3.github.io/devops-demo/ --featured-slide 2
+          reveal-md --static _site --template template.html --glob 'slides/*.md' --absolute-url ${{ vars.SITE_URL }} --featured-slide 2
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
