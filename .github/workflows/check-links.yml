@@ -81,6 +81,6 @@ jobs:
 #          echo $(npx linkinator "npx linkinator "https://dr3dr3.github.io/devops-demo-stg" --recurse --format JSON) >> links-ext.json
 #          echo 'EXT='$(jq '.passed' links-ext.json) >> $GITHUB_OUTPUT
 
-      - name: Fail workflow - External
-        if: ${{ steps.results-ext.outputs.EXT != 'true' }}
-        run: exit 1
+#      - name: Fail workflow - External
+#        if: ${{ steps.results-ext.outputs.EXT != 'true' }}
+#        run: exit 1

@@ -53,12 +53,12 @@ jobs:
           echo -e "${{ inputs.artefact-ref }} \n" >> reveal-md/slides/version.md
 
       # If linting fails will fail this job
-#      - name: Run linter from Reveal-MD
-#        run: npm run lint
+      - name: Run linter from Reveal-MD
+        run: npm run lint
 
       # If this tests fail the NPM error will fail this job
-#      - name: Run tests from Reveal-MD
-#        run: npm run test
+      - name: Run tests from Reveal-MD
+        run: npm run test
 
       - name: GitHub Step Summary for Test
         run: |
