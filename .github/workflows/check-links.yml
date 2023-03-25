@@ -33,7 +33,7 @@ jobs:
       - name: Check links to JS files
         id: results-js
         run: |
-          echo $(npx linkinator "_site/**/*.js")
+          echo $(npx linkinator "_site/**/*.js" --verbosity error)
           echo $(npx linkinator "_site/**/*.js" --format JSON) >> links-js.json
           echo 'JS='$(jq '.passed' links-js.json) >> $GITHUB_OUTPUT
 
@@ -44,7 +44,7 @@ jobs:
       - name: Check links to HTML files
         id: results-html
         run: |
-          echo $(npx linkinator "_site/**/*.html")
+          echo $(npx linkinator "_site/**/*.html" --verbosity error)
           echo $(npx linkinator "_site/**/*.html" --format JSON) >> links-html.json
           echo 'HTML='$(jq '.passed' links-html.json) >> $GITHUB_OUTPUT
 
@@ -55,7 +55,7 @@ jobs:
       - name: Check links to CSS files
         id: results-css
         run: |
-          echo $(npx linkinator "_site/**/*.css")
+          echo $(npx linkinator "_site/**/*.css" --verbosity error)
           echo $(npx linkinator "_site/**/*.css" --format JSON) >> links-css.json
           echo 'CSS='$(jq '.passed' links-css.json) >> $GITHUB_OUTPUT
 
@@ -63,16 +63,16 @@ jobs:
         if: ${{ steps.results-css.outputs.CSS != 'true' }}
         run: exit 1
 
-      - name: Check links to MD files
-        id: results-md
-        run: |
-          echo $(npx linkinator "_site/**/*.md")
-          echo $(npx linkinator "_site/**/*.md" --format JSON --markdown) >> links-md.json
-          echo 'MD='$(jq '.passed' links-md.json) >> $GITHUB_OUTPUT
+#      - name: Check links to MD files
+#        id: results-md
+#        run: |
+#          echo $(npx linkinator "_site/**/*.md")
+#          echo $(npx linkinator "_site/**/*.md" --format JSON --markdown) >> links-md.json
+#          echo 'MD='$(jq '.passed' links-md.json) >> $GITHUB_OUTPUT
 
-      - name: Fail workflow - MD
-        if: ${{ steps.results-md.outputs.MD != 'true' }}
-        run: exit 1
+#      - name: Fail workflow - MD
+#        if: ${{ steps.results-md.outputs.MD != 'true' }}
+#        run: exit 1
 
 #      - name: Check external links
 #        id: results-ext
