@@ -83,7 +83,7 @@ jobs:
       - name: Run Reveal-MD build
         run: |
           cd reveal-md
-          reveal-md --static _site --template template.html --glob 'slides/*.md' --absolute-url https://dr3dr3.github.io/devops-demo/ 
+          reveal-md --static _site --template template.html --glob 'slides/*.md' --absolute-url https://dr3dr3.github.io/devops-demo/ --featured-slide 1
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
