@@ -64,7 +64,7 @@ jobs:
         run: exit 1
 
       - name: Check links to MD files
-        id: results-js
+        id: results-md
         run: |
           echo npx linkinator "**/*.md"
           echo $(npx linkinator "**/*.md" --format JSON --markdown) >> link-md.json
