@@ -98,7 +98,7 @@ jobs:
         with:
           urls: 'https://dr3dr3.github.io/devops-demo-stg/markdown/version.html#/' #"${{ needs.deploy-to-github-pages.outputs.url }}"
           configPath: "./config/lighthouserc.json"
-          uploadArtifacts: true
+          #uploadArtifacts: true
 
   # Given successful testing then update the build for this environment in GitOps Config
   build-rmd:
