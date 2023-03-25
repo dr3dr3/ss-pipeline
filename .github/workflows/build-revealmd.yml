@@ -37,6 +37,7 @@ jobs:
         run: |
           cd reveal-md
           npm install -g reveal-md
+          npm install --only=dev
           cd ..
 
       - name: Copy markdown files to Reveal-MD
