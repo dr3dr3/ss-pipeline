@@ -96,7 +96,7 @@ jobs:
       - name: Run Lighthouse on urls and validate with lighthouserc
         uses: treosh/lighthouse-ci-action@v9
         with:
-          urls: 'https://dr3dr3.github.io/devops-demo-stg/slides/version.html#/' #"${{ needs.deploy-to-github-pages.outputs.url }}"
+          urls: 'https://dr3dr3.github.io/devops-demo/slides/version.html#/' #"${{ needs.deploy-to-github-pages.outputs.url }}"
           configPath: "./config/lighthouserc.json"
           #uploadArtifacts: true
 
