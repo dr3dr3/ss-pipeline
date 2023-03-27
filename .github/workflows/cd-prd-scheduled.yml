@@ -4,7 +4,7 @@ run-name: Scheduled Deployment to Production
 on:
 
   schedule:
-    - cron: '55 19 * * 1,2,3,4,7'  
+    - cron: '55 19 * * 0,1,2,3,4'  
     # Daily run (M-F) of deployments 5:55am Brisbane
     # “At 19:55 on Monday, Tuesday, Wednesday, Thursday, and Sunday.”
     # https://crontab.guru/
