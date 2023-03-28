@@ -43,9 +43,14 @@ jobs:
 
 
       # Add placeholder index.html (overwrites index.html created by Reveal-MD)
+      - name: index.html with canary redirect
+        if: ${{ inputs.target-deploy == 'prd' }}
+        run: echo "<!doctype html><html lang='en'><head><title>Test</title><script>var url_25 = 'http://can.andredreyer.com'; var choice = Math.floor((Math.random() * 4)); if(choice == 3){window.location = url_25;}</script></head><body><p>Reveal-MD ${{ steps.build-rmd.outputs.RMD }}</p><p>Environment = ${{ inputs.target-deploy }}</p></body></html>" > _site/index.html
+
       - name: index.html
+        if: ${{ inputs.target-deploy != 'prd' }}
         run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Reveal-MD ${{ steps.build-rmd.outputs.RMD }}</p><p>Environment = ${{ inputs.target-deploy }}</p></body></html>" > _site/index.html
-          
+
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
