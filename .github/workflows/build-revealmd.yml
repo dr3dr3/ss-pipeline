@@ -43,6 +43,9 @@ jobs:
       - name: Copy markdown files to Reveal-MD
         run: rsync -avh slides reveal-md
 
+      - name: Copy favicon to Reveal-MD
+        run: rsync -avh build-files/favicon.ico reveal-md
+
       - name: Copy slide template to Reveal-MD
         run: rsync -avh build-files/template.html reveal-md
         

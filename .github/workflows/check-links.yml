@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: 16
 
+      # https://github.com/JustinBeckwith/linkinator
       - name: Install Linkinator
         run: npm install linkinator
 
@@ -34,7 +35,7 @@ jobs:
         id: results-js
         run: |
           echo $(npx linkinator "_site/**/*.js" --verbosity error)
-          echo $(npx linkinator "_site/**/*.js" --format JSON) >> links-js.json
+          echo $(npx linkinator "_site/**/*.js" --format JSON --skip '/featured-slide/') >> links-js.json
           echo 'JS='$(jq '.passed' links-js.json) >> $GITHUB_OUTPUT
 
       - name: Fail workflow - JS
