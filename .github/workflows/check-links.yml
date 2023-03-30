@@ -35,7 +35,7 @@ jobs:
         id: results-js
         run: |
           echo $(npx linkinator "_site/**/*.js" --verbosity error)
-          echo $(npx linkinator "_site/**/*.js" --format JSON --skip '/featured-slide/') >> links-js.json
+          echo $(npx linkinator "_site/**/*.js" --format JSON') >> links-js.json
           echo 'JS='$(jq '.passed' links-js.json) >> $GITHUB_OUTPUT
 
       - name: Fail workflow - JS
@@ -46,7 +46,7 @@ jobs:
         id: results-html
         run: |
           echo $(npx linkinator "_site/**/*.html" --verbosity error)
-          echo $(npx linkinator "_site/**/*.html" --format JSON) >> links-html.json
+          echo $(npx linkinator "_site/**/*.html" --format JSON --skip "https://www.andredreyer.com/featured-slide.jpg" --verbosity error) >> links-html.json
           echo 'HTML='$(jq '.passed' links-html.json) >> $GITHUB_OUTPUT
 
       - name: Fail workflow - HTML
