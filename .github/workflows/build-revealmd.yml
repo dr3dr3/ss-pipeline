@@ -44,7 +44,9 @@ jobs:
         run: rsync -avh slides reveal-md
 
       - name: Copy featured-slide.jpg to Reveal-MD
-        run: rsync -avh build-files/featured-slide.jpg reveal-md
+        run: |
+          mkdir reveal-md/assets
+          rsync -avh build-files/featured-slide.jpg reveal-md/assets/featured-slide.jpg
 
       - name: Copy favicon to Reveal-MD
         run: rsync -avh build-files/favicon.ico reveal-md
