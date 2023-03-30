@@ -104,6 +104,19 @@ jobs:
           urls: '${{ vars.SITE_URL }}' #"${{ needs.deploy-to-github-pages.outputs.url }}"
           configPath: "./config/lighthouserc.json"
           uploadArtifacts: true
+  
+  ifttt:
+    name: Send IFTTT message that ${{ inputs.target-deploy}} deploy successful
+    needs: [build]
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: API Post to IFTTT webhook
+        run: |
+          echo 'Feature still in development'
+          
+    #curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_${{ inputs.target-deploy }}_green/json/with/key/${{ secrets.IFTTT }}
 
   # Given successful testing then update the build for this environment in GitOps Config
   build-rmd:

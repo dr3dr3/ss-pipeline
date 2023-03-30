@@ -106,6 +106,17 @@ jobs:
     with:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
 
+  ifttt-ci:
+    name: Send IFTTT message that build successful
+    needs: [deploy-ci]
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: API Post to IFTTT webhook
+        run: |
+          curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_ci_green/json/with/key/${{ secrets.IFTTT }}
+
   # Set target build in GitOps config (to be used in continuous deployment)
   target-build-stg:
     name: Set Target Build in Config
