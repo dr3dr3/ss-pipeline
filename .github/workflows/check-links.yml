@@ -46,7 +46,7 @@ jobs:
         id: results-html
         run: |
           echo $(npx linkinator "_site/**/*.html" --verbosity error)
-          echo $(npx linkinator "_site/**/*.html" --format JSON --skip "https://www.andredreyer.com/featured-slide.jpg" --verbosity error) >> links-html.json
+          echo $(npx linkinator "_site/**/*.html" --format JSON --skip "${{ vars.SITE_URL }}/featured-slide.jpg" --verbosity error) >> links-html.json
           echo 'HTML='$(jq '.passed' links-html.json) >> $GITHUB_OUTPUT
 
       - name: Fail workflow - HTML
