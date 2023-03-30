@@ -43,6 +43,9 @@ jobs:
       - name: Copy markdown files to Reveal-MD
         run: rsync -avh slides reveal-md
 
+      - name: Copy featured-slide.jpg to Reveal-MD
+        run: rsync -avh build-files/featured-slide.jpg reveal-md
+
       - name: Copy favicon to Reveal-MD
         run: rsync -avh build-files/favicon.ico reveal-md
 
@@ -87,7 +90,7 @@ jobs:
       - name: Run Reveal-MD build
         run: |
           cd reveal-md
-          reveal-md --static _site --template template.html --glob 'slides/*.md' --absolute-url '${{ vars.SITE_URL }}'
+          reveal-md --static _site --template template.html --glob 'slides/*.md' --absolute-url 'https://www.andredreyer.com'
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
