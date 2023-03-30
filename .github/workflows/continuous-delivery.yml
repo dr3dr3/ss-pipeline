@@ -86,7 +86,6 @@ jobs:
   # https://github.com/marketplace/actions/lighthouse-ci-action
   lighthouse:
     name: Google Lighthouse Report
-    if: ${{ inputs.target-deploy == 'stg' }}
     needs: [deploy-to-github-pages]
     timeout-minutes: 10
     runs-on: ubuntu-latest
@@ -99,6 +98,7 @@ jobs:
           token: ${{ secrets.GHA_PAT }}
 
       - name: Run Lighthouse on urls and validate with lighthouserc
+        if: ${{ inputs.target-deploy == 'stg' }}
         uses: treosh/lighthouse-ci-action@v9
         with:
           urls: '${{ vars.SITE_URL }}' #"${{ needs.deploy-to-github-pages.outputs.url }}"
@@ -119,7 +119,7 @@ jobs:
   # Given successful testing then update the build for this environment in GitOps Config
   build-rmd:
     name: Actual Build for RMD
-    needs: [get-build-artefacts, deploy-to-github-pages]
+    needs: [get-build-artefacts, lighthouse]
     uses: ./.github/workflows/gitops-update.yml
     with:
       config-item: '.deploy.revealmd.build.${{ inputs.target-deploy }}'
