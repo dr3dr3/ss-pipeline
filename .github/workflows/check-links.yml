@@ -35,7 +35,7 @@ jobs:
         id: results-js
         run: |
           echo $(npx linkinator "_site/**/*.js" --verbosity error)
-          echo $(npx linkinator "_site/**/*.js" --format JSON') >> links-js.json
+          echo $(npx linkinator "_site/**/*.js" --format JSON) >> links-js.json
           echo 'JS='$(jq '.passed' links-js.json) >> $GITHUB_OUTPUT
 
       - name: Fail workflow - JS
