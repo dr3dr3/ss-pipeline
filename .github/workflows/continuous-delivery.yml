@@ -107,7 +107,7 @@ jobs:
   
   ifttt:
     name: Send IFTTT message that ${{ inputs.target-deploy}} deploy successful
-    needs: [build]
+    needs: [lighthouse]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
