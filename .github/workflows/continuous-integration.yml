@@ -55,8 +55,13 @@ jobs:
       !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest 
     steps:
+
       - name: Ready message
         run: echo "### Builds Completed :thumbsup:" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send IFTTT message that build successful
+        run: |
+          curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_build_green/json/with/key/${{ secrets.IFTTT }}
 
   # Merge PR. GitHub setup to delete SLFB after merge completed.
   pr-merge: 
