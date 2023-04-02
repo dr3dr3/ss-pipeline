@@ -15,7 +15,7 @@ jobs:
   # https://github.com/marketplace/actions/lighthouse-ci-action
   lighthouse:
     name: Google Lighthouse Report
-    if: github.event.schedule == '55 20 * * 0'
+    #if: github.event.schedule == '55 20 * * 0'
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -29,6 +29,8 @@ jobs:
       - name: Run Lighthouse on urls and validate with lighthouserc
         uses: treosh/lighthouse-ci-action@v9
         with:
-          urls: '${{ vars.SITE_URL }}'
+          urls: |
+            https://www.andredreyer.com
+            https://www.andredreyer.com/slides/version.html
           configPath: "./config/lighthouserc.json"
           uploadArtifacts: true
