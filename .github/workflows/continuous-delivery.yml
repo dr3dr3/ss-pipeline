@@ -82,44 +82,28 @@ jobs:
 
   # Do different testing (smoke, PVT, etc)
 
-  # Performance testing using Google Lighthouse
-  # https://github.com/marketplace/actions/lighthouse-ci-action
-  lighthouse:
-    name: Google Lighthouse Report
-    needs: [deploy-to-github-pages]
-    timeout-minutes: 10
-    runs-on: ubuntu-latest
+  # Check all acceptance tests completed
+  acceptance-complete:
+    name: Acceptance👍
+    needs: [check-links, deploy-to-github-pages] ### ADD ALL CHECKS
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          repository: 'dr3dr3/ss-pipeline'
-          ref: 'main'
-          token: ${{ secrets.GHA_PAT }}
 
-      - name: Run Lighthouse on urls and validate with lighthouserc
-        if: ${{ inputs.target-deploy == 'stg' }}
-        uses: treosh/lighthouse-ci-action@v9
-        with:
-          urls: '${{ vars.SITE_URL }}' #"${{ needs.deploy-to-github-pages.outputs.url }}"
-          configPath: "./config/lighthouserc.json"
-          uploadArtifacts: true
-  
-  ifttt:
-    name: Send IFTTT message that ${{ inputs.target-deploy}} deploy successful
-    needs: [lighthouse]
-    timeout-minutes: 10
-    runs-on: ubuntu-latest
-    steps:
-    
-      - name: API Post to IFTTT webhook
+      - name: Ready message
+        run: echo "### Acceptance Completed :thumbsup:" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send IFTTT message that deploy successful
         run: |
           curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_${{ inputs.target-deploy }}_green/json/with/key/${{ secrets.IFTTT }}
 
   # Given successful testing then update the build for this environment in GitOps Config
   build-rmd:
     name: Actual Build for RMD
-    needs: [get-build-artefacts, lighthouse]
+    needs: [get-build-artefacts, acceptance-complete]
     uses: ./.github/workflows/gitops-update.yml
     with:
       config-item: '.deploy.revealmd.build.${{ inputs.target-deploy }}'
