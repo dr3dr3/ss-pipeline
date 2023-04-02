@@ -1,0 +1,34 @@
+name: CHECKS-SCHEDULED
+run-name: Scheduled Checks
+
+on:
+
+  schedule:
+    - cron: '55 20 * * 0'  # Sun at 6:55am Brisbane
+    # https://crontab.guru/
+
+  workflow_dispatch:
+
+jobs:
+
+  # Performance testing using Google Lighthouse
+  # https://github.com/marketplace/actions/lighthouse-ci-action
+  lighthouse:
+    name: Google Lighthouse Report
+    if: github.event.schedule == '55 20 * * 0'
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: 'dr3dr3/ss-pipeline'
+          ref: 'main'
+          token: ${{ secrets.GHA_PAT }}
+
+      - name: Run Lighthouse on urls and validate with lighthouserc
+        uses: treosh/lighthouse-ci-action@v9
+        with:
+          urls: '${{ vars.SITE_URL }}'
+          configPath: "./config/lighthouserc.json"
+          uploadArtifacts: true
