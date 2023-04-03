@@ -62,8 +62,8 @@ jobs:
     # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-failed:
     name: Builds 👎
-    needs: [builds-complete] 
-    if: needs.builds-complete.result == 'skipped'
+    needs: [build-revealmd] 
+    if: always() && !contains(needs.build-revealmd.result, 'success')
     runs-on: ubuntu-latest 
     steps:
 
