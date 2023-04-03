@@ -42,6 +42,9 @@ jobs:
         uses: octokit/graphql-action@v2.x
         id: block
         with:
+          owner: 'dr3dr3'
+          repo: ${{ format('{0}-{1}', 'devops-demo', inputs.target-deploy) }}
+          labels: 'status-deploy-paused'
           query: |
             query release($owner:String!,$repo:String!,$labels:[String!]) {
               repository(owner:$owner,name:$repo) {
@@ -50,9 +53,6 @@ jobs:
                 }
               }
             }
-          owner: 'dr3dr3'
-          repo: ${{ format('{0}-{1}', 'devops-demo', inputs.target-deploy) }}
-          labels: 'status-deploy-paused'
 
       - name: Results
         id: results

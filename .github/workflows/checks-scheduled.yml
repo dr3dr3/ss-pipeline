@@ -37,13 +37,18 @@ jobs:
           runs: 3
           uploadArtifacts: true
 
+      - name: Results
+        run: |
+          echo "### Lighthouse Results :thumbsup:" >> $GITHUB_STEP_SUMMARY
+          echo "Performance: ${{ fromJSON(steps.lighthouse.outputs.manifest).summary.performance }}" >> $GITHUB_STEP_SUMMARY
+
+  # Test for public javascript library vulnerabilities
   security:
     name: Is Website Vulnerable?
     if: github.event.schedule == '55 20 * * 0' || github.event_name == 'workflow_dispatch'
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-
       - name: Test for public javascript library vulnerabilities 
         uses: lirantal/is-website-vulnerable@main
         with:
