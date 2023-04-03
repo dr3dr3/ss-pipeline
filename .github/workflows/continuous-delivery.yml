@@ -57,6 +57,9 @@ jobs:
           name: ${{ format('{0}-{1}', 'RC', github.run_id ) }}
           path: _site
           retention-days: 1
+
+      - name: Fail to test workflow
+        run: exit 1
   
   # Check links working in compiled deploy artefact
   check-links:
@@ -70,7 +73,7 @@ jobs:
   # Deploy to GitHub Page
   deploy-to-github-pages:
     name: Deploy GHP
-    needs: [get-build-artefacts, check-links]
+    needs: [get-build-artefacts]
     uses: ./.github/workflows/deploy-github-pages.yml
     permissions:
       contents: read
@@ -82,14 +85,22 @@ jobs:
 
   # Do different testing (smoke, PVT, etc)
 
-  # Check all acceptance tests completed
+  # Given successful testing then update the build for this environment in GitOps Config
+  build-rmd:
+    name: Actual Build for RMD
+    needs: [get-build-artefacts]
+    uses: ./.github/workflows/gitops-update.yml
+    with:
+      config-item: '.deploy.revealmd.build.${{ inputs.target-deploy }}'
+      config-value: ${{ needs.get-build-artefacts.outputs.build-rmd }}
+    secrets: inherit
+
+  # Do for other solutions as well
+
+  # Check all acceptance completed
   acceptance-complete:
     name: Acceptance 👍
-    needs: [check-links, deploy-to-github-pages] ### ADD ALL CHECKS
-    if: |
-      always() &&
-      !contains(needs.*.result, 'failure') &&
-      !contains(needs.*.result, 'cancelled')
+    needs: [get-build-artefacts, check-links, deploy-to-github-pages, build-rmd] ### ADD ALL CHECKS
     runs-on: ubuntu-latest 
     steps:
 
@@ -102,7 +113,7 @@ jobs:
 
   acceptance-failed:
     name: Acceptance 👎
-    needs: [check-links, deploy-to-github-pages] ### ADD ALL CHECKS
+    needs: [get-build-artefacts, check-links, deploy-to-github-pages, build-rmd] ### ADD ALL CHECKS
     if: |
       always() &&
       contains(needs.*.result, 'failure') ||
@@ -116,15 +127,3 @@ jobs:
       - name: Send IFTTT message that deploy failed
         run: |
           curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_${{ inputs.target-deploy }}_red/json/with/key/${{ secrets.IFTTT }}
-
-  # Given successful testing then update the build for this environment in GitOps Config
-  build-rmd:
-    name: Actual Build for RMD
-    needs: [get-build-artefacts, acceptance-complete]
-    uses: ./.github/workflows/gitops-update.yml
-    with:
-      config-item: '.deploy.revealmd.build.${{ inputs.target-deploy }}'
-      config-value: ${{ needs.get-build-artefacts.outputs.build-rmd }}
-    secrets: inherit
-
-  # Do for other solutions as well
