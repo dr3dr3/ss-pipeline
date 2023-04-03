@@ -63,7 +63,7 @@ jobs:
   builds-failed:
     name: Builds 👎
     needs: [build-revealmd] 
-    if: always() && !contains(needs.build-revealmd.result, 'success')
+    if: always() && needs.build-revealmd.result == 'failure'
     runs-on: ubuntu-latest 
     steps:
 
@@ -144,8 +144,8 @@ jobs:
 
   ci-failed:
     name: CI Failed 👎
-    needs: [ci-complete] 
-    if: needs.ci-complete.result == 'skipped'
+    needs: [tag-release, target-build-stg, deploy-ci] 
+    if: always() && (needs.tag-release.result == 'failure' || needs.target-build-stg.result == 'failure' || needs.deploy-ci.result == 'failure')
     runs-on: ubuntu-latest 
     steps:
 
