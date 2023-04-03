@@ -19,6 +19,7 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -35,3 +36,19 @@ jobs:
           configPath: "./config/lighthouserc.json"
           runs: 3
           uploadArtifacts: true
+
+  security:
+    name: Is Website Vulnerable?
+    if: github.event.schedule == '55 20 * * 0' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Test for public javascript library vulnerabilities 
+        uses: lirantal/is-website-vulnerable@main
+        with:
+          scan-url: "https://www.andredreyer.com/slides/version.html"
+
+### Results of checks send to workflow outputs
+
+### If any checks fail then add issue to pause Prod deployments and alert via IFTTT
