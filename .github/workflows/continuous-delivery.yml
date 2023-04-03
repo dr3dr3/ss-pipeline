@@ -84,7 +84,7 @@ jobs:
 
   # Check all acceptance tests completed
   acceptance-complete:
-    name: Acceptance👍
+    name: Acceptance 👍
     needs: [check-links, deploy-to-github-pages] ### ADD ALL CHECKS
     if: |
       always() &&
@@ -99,6 +99,23 @@ jobs:
       - name: Send IFTTT message that deploy successful
         run: |
           curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_${{ inputs.target-deploy }}_green/json/with/key/${{ secrets.IFTTT }}
+
+  acceptance-failed:
+    name: Acceptance 👎
+    needs: [check-links, deploy-to-github-pages] ### ADD ALL CHECKS
+    if: |
+      always() &&
+      contains(needs.*.result, 'failure') ||
+      contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest 
+    steps:
+
+      - name: Ready message
+        run: echo "### Acceptance Failed :thumbsdown:" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send IFTTT message that deploy failed
+        run: |
+          curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_${{ inputs.target-deploy }}_red/json/with/key/${{ secrets.IFTTT }}
 
   # Given successful testing then update the build for this environment in GitOps Config
   build-rmd:

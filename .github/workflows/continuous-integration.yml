@@ -47,7 +47,7 @@ jobs:
 
   # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-complete:
-    name: Builds👍
+    name: Builds 👍
     needs: [build-revealmd] ### ADD MORE SS SOLUTIONS
     if: |
       always() &&
@@ -62,6 +62,24 @@ jobs:
       - name: Send IFTTT message that build successful
         run: |
           curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_build_green/json/with/key/${{ secrets.IFTTT }}
+
+    # Check builds ok. Is a required check on the PR (setup in GitHub). 
+  builds-failed:
+    name: Builds 👎
+    needs: [build-revealmd] ### ADD MORE SS SOLUTIONS
+    if: |
+      always() &&
+      contains(needs.*.result, 'failure') ||
+      contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest 
+    steps:
+
+      - name: Ready message
+        run: echo "### Builds Failed :thumbsdown:" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send IFTTT message that build successful
+        run: |
+          curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_build_red/json/with/key/${{ secrets.IFTTT }}
 
   # Merge PR. GitHub setup to delete SLFB after merge completed.
   pr-merge: 
@@ -93,6 +111,16 @@ jobs:
       feature: ${{ inputs.feature }}
     secrets: inherit
 
+  # Set target build in GitOps config (to be used in continuous deployment)
+  target-build-stg:
+    name: Set Target Build in Config
+    needs: [set-tag, builds-complete]
+    uses: ./.github/workflows/gitops-update.yml
+    with:
+      config-item: '.deploy.revealmd.build.target'
+      config-value: ${{ needs.set-tag.outputs.tag }}
+    secrets: inherit
+
   # Deploy CI to GitHub Pages
   # Uses artefacts created by build jobs
   deploy-ci:
@@ -106,31 +134,46 @@ jobs:
     with:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
 
-  ifttt-ci:
-    name: Send IFTTT message that build successful
-    needs: [deploy-ci]
-    timeout-minutes: 10
-    runs-on: ubuntu-latest
+  # Run CI Tests here
+
+  ci-complete:
+    name: CI Complete 👍
+    needs: [tag-release, target-build-stg, deploy-ci] 
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest 
     steps:
-    
-      - name: API Post to IFTTT webhook
+
+      - name: Ready message
+        run: echo "### Continuous Integration Completed :thumbsup:" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send IFTTT message that CI successful
         run: |
           curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_ci_green/json/with/key/${{ secrets.IFTTT }}
 
-  # Set target build in GitOps config (to be used in continuous deployment)
-  target-build-stg:
-    name: Set Target Build in Config
-    needs: [set-tag, builds-complete]
-    uses: ./.github/workflows/gitops-update.yml
-    with:
-      config-item: '.deploy.revealmd.build.target'
-      config-value: ${{ needs.set-tag.outputs.tag }}
-    secrets: inherit
+  ci-failed:
+    name: CI Failed 👎
+    needs: [tag-release, target-build-stg, deploy-ci] 
+    if: |
+      always() &&
+      contains(needs.*.result, 'failure') ||
+      contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest 
+    steps:
+
+      - name: Ready message
+        run: echo "### Continuous Integration Failed :thumbsdown:" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send IFTTT message that Ci failed
+        run: |
+          curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_ci_red/json/with/key/${{ secrets.IFTTT }}
 
   # Dispatch to Deploy to Stage Environment
   dispatch-stg:
     name: Dispatch STG
-    needs: [set-tag, tag-release, target-build-stg]
+    needs: [ci-complete]
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
       target-deploy: 'stg'
