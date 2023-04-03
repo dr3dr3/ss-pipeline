@@ -43,4 +43,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Fail to test workflow
+        run: exit 1
+  
+
 ### ADD: Get release notes from related issue (if issue ID in commit message) and put into body of release

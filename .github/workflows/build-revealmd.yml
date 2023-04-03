@@ -101,9 +101,6 @@ jobs:
           path: reveal-md/_site
           retention-days: 1
 
-      - name: Fail to test workflow
-        run: exit 1
-
   check-links:
     name: 🔗 Check Links
     needs: [build]
