@@ -49,7 +49,6 @@ jobs:
   builds-complete:
     name: Builds 👍
     needs: [build-revealmd] ### ADD MORE SS SOLUTIONS
-    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest 
     steps:
 
@@ -63,8 +62,8 @@ jobs:
     # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-failed:
     name: Builds 👎
-    needs: [build-revealmd] ### ADD MORE SS SOLUTIONS
-    if: failure() || cancelled()
+    needs: [builds-complete] 
+    if: always() && needs.builds-complete.result == 'skipped'
     runs-on: ubuntu-latest 
     steps:
 
@@ -146,8 +145,8 @@ jobs:
 
   ci-failed:
     name: CI Failed 👎
-    needs: [tag-release, target-build-stg, deploy-ci] 
-    if: failure() || cancelled()
+    needs: [ci-complete] 
+    if: always() && needs.ci-complete.result == 'skipped'
     runs-on: ubuntu-latest 
     steps:
 
