@@ -63,7 +63,7 @@ jobs:
   builds-failed:
     name: Builds 👎
     needs: [builds-complete] 
-    if: always() && needs.builds-complete.result == 'skipped'
+    if: needs.builds-complete.result == 'skipped'
     runs-on: ubuntu-latest 
     steps:
 
@@ -132,7 +132,6 @@ jobs:
   ci-complete:
     name: CI Complete 👍
     needs: [tag-release, target-build-stg, deploy-ci] 
-    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest 
     steps:
 
@@ -146,7 +145,7 @@ jobs:
   ci-failed:
     name: CI Failed 👎
     needs: [ci-complete] 
-    if: always() && needs.ci-complete.result == 'skipped'
+    if: needs.ci-complete.result == 'skipped'
     runs-on: ubuntu-latest 
     steps:
 
