@@ -57,9 +57,6 @@ jobs:
           name: ${{ format('{0}-{1}', 'RC', github.run_id ) }}
           path: _site
           retention-days: 1
-
-      - name: Fail to test workflow
-        run: exit 1
   
   # Check links working in compiled deploy artefact
   check-links:
