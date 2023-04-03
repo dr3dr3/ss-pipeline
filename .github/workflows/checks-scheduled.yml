@@ -41,7 +41,7 @@ jobs:
       - name: Results
         run: |
           echo "### Lighthouse Results :thumbsup:" >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.lighthouse-ci.outputs.manifest }}" >> $GITHUB_STEP_SUMMARY
+          echo "${{ toJSON(steps.lighthouse-ci.outputs.manifest) }}" >> $GITHUB_STEP_SUMMARY
 
   # Test for public javascript library vulnerabilities
   security:
