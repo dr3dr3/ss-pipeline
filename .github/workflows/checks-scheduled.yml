@@ -28,6 +28,7 @@ jobs:
           token: ${{ secrets.GHA_PAT }}
 
       - name: Run Lighthouse on urls and validate with lighthouserc
+        id: lighthouse-ci
         uses: treosh/lighthouse-ci-action@v9
         with:
           urls: |
@@ -40,7 +41,7 @@ jobs:
       - name: Results
         run: |
           echo "### Lighthouse Results :thumbsup:" >> $GITHUB_STEP_SUMMARY
-          echo "Performance: ${{ steps.lighthouse.outputs.manifest || 'Error' }}" >> $GITHUB_STEP_SUMMARY
+          echo "Performance: ${{ fromJSON(steps.lighthouse-ci.outputs.manifest).summary.performance }}" >> $GITHUB_STEP_SUMMARY
 
   # Test for public javascript library vulnerabilities
   security:
