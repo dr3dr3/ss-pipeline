@@ -44,6 +44,7 @@ jobs:
 
   set-tag:
     name: 🔖 Set Tag
+    needs: [get-config]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     outputs:
@@ -88,6 +89,7 @@ jobs:
   builds-complete:
     name: Builds 👍
     needs: [build-revealmd, build-landing] ### ADD MORE SS SOLUTIONS
+    if: always() && (needs.build-revealmd.result == 'success' || needs.build-landing.result == 'success')
     runs-on: ubuntu-latest 
     steps:
 
