@@ -28,7 +28,10 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      ##### Solution: Landing
+      - name: Create directory
+        run: mkdir _site
+
+##### Solution: Landing
 
       - name: Landing Target Build
         id: landing
@@ -44,9 +47,8 @@ jobs:
 
       - name: Landing Pages Build Artefact
         run: |
-          wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.TARGET }}/build.tar.gz"
-          mkdir _site
-          tar -xzvf build.tar.gz -C _site
+          wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.TARGET }}/build.tar.gz" -O landing.tar.gz
+          tar -xzvf landing.tar.gz -C _site
 
           ##### Solution: Reveal-MD
 
@@ -64,9 +66,9 @@ jobs:
 
       - name: Reveal-MD Build Artefact
         run: |
-          wget "https://github.com/${{ steps.revealmd.outputs.REPO }}/releases/download/${{ steps.revealmd.outputs.TARGET }}/build.tar.gz"
+          wget "https://github.com/${{ steps.revealmd.outputs.REPO }}/releases/download/${{ steps.revealmd.outputs.TARGET }}/build.tar.gz" -O revealmd.tar.gz
           mkdir _site/reveal
-          tar -xzvf build.tar.gz -C _site/reveal
+          tar -xzvf revealmd.tar.gz -C _site/reveal
 
 #      - name: Rename index.html from Reveal-MD
 #        run: rsync -avh _site/index.html _site/slides.html
