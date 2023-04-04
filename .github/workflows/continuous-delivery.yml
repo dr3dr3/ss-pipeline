@@ -35,8 +35,10 @@ jobs:
         run: |
           target="$(yq '.deploy.revealmd.build.target' 'config.yml')" || 'ERROR'
           echo "TARGET=$target" >> $GITHUB_OUTPUT
+          echo "Target = $target"
           current="$(yq '.deploy.revealmd.build.${{ inputs.target-deploy }}' 'config.yml')" || 'ERROR'
           echo "CURRENT=$current" >> $GITHUB_OUTPUT
+          echo "Current = $current"
           repo="$(yq '.repositories.solutions.revealmd' 'config.yml')" || 'ERROR'
           echo "REPO=$repo" >> $GITHUB_OUTPUT
 
@@ -55,8 +57,10 @@ jobs:
         run: |
           target="$(yq '.deploy.landing.build.target' 'config.yml')" || 'ERROR'
           echo "TARGET=$target" >> $GITHUB_OUTPUT
+          echo "Target = $target"
           current="$(yq '.deploy.landing.build.${{ inputs.target-deploy }}' 'config.yml')" || 'ERROR'
           echo "CURRENT=$current" >> $GITHUB_OUTPUT
+          echo "Current = $current"
           repo="$(yq '.repositories.solutions.landing' 'config.yml')" || 'ERROR'
           echo "REPO=$repo" >> $GITHUB_OUTPUT
 
@@ -137,10 +141,7 @@ jobs:
   acceptance-failed:
     name: Acceptance 👎
     needs: [get-build-artefacts, check-links, deploy-to-github-pages, config-revealmd, config-landing] ### ADD ALL CHECKS
-    if: |
-      always() &&
-      contains(needs.*.result, 'failure') ||
-      contains(needs.*.result, 'cancelled')
+    if: always() && ( contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') )
     runs-on: ubuntu-latest 
     steps:
 
