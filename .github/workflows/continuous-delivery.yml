@@ -28,28 +28,6 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      ##### Solution: Reveal-MD
-
-      - name: Reveal-MD Target Build
-        id: revealmd
-        run: |
-          target="$(yq '.deploy.revealmd.build.target' 'config.yml')" || 'ERROR'
-          echo "TARGET=$target" >> $GITHUB_OUTPUT
-          echo "Target = $target"
-          current="$(yq '.deploy.revealmd.build.${{ inputs.target-deploy }}' 'config.yml')" || 'ERROR'
-          echo "CURRENT=$current" >> $GITHUB_OUTPUT
-          echo "Current = $current"
-          repo="$(yq '.repositories.solutions.revealmd' 'config.yml')" || 'ERROR'
-          echo "REPO=$repo" >> $GITHUB_OUTPUT
-
-      - name: Reveal-MD Build Artefact
-        run: |
-          wget "https://github.com/${{ steps.revealmd.outputs.REPO }}/releases/download/${{ steps.revealmd.outputs.TARGET }}/build.tar.gz"
-          tar -xzvf build.tar.gz
-
-      - name: Rename index.html from Reveal-MD
-        run: rsync -avh _site/index.html _site/slides.html
-
       ##### Solution: Landing
 
       - name: Landing Target Build
@@ -67,7 +45,29 @@ jobs:
       - name: Landing Pages Build Artefact
         run: |
           wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.TARGET }}/build.tar.gz"
-          tar -xzvf build.tar.gz
+          tar -xzvf build.tar.gz -C _site
+
+          ##### Solution: Reveal-MD
+
+      - name: Reveal-MD Target Build
+        id: revealmd
+        run: |
+          target="$(yq '.deploy.revealmd.build.target' 'config.yml')" || 'ERROR'
+          echo "TARGET=$target" >> $GITHUB_OUTPUT
+          echo "Target = $target"
+          current="$(yq '.deploy.revealmd.build.${{ inputs.target-deploy }}' 'config.yml')" || 'ERROR'
+          echo "CURRENT=$current" >> $GITHUB_OUTPUT
+          echo "Current = $current"
+          repo="$(yq '.repositories.solutions.revealmd' 'config.yml')" || 'ERROR'
+          echo "REPO=$repo" >> $GITHUB_OUTPUT
+
+      - name: Reveal-MD Build Artefact
+        run: |
+          wget "https://github.com/${{ steps.revealmd.outputs.REPO }}/releases/download/${{ steps.revealmd.outputs.TARGET }}/build.tar.gz"
+          tar -xzvf build.tar.gz -C _site/reveal
+
+#      - name: Rename index.html from Reveal-MD
+#        run: rsync -avh _site/index.html _site/slides.html
 
       ##### Upload Deployable Artifact
 
