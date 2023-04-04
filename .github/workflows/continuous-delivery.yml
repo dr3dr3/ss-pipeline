@@ -45,6 +45,7 @@ jobs:
       - name: Landing Pages Build Artefact
         run: |
           wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.TARGET }}/build.tar.gz"
+          mkdir _site
           tar -xzvf build.tar.gz -C _site
 
           ##### Solution: Reveal-MD
@@ -64,6 +65,7 @@ jobs:
       - name: Reveal-MD Build Artefact
         run: |
           wget "https://github.com/${{ steps.revealmd.outputs.REPO }}/releases/download/${{ steps.revealmd.outputs.TARGET }}/build.tar.gz"
+          mkdir _site/reveal
           tar -xzvf build.tar.gz -C _site/reveal
 
 #      - name: Rename index.html from Reveal-MD
