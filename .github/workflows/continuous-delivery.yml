@@ -29,7 +29,7 @@ jobs:
           token: ${{ secrets.GHA_PAT }}
 
       - name: Create directory
-        run: mkdir _site
+        run: mkdir _deploy
 
 ##### Solution: Landing
 
@@ -48,7 +48,7 @@ jobs:
       - name: Landing Pages Build Artefact
         run: |
           wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.TARGET }}/build.tar.gz" -O landing.tar.gz
-          tar -xzvf landing.tar.gz -C _site
+          tar -xzvf landing.tar.gz
 
           ##### Solution: Reveal-MD
 
@@ -67,8 +67,8 @@ jobs:
       - name: Reveal-MD Build Artefact
         run: |
           wget "https://github.com/${{ steps.revealmd.outputs.REPO }}/releases/download/${{ steps.revealmd.outputs.TARGET }}/build.tar.gz" -O revealmd.tar.gz
-          mkdir _site/reveal
-          tar -xzvf revealmd.tar.gz -C _site/reveal
+          mkdir _deploy/reveal
+          tar -xzvf revealmd.tar.gz -C _deploy/reveal
 
 #      - name: Rename index.html from Reveal-MD
 #        run: rsync -avh _site/index.html _site/slides.html
@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ format('{0}-{1}', 'RC', github.run_id ) }}
-          path: _site
+          path: _deploy
           retention-days: 1
   
   # Check links working in compiled deploy artefact
