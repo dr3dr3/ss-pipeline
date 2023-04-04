@@ -88,8 +88,11 @@ jobs:
   # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-complete:
     name: Builds 👍
-    needs: [build-revealmd, build-landing] ### ADD MORE SS SOLUTIONS
-    if: always() && (needs.build-revealmd.result == 'success' || needs.build-landing.result == 'success')
+    needs: [build-revealmd, build-landing] ### ADD MORE SOLUTIONS
+    if: |
+      always() && 
+      (needs.build-revealmd.result == 'success' || needs.build-revealmd.result == 'skipped') &&
+      (needs.build-landing.result == 'success' || needs.build-landing.result == 'skipped')
     runs-on: ubuntu-latest 
     steps:
 
@@ -136,7 +139,7 @@ jobs:
 
   ## TAG RELEASE
   tag-release:
-    name: 🔖
+    name: Tag and Release
     needs: [set-tag, builds-complete]
     uses: ./.github/workflows/tag-release.yml
     with:
