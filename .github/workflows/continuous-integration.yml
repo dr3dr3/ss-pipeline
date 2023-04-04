@@ -44,7 +44,6 @@ jobs:
 
   set-tag:
     name: 🔖 Set Tag
-    needs: [get-config]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     outputs:
@@ -59,40 +58,35 @@ jobs:
           echo "TAG=$build" >> $GITHUB_OUTPUT          
 
   ##### BUILD FOR EACH SOLUTION
-  # BUILDS INCLUDE TESTING (Unit Testing, Mocked Integration Testing, etc)
+  # BUILDS INCLUDE TESTING (Linting, Static Analysis, Unit Testing, etc)
 
   # Build static site using Reveal-MD
-  build-revealmd:
-    name: Reveal-MD Build
+  build:
+    name: Build
     needs: [get-config, set-tag]
-    if: ${{ github.repository == needs.get-config.outputs.repo-revealmd }}
-    uses: ./.github/workflows/build-revealmd.yml
+    uses: ./.github/workflows/build-solutions.yml
     secrets: inherit
     with: 
       target-ref: ${{ inputs.target-ref }}
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
-
-  # Build static site using Reveal-MD
-  build-landing:
-    name: Landing Build
-    needs: [get-config, set-tag]
-    if: ${{ github.repository == needs.get-config.outputs.repo-landing }}
-    uses: ./.github/workflows/build-revealmd.yml
-    secrets: inherit
-    with: 
-      target-ref: ${{ inputs.target-ref }}
-      artefact-ref: ${{ needs.set-tag.outputs.tag }}
+      solution: 'revealmd'
 
   ##### Other solutions builds above
+
+  check-links:
+    name: 🔗 Check Links
+    needs: [set-tag, build]
+    uses: ./.github/workflows/check-links.yml
+    secrets: inherit
+    with: 
+      artefact-ref: ${{ needs.set-tag.outputs.tag }}
+
+  ##### Tests on build above
 
   # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-complete:
     name: Builds 👍
-    needs: [build-revealmd, build-landing] ### ADD MORE SOLUTIONS
-    if: |
-      always() && 
-      (needs.build-revealmd.result == 'success' || needs.build-revealmd.result == 'skipped') &&
-      (needs.build-landing.result == 'success' || needs.build-landing.result == 'skipped')
+    needs: [build] ### ADD MORE SOLUTIONS
     runs-on: ubuntu-latest 
     steps:
 
@@ -106,8 +100,8 @@ jobs:
     # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-failed:
     name: Builds 👎
-    needs: [build-revealmd, build-landing] 
-    if: always() && (needs.build-revealmd.result == 'failure' || needs.build-landing.result == 'failure')
+    needs: [build] 
+    if: always() && (needs.build.result == 'failure' || needs.check-links.result == 'failure')
     runs-on: ubuntu-latest 
     steps:
 
@@ -130,7 +124,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Merge Pull Request
-        run: gh pr merge ${{ inputs.slfb }} --squash --subject "${{ inputs.slfb }}" --body "Short-lived feature branch ${{ inputs.slfb }} automerged by GitHub Action" --auto
+        run: gh pr merge ${{ inputs.feature }} --squash --subject "${{ inputs.feature }}" --body "Short-lived feature branch ${{ inputs.feature }} automerged by GitHub Action" --auto
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

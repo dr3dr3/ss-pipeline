@@ -8,12 +8,17 @@ on:
         type: string
       artefact-ref:
         required: true
-        type: string        
+        type: string
+      solution:
+          required: true
+          type: string 
 
 jobs:
+
   # Build static site using Reveal-MD
-  build:
-    name: 🔨 Build
+  build-revealmd:
+    name: 🔨 Build Reveal-MD
+    if: inputs.solution == 'revealmd'
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -101,10 +106,25 @@ jobs:
           path: reveal-md/_site
           retention-days: 1
 
-  check-links:
-    name: 🔗 Check Links
-    needs: [build]
-    uses: ./.github/workflows/check-links.yml
-    secrets: inherit
-    with: 
-      artefact-ref: ${{ inputs.artefact-ref }}
+            # Build static site for landing page(s)
+  build-landing:
+    name: 🔨 Build Landing Pages
+    if: inputs.solution == 'landing'
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Soln Repo
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ inputs.target-ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.artefact-ref }}
+          path: _site
+          retention-days: 1
