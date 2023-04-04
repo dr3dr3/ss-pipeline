@@ -14,6 +14,34 @@ on:
 
 jobs:
 
+  get-config:
+    name: Get Configuration from GitOps repo
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    outputs:
+      repo-revealmd: ${{ steps.setoutputs.outputs.REVEALMD }}
+      repo-landing: ${{ steps.setoutputs.outputs.LANDING }}
+      solution: ${{ steps.setoutputs.outputs.SOLN }}
+    steps:
+
+      - name: Checkout GitOps
+        uses: actions/checkout@v3
+        with:
+          repository: 'dr3dr3/ss-gitops'
+          ref: 'main'
+          token: ${{ secrets.GHA_PAT }}
+
+      ### Reveal-MD Solution
+
+      - name: Config RMD
+        id: setoutputs
+        run: |
+          rmd="$(yq '.repositories.solutions.revealmd' 'config.yml')" || 'ERROR'
+          echo "REVEALMD=$rmd" >> $GITHUB_OUTPUT
+          land="$(yq '.repositories.solutions.landing' 'config.yml')" || 'ERROR'
+          echo "LANDING=$land" >> $GITHUB_OUTPUT
+          echo "SOLN=$SOLUTION" >> $GITHUB_OUTPUT
+
   set-tag:
     name: 🔖 Set Tag
     timeout-minutes: 10
@@ -29,26 +57,37 @@ jobs:
           echo "$build"
           echo "TAG=$build" >> $GITHUB_OUTPUT          
 
-  # BUILD FOR EACH SOLUTION
+  ##### BUILD FOR EACH SOLUTION
+  # BUILDS INCLUDE TESTING (Unit Testing, Mocked Integration Testing, etc)
 
   # Build static site using Reveal-MD
   build-revealmd:
-    name: RMD
-    needs: [set-tag]
-    if: ${{ github.repository == 'dr3dr3/devops-demo' }}
+    name: Reveal-MD Build
+    needs: [get-config, set-tag]
+    if: ${{ github.repository == needs.get-config.outputs.repo-revealmd }}
     uses: ./.github/workflows/build-revealmd.yml
     secrets: inherit
     with: 
       target-ref: ${{ inputs.target-ref }}
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
 
-  # Other solutions builds here
-  # BUILDS INCLUDE TESTING (Unit Testing, Mocked Integration Testing, etc)
+  # Build static site using Reveal-MD
+  build-landing:
+    name: Landing Build
+    needs: [get-config, set-tag]
+    if: ${{ github.repository == needs.get-config.outputs.repo-landing }}
+    uses: ./.github/workflows/build-revealmd.yml
+    secrets: inherit
+    with: 
+      target-ref: ${{ inputs.target-ref }}
+      artefact-ref: ${{ needs.set-tag.outputs.tag }}
+
+  ##### Other solutions builds above
 
   # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-complete:
     name: Builds 👍
-    needs: [build-revealmd] ### ADD MORE SS SOLUTIONS
+    needs: [build-revealmd, build-landing] ### ADD MORE SS SOLUTIONS
     runs-on: ubuntu-latest 
     steps:
 
@@ -62,8 +101,8 @@ jobs:
     # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-failed:
     name: Builds 👎
-    needs: [build-revealmd] 
-    if: always() && needs.build-revealmd.result == 'failure'
+    needs: [build-revealmd, build-landing] 
+    if: always() && (needs.build-revealmd.result == 'failure' || needs.build-landing.result == 'failure')
     runs-on: ubuntu-latest 
     steps:
 
@@ -107,10 +146,10 @@ jobs:
   # Set target build in GitOps config (to be used in continuous deployment)
   target-build-stg:
     name: Set Target Build in Config
-    needs: [set-tag, builds-complete]
+    needs: [get-config, set-tag, builds-complete]
     uses: ./.github/workflows/gitops-update.yml
     with:
-      config-item: '.deploy.revealmd.build.target'
+      config-item: '.deploy.${{ needs.get-config.outputs.solution }}.build.target'
       config-value: ${{ needs.set-tag.outputs.tag }}
     secrets: inherit
 

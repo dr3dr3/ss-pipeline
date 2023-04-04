@@ -13,7 +13,10 @@ jobs:
   get-build-artefacts:
     name: Get Build Artefacts
     outputs:
-      build-rmd: ${{ steps.build-rmd.outputs.RMD }}   
+      target-revealmd: ${{ steps.revealmd.outputs.TARGET }}   
+      current-revealmd: ${{ steps.revealmd.outputs.CURRENT }}   
+      target-landing: ${{ steps.landing.outputs.TARGET }}   
+      current-landing: ${{ steps.landing.outputs.CURRENT }}   
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -25,31 +28,44 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      ### Reveal-MD Solution
+      ##### Solution: Reveal-MD
 
-      - name: Config RMD
-        id: build-rmd
+      - name: Reveal-MD Target Build
+        id: revealmd
         run: |
-          value="$(yq '.deploy.revealmd.build.target' 'config.yml')" || 'ERROR'
-          echo "RMD=$value" >> $GITHUB_OUTPUT
+          target="$(yq '.deploy.revealmd.build.target' 'config.yml')" || 'ERROR'
+          echo "TARGET=$target" >> $GITHUB_OUTPUT
+          current="$(yq '.deploy.revealmd.build.${{ inputs.target-deploy }}' 'config.yml')" || 'ERROR'
+          echo "CURRENT=$current" >> $GITHUB_OUTPUT
+          repo="$(yq '.repositories.solutions.revealmd' 'config.yml')" || 'ERROR'
+          echo "REPO=$repo" >> $GITHUB_OUTPUT
 
       - name: Reveal-MD Build Artefact
         run: |
-          wget "https://github.com/dr3dr3/devops-demo/releases/download/${{ steps.build-rmd.outputs.RMD }}/build.tar.gz"
+          wget "https://github.com/${{ steps.revealmd.outputs.REPO }}/releases/download/${{ steps.revealmd.outputs.TARGET }}/build.tar.gz"
           tar -xzvf build.tar.gz
 
       - name: Rename index.html from Reveal-MD
-        run: rsync -avh _site/index.html _site/links.html
+        run: rsync -avh _site/index.html _site/slides.html
 
+      ##### Solution: Landing
 
-      # Add placeholder index.html (overwrites index.html created by Reveal-MD)
-      - name: index.html with canary redirect
-        if: ${{ inputs.target-deploy == 'prd' }}
-        run: echo "<!doctype html><html lang='en'><head><title>Test</title><script>var url_25 = 'http://can.andredreyer.com'; var choice = Math.floor((Math.random() * 4)); if(choice == 3){window.location = url_25;}</script></head><body><p>Reveal-MD ${{ steps.build-rmd.outputs.RMD }}</p><p>Environment = ${{ inputs.target-deploy }}</p></body></html>" > _site/index.html
+      - name: Landing Target Build
+        id: landing
+        run: |
+          target="$(yq '.deploy.landing.build.target' 'config.yml')" || 'ERROR'
+          echo "TARGET=$target" >> $GITHUB_OUTPUT
+          current="$(yq '.deploy.landing.build.${{ inputs.target-deploy }}' 'config.yml')" || 'ERROR'
+          echo "CURRENT=$current" >> $GITHUB_OUTPUT
+          repo="$(yq '.repositories.solutions.landing' 'config.yml')" || 'ERROR'
+          echo "REPO=$repo" >> $GITHUB_OUTPUT
 
-      - name: index.html
-        if: ${{ inputs.target-deploy != 'prd' }}
-        run: echo "<!doctype html><html lang="en"><head><title>Test</title></head><body><p>Reveal-MD ${{ steps.build-rmd.outputs.RMD }}</p><p>Environment = ${{ inputs.target-deploy }}</p></body></html>" > _site/index.html
+      - name: Reveal-MD Build Artefact
+        run: |
+          wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.BUILD }}/build.tar.gz"
+          tar -xzvf build.tar.gz
+
+      ##### Upload Deployable Artifact
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
@@ -83,21 +99,31 @@ jobs:
   # Do different testing (smoke, PVT, etc)
 
   # Given successful testing then update the build for this environment in GitOps Config
-  build-rmd:
-    name: Actual Build for RMD
+  config-revealmd:
+    name: Actual Build for Reveal-MD
     needs: [get-build-artefacts]
+    if: needs.get-build-artefacts.outputs.current-revealmd != needs.get-build-artefacts.outputs.target-revealmd
     uses: ./.github/workflows/gitops-update.yml
     with:
       config-item: '.deploy.revealmd.build.${{ inputs.target-deploy }}'
-      config-value: ${{ needs.get-build-artefacts.outputs.build-rmd }}
+      config-value: ${{ needs.get-build-artefacts.outputs.target-revealmd }}
     secrets: inherit
 
-  # Do for other solutions as well
+  # Given successful testing then update the build for this environment in GitOps Config
+  config-landing:
+    name: Actual Build for Landing
+    needs: [get-build-artefacts]
+    if: needs.get-build-artefacts.outputs.current-landing != needs.get-build-artefacts.outputs.target-landing
+    uses: ./.github/workflows/gitops-update.yml
+    with:
+      config-item: '.deploy.landing.build.${{ inputs.target-deploy }}'
+      config-value: ${{ needs.get-build-artefacts.outputs.target-landing }}
+    secrets: inherit
 
   # Check all acceptance completed
   acceptance-complete:
     name: Acceptance 👍
-    needs: [get-build-artefacts, check-links, deploy-to-github-pages, build-rmd] ### ADD ALL CHECKS
+    needs: [get-build-artefacts, check-links, deploy-to-github-pages, config-revealmd, config-landing] ### ADD ALL CHECKS
     runs-on: ubuntu-latest 
     steps:
 
@@ -110,7 +136,7 @@ jobs:
 
   acceptance-failed:
     name: Acceptance 👎
-    needs: [get-build-artefacts, check-links, deploy-to-github-pages, build-rmd] ### ADD ALL CHECKS
+    needs: [get-build-artefacts, check-links, deploy-to-github-pages, config-revealmd, config-landing] ### ADD ALL CHECKS
     if: |
       always() &&
       contains(needs.*.result, 'failure') ||
