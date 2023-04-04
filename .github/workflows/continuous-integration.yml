@@ -11,6 +11,9 @@ on:
       target-ref:
         required: true
         type: string
+      solution:
+        required: true
+        type: string 
 
 jobs:
 
@@ -40,7 +43,6 @@ jobs:
           echo "REVEALMD=$rmd" >> $GITHUB_OUTPUT
           land="$(yq '.repositories.solutions.landing' 'config.yml')" || 'ERROR'
           echo "LANDING=$land" >> $GITHUB_OUTPUT
-          echo "SOLN=$SOLUTION" >> $GITHUB_OUTPUT
 
   set-tag:
     name: 🔖 Set Tag
