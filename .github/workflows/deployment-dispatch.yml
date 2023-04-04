@@ -30,7 +30,7 @@ on:
 jobs:
 
   blocked:
-    name: Check if blocked
+    name: Check if deployments blocked
     outputs:
       check: ${{ steps.results.outputs.COUNT }}
     runs-on: ubuntu-latest

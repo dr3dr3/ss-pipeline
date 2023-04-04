@@ -60,9 +60,9 @@ jobs:
           repo="$(yq '.repositories.solutions.landing' 'config.yml')" || 'ERROR'
           echo "REPO=$repo" >> $GITHUB_OUTPUT
 
-      - name: Reveal-MD Build Artefact
+      - name: Landing Pages Build Artefact
         run: |
-          wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.BUILD }}/build.tar.gz"
+          wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.TARGET }}/build.tar.gz"
           tar -xzvf build.tar.gz
 
       ##### Upload Deployable Artifact

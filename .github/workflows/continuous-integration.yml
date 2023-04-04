@@ -44,7 +44,7 @@ jobs:
     with: 
       target-ref: ${{ inputs.target-ref }}
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
-      solution: 'revealmd'
+      solution: ${{ inputs.solution }}
 
   ##### Other solutions builds above
 
@@ -158,7 +158,10 @@ jobs:
   ci-failed:
     name: CI Failed 👎
     needs: [tag-release, target-build-stg, deploy-ci] 
-    if: always() && (needs.tag-release.result == 'failure' || needs.target-build-stg.result == 'failure' || needs.deploy-ci.result == 'failure')
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest 
     steps:
 
