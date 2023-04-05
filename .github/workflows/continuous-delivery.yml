@@ -50,7 +50,7 @@ jobs:
           wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.TARGET }}/build.tar.gz" -O landing.tar.gz
           mkdir landing
           tar -xzvf landing.tar.gz -C landing
-          rsync -avh landing _site
+          rsync -avh landing/ _site
 
           ##### Solution: Reveal-MD
 
@@ -71,11 +71,11 @@ jobs:
           wget "https://github.com/${{ steps.revealmd.outputs.REPO }}/releases/download/${{ steps.revealmd.outputs.TARGET }}/build.tar.gz" -O revealmd.tar.gz
           mkdir revealmd
           tar -xzvf revealmd.tar.gz -C revealmd
-          rsync -avh revealmd _site/revealmd
+          rsync -avh revealmd _site
 
       - name: List Files
         run: |
-          echo "$(cd _site && ls)" >> $GITHUB_STEP_SUMMARY
+          echo "$(cd _site && ls -R)" >> $GITHUB_STEP_SUMMARY
 
 #      - name: Rename index.html from Reveal-MD
 #        run: rsync -avh _site/index.html _site/slides.html
@@ -86,7 +86,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ format('{0}-{1}', 'RC', github.run_id ) }}
-          path: _deploy
+          path: _site
           retention-days: 1
   
   # Check links working in compiled deploy artefact
