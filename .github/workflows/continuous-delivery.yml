@@ -50,7 +50,7 @@ jobs:
           wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.TARGET }}/build.tar.gz" -O landing.tar.gz
           mkdir landing
           tar -xzvf landing.tar.gz -C landing
-          rsync -avh landing/ _site
+          rsync -avh landing/_site/ _site
 
           ##### Solution: Reveal-MD
 
@@ -71,7 +71,7 @@ jobs:
           wget "https://github.com/${{ steps.revealmd.outputs.REPO }}/releases/download/${{ steps.revealmd.outputs.TARGET }}/build.tar.gz" -O revealmd.tar.gz
           mkdir revealmd
           tar -xzvf revealmd.tar.gz -C revealmd
-          rsync -avh revealmd _site
+          rsync -avh revealmd/_site/ _site/revealmd
 
       - name: List Files
         run: |
