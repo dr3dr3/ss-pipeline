@@ -8,7 +8,7 @@
     "timeout": 0,
     "markdown": true,
     "serverRoot": "./_site/",
-    "directoryListing": true,
+    "directoryListing": false,
     "retry": true,
     "retryErrors": true,
     "retryErrorsCount": 3,
