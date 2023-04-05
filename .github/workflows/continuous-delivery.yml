@@ -29,7 +29,7 @@ jobs:
           token: ${{ secrets.GHA_PAT }}
 
       - name: Create directory
-        run: mkdir _deploy
+        run: mkdir _site
 
 ##### Solution: Landing
 
@@ -75,6 +75,8 @@ jobs:
 
       - name: List Files
         run: |
+          echo "$(ls)" >> $GITHUB_STEP_SUMMARY
+          cd _site
           echo "$(ls)" >> $GITHUB_STEP_SUMMARY
 
 #      - name: Rename index.html from Reveal-MD
