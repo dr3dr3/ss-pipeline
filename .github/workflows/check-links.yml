@@ -45,8 +45,8 @@ jobs:
           echo "### Linkinator .JS" >> $GITHUB_STEP_SUMMARY
           count="$(ls -l **/*.js 2>/dev/null | wc -l)"
           if [[ $count != 0 ]]; then
-            echo $(npx linkinator "_site/**/*.js" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
-            echo $(npx linkinator "_site/**/*.js" --config "./config/linkinator.config.json") >> links-js.json
+            echo $(npx linkinator "**/*.js" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
+            echo $(npx linkinator "**/*.js" --config "./config/linkinator.config.json") >> links-js.json
             echo 'JS='$(jq '.passed' links-js.json) >> $GITHUB_OUTPUT
           else
             echo "No .JS files found" >> $GITHUB_STEP_SUMMARY
@@ -63,8 +63,8 @@ jobs:
           echo "### Linkinator .HTML" >> $GITHUB_STEP_SUMMARY
           count="$(ls -l **/*.html 2>/dev/null | wc -l)"
           if [[ $count != 0 ]]; then
-            echo $(npx linkinator "_site/**/*.html" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
-            echo $(npx linkinator "_site/**/*.html" --config "./config/linkinator.config.json") >> links-html.json
+            echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
+            echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> links-html.json
             echo 'HTML='$(jq '.passed' links-html.json) >> $GITHUB_OUTPUT
           else
             echo "No .HTML files found" >> $GITHUB_STEP_SUMMARY
@@ -81,8 +81,8 @@ jobs:
           echo "### Linkinator .CSS" >> $GITHUB_STEP_SUMMARY
           count="$(ls -l **/*.css 2>/dev/null | wc -l)"
           if [[ $count != 0 ]]; then
-            echo $(npx linkinator "_site/**/*.css" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
-            echo $(npx linkinator "_site/**/*.css" --config "./config/linkinator.config.json") >> links-css.json
+            echo $(npx linkinator "**/*.css" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
+            echo $(npx linkinator "**/*.css" --config "./config/linkinator.config.json") >> links-css.json
             echo 'CSS='$(jq '.passed' links-css.json) >> $GITHUB_OUTPUT
           else
             echo "No .CSS files found" >> $GITHUB_STEP_SUMMARY
