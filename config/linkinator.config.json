@@ -7,7 +7,7 @@
     "verbosity": "error",
     "timeout": 0,
     "markdown": true,
-    "serverRoot": "./",
+    "serverRoot": "./_site/",
     "directoryListing": true,
     "retry": true,
     "retryErrors": true,
