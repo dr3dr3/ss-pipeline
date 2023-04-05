@@ -75,7 +75,7 @@ jobs:
 
       - name: List Files
         run: |
-          echo "$(echo ls)" >> $GITHUB_STEP_SUMMARY
+          echo "$(ls)" >> $GITHUB_STEP_SUMMARY
 
 #      - name: Rename index.html from Reveal-MD
 #        run: rsync -avh _site/index.html _site/slides.html
