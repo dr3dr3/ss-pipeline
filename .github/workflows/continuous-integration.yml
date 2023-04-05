@@ -144,7 +144,7 @@ jobs:
 
   ci-complete:
     name: CI Complete 👍
-    needs: [tag-release, target-build-stg, deploy-ci] 
+    needs: [check-links, tag-release, target-build-stg, deploy-ci] 
     runs-on: ubuntu-latest 
     steps:
 

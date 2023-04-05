@@ -16,6 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Checkout SS-Pipelines
+        uses: actions/checkout@v3
+        with:
+          repository: 'dr3dr3/ss-pipeline'
+          ref: 'main'
+          token: ${{ secrets.GHA_PAT }}
+
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
