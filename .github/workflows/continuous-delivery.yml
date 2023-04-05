@@ -70,7 +70,7 @@ jobs:
         run: |
           wget "https://github.com/${{ steps.revealmd.outputs.REPO }}/releases/download/${{ steps.revealmd.outputs.TARGET }}/build.tar.gz" -O revealmd.tar.gz
           mkdir revealmd
-          tar -xzvf revealmd.tar.gz -C reveal
+          tar -xzvf revealmd.tar.gz -C revealmd
           rsync -avh revealmd _site/revealmd
 
       - name: List Files
