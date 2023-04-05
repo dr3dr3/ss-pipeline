@@ -31,13 +31,13 @@ jobs:
       - name: Install Linkinator
         run: |
           npm install linkinator
-          echo "### Linkinator Results" >> $GITHUB_STEP_SUMMARY
 
       - name: Check links to JS files
         id: results-js
         run: |
-          echo $(npx linkinator "_site/**/*.js" --verbosity error) >> $GITHUB_STEP_SUMMARY
-          echo $(npx linkinator "_site/**/*.js" --format JSON) >> links-js.json
+          echo "### Linkinator .JS" >> $GITHUB_STEP_SUMMARY
+          echo $(npx linkinator "_site/**/*.js" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
+          echo $(npx linkinator "_site/**/*.js" --config "./config/linkinator.config.json") >> links-js.json
           echo 'JS='$(jq '.passed' links-js.json) >> $GITHUB_OUTPUT
 
       - name: Fail workflow - JS
@@ -47,8 +47,9 @@ jobs:
       - name: Check links to HTML files
         id: results-html
         run: |
-          echo $(npx linkinator "_site/**/*.html" --verbosity error) >> $GITHUB_STEP_SUMMARY
-          echo $(npx linkinator "_site/**/*.html" --format JSON --skip "https://www.andredreyer.com/assets/featured-slide.jpg" --verbosity error) >> links-html.json
+          echo "### Linkinator .HTML" >> $GITHUB_STEP_SUMMARY
+          echo $(npx linkinator "_site/**/*.html" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
+          echo $(npx linkinator "_site/**/*.html" --config "./config/linkinator.config.json") >> links-html.json
           echo 'HTML='$(jq '.passed' links-html.json) >> $GITHUB_OUTPUT
 
       - name: Fail workflow - HTML
@@ -58,8 +59,9 @@ jobs:
       - name: Check links to CSS files
         id: results-css
         run: |
-          echo $(npx linkinator "_site/**/*.css" --verbosity error) >> $GITHUB_STEP_SUMMARY
-          echo $(npx linkinator "_site/**/*.css" --format JSON) >> links-css.json
+          echo "### Linkinator .CSS" >> $GITHUB_STEP_SUMMARY
+          echo $(npx linkinator "_site/**/*.css" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
+          echo $(npx linkinator "_site/**/*.css" --config "./config/linkinator.config.json") >> links-css.json
           echo 'CSS='$(jq '.passed' links-css.json) >> $GITHUB_OUTPUT
 
       - name: Fail workflow - CSS

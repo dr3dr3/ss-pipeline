@@ -157,7 +157,7 @@ jobs:
 
   ci-failed:
     name: CI Failed 👎
-    needs: [tag-release, target-build-stg, deploy-ci] 
+    needs: [check-links, tag-release, target-build-stg, deploy-ci] 
     if: always() && ( contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') )
     runs-on: ubuntu-latest 
     steps:
