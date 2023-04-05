@@ -48,7 +48,9 @@ jobs:
       - name: Landing Pages Build Artefact
         run: |
           wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.TARGET }}/build.tar.gz" -O landing.tar.gz
-          tar -xzvf landing.tar.gz
+          mkdir landing
+          tar -xzvf landing.tar.gz -C landing
+          rsync -avh landing _site
 
           ##### Solution: Reveal-MD
 
@@ -67,8 +69,13 @@ jobs:
       - name: Reveal-MD Build Artefact
         run: |
           wget "https://github.com/${{ steps.revealmd.outputs.REPO }}/releases/download/${{ steps.revealmd.outputs.TARGET }}/build.tar.gz" -O revealmd.tar.gz
-          mkdir _deploy/reveal
-          tar -xzvf revealmd.tar.gz -C _deploy/reveal
+          mkdir revealmd
+          tar -xzvf revealmd.tar.gz -C reveal
+          rsync -avh revealmd _site/revealmd
+
+      - name: List Files
+        run: |
+          echo "$(echo ls)" >> $GITHUB_STEP_SUMMARY
 
 #      - name: Rename index.html from Reveal-MD
 #        run: rsync -avh _site/index.html _site/slides.html
@@ -132,6 +139,7 @@ jobs:
   acceptance-complete:
     name: Acceptance 👍
     needs: [get-build-artefacts, check-links, deploy-to-github-pages, config-revealmd, config-landing] ### ADD ALL CHECKS
+    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest 
     steps:
 
