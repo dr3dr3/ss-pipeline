@@ -43,9 +43,15 @@ jobs:
         id: results-js
         run: |
           echo "### Linkinator .JS" >> $GITHUB_STEP_SUMMARY
+          count="$(ls -l **/*.js 2>/dev/null | wc -l)"
+          if [ $count != 0 ]
           echo $(npx linkinator "_site/**/*.js" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
           echo $(npx linkinator "_site/**/*.js" --config "./config/linkinator.config.json") >> links-js.json
           echo 'JS='$(jq '.passed' links-js.json) >> $GITHUB_OUTPUT
+          then
+          echo "### Linkinator .JS" >> $GITHUB_STEP_SUMMARY
+          echo "No .JS files found" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Fail workflow - JS
         if: ${{ steps.results-js.outputs.JS != 'true' }}
