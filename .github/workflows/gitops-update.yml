@@ -38,7 +38,7 @@ jobs:
           token: ${{ secrets.GHA_PAT }}
 
       - name: Update config of build for continuous delivery
-        if: ${{ startsWith( inputs.config-item, '.deploy.revealmd.build' ) }} 
+        if: ${{ startsWith( inputs.config-item, '.builds.' ) }} 
         run: yq -i '${{ inputs.config-item }} = "${{ inputs.config-value }}"' config.yml
 
       - name: Manual update config by dr3dr3

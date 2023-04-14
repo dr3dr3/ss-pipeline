@@ -75,7 +75,7 @@ jobs:
     # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-failed:
     name: Builds 👎
-    needs: [build] 
+    needs: [build, check-links] 
     if: always() && (needs.build.result == 'failure' || needs.check-links.result == 'failure')
     runs-on: ubuntu-latest 
     steps:
@@ -123,7 +123,7 @@ jobs:
     needs: [set-tag, builds-complete]
     uses: ./.github/workflows/gitops-update.yml
     with:
-      config-item: '.deploy.${{ inputs.solution }}.build.target'
+      config-item: '.builds.${{ inputs.solution }}.build.target'
       config-value: ${{ needs.set-tag.outputs.tag }}
     secrets: inherit
 
