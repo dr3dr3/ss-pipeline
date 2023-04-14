@@ -1,0 +1,50 @@
+name: REPOSITORY-VARIABLES
+run-name: Set / validate configured variables in GitHub repositories
+
+on:
+  workflow_call:
+    inputs:
+      repo-gitops:
+        required: true
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      repo-gitops:
+        description: GitOps Repository
+        required: true
+        type: string
+
+jobs:
+  repo-variables:
+    name: Setup / Validate Repository Variables
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.REPO_VARS }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ inputs.repo-gitops }}
+          ref: 'main'
+          token: ${{ secrets.GHA_PAT }}
+
+      - name: Variable GITOPS TEST
+        id: gitops-test
+        run: echo "CONFIG=$(yq '.repositories.core.gitops.var-TEST' 'repositories.yml')" >> $GITHUB_OUTPUT
+
+      ##### Checkout each repo so GH CLI can setup variables for the repository
+
+      ##### Repo = GitOPS
+
+      - name: Checkout GitOps
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ inputs.repo-gitops }}
+          ref: 'main'
+          token: ${{ secrets.GHA_PAT }}
+
+      - name: Validate Reveal-MD Repository Variables
+        run: gh variable set TEST --body "${{ steps.gitops-test.outputs.CONFIG }}"
