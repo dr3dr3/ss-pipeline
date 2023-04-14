@@ -50,6 +50,6 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add config.yml
+          git add builds.yml
           git commit -m "Updated builds.yml for ${{ inputs.config-item }} to value ${{ inputs.config-value }} by ${{ github.actor }}"
           git push
