@@ -31,20 +31,24 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      - name: Variable GITOPS TEST
-        id: gitops-test
-        run: echo "CONFIG=$(yq '.repositories.core.gitops.var-TEST' 'repositories.yml')" >> $GITHUB_OUTPUT
+      - name: Get Reveal-MD Repo
+        id: revealmd-repo
+        run: echo "CONFIG=$(yq '.repositories.solutions.revealmd.ref' 'repositories.yml')" >> $GITHUB_OUTPUT
+
+      - name: Get Variable REVEALMD.CI_PATTERN
+        id: revealmd-cipattern
+        run: echo "CONFIG=$(yq '.repositories.solutions.revealmd.var-CI_PATTERN' 'repositories.yml')" >> $GITHUB_OUTPUT
 
       ##### Checkout each repo so GH CLI can setup variables for the repository
 
       ##### Repo = GitOPS
 
-      - name: Checkout GitOps
+      - name: Checkout Reveal-MD
         uses: actions/checkout@v3
         with:
-          repository: ${{ inputs.repo-gitops }}
+          repository: ${{ steps.revealmd-repo.outputs.CONFIG }}
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      - name: Validate Reveal-MD Repository Variables
-        run: gh variable set TEST --body "${{ steps.gitops-test.outputs.CONFIG }}"
+      - name: Set Variable - REVEALMD.CI_PATTERN
+        run: gh variable set CI_PATTERN --body "${{ steps.revealmd-cipattern.outputs.CONFIG }}"
