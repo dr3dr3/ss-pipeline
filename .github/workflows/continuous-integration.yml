@@ -32,10 +32,7 @@ jobs:
           echo "$build"
           echo "TAG=$build" >> $GITHUB_OUTPUT          
 
-  ##### BUILD FOR EACH SOLUTION
-  # BUILDS INCLUDE TESTING (Linting, Static Analysis, Unit Testing, etc)
-
-  # Build static site using Reveal-MD
+  # Build for specific solution
   build:
     name: Build
     needs: [set-tag]
@@ -45,8 +42,6 @@ jobs:
       target-ref: ${{ inputs.target-ref }}
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
       solution: ${{ inputs.solution }}
-
-  ##### Other solutions builds above
 
   check-links:
     name: 🔗 Check Links
