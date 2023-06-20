@@ -2,7 +2,7 @@
     "concurrency": 100,
     "config": "string",
     "recurse": true,
-    "skip": ["https://www.andredreyer.com/assets/featured-slide.jpg","https://linkedin.com/in/andredreyer"],
+    "skip": ["https://www.andredreyer.com/assets/featured-slide.jpg","https://linkedin.com/in/andredreyer","https://twitter.com/andre_dreyer"],
     "format": "json",
     "verbosity": "error",
     "timeout": 0,
