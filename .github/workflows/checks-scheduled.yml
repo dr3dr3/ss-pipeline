@@ -33,7 +33,7 @@ jobs:
         with:
           urls: |
             https://www.andredreyer.com
-            https://www.andredreyer.com/slides/version.html
+            https://www.andredreyer.com/revealmd/slides/version.html
           configPath: "./config/lighthouserc.json"
           runs: 3
           uploadArtifacts: true

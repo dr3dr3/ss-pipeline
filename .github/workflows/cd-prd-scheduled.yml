@@ -31,13 +31,13 @@ jobs:
       - name: Canary Build Version
         id: can-build
         run: |
-          value="$(yq '.builds.revealmd.build.can' 'builds.yml')" || 'ERROR'
+          value="$(yq '.deploy.can.revealmd' 'builds.yml')" || 'ERROR'
           echo "RMD=$value" >> $GITHUB_OUTPUT
 
       - name: Production Build Version
         id: prd-build
         run: |
-          value="$(yq '.builds.revealmd.build.prd' 'builds.yml')" || 'ERROR'
+          value="$(yq '.deploy.prd.revealmd' 'builds.yml')" || 'ERROR'
           echo "RMD=$value" >> $GITHUB_OUTPUT
 
       - name: Decision on PRD deploy
