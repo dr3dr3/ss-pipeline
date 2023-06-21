@@ -118,7 +118,7 @@ jobs:
     needs: [set-tag, builds-complete]
     uses: ./.github/workflows/gitops-update.yml
     with:
-      config-item: '.build.${{ inputs.solution }}.target'
+      config-item: '.build.${{ inputs.solution }}'
       config-value: ${{ needs.set-tag.outputs.tag }}
     secrets: inherit
 
