@@ -113,12 +113,12 @@ jobs:
     secrets: inherit
 
   # Set target build in GitOps config (to be used in continuous deployment)
-  target-build-stg:
+  build-target:
     name: Set Target Build in Config
     needs: [set-tag, builds-complete]
     uses: ./.github/workflows/gitops-update.yml
     with:
-      config-item: '.builds.${{ inputs.solution }}.build.target'
+      config-item: '.build.${{ inputs.solution }}.target'
       config-value: ${{ needs.set-tag.outputs.tag }}
     secrets: inherit
 
@@ -139,7 +139,7 @@ jobs:
 
   ci-complete:
     name: CI Complete 👍
-    needs: [check-links, tag-release, target-build-stg, deploy-ci] 
+    needs: [check-links, tag-release, build-target, deploy-ci] 
     runs-on: ubuntu-latest 
     steps:
 
@@ -152,7 +152,7 @@ jobs:
 
   ci-failed:
     name: CI Failed 👎
-    needs: [check-links, tag-release, target-build-stg, deploy-ci] 
+    needs: [check-links, tag-release, build-target, deploy-ci] 
     if: always() && ( contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') )
     runs-on: ubuntu-latest 
     steps:
@@ -164,6 +164,16 @@ jobs:
         run: |
           curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_ci_red/json/with/key/${{ secrets.IFTTT }}
 
+  # Set target build in GitOps config (to be used in continuous deployment)
+  build-ci:
+    name: Set CI Build in Config
+    needs: [set-tag, ci-complete]
+    uses: ./.github/workflows/gitops-update.yml
+    with:
+      config-item: '.deploy.ci.${{ inputs.solution }}'
+      config-value: ${{ needs.set-tag.outputs.tag }}
+    secrets: inherit
+        
   # Dispatch to Deploy to Stage Environment
   dispatch-stg:
     name: Dispatch STG

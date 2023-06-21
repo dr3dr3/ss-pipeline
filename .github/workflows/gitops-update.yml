@@ -37,8 +37,12 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
+      - name: Update config of build for continuous integration
+        if: ${{ startsWith( inputs.config-item, '.build.' ) }} 
+        run: yq -i '${{ inputs.config-item }} = "${{ inputs.config-value }}"' builds.yml
+
       - name: Update config of build for continuous delivery
-        if: ${{ startsWith( inputs.config-item, '.builds.' ) }} 
+        if: ${{ startsWith( inputs.config-item, '.deploy.' ) }} 
         run: yq -i '${{ inputs.config-item }} = "${{ inputs.config-value }}"' builds.yml
 
       - name: Manual update config by dr3dr3
