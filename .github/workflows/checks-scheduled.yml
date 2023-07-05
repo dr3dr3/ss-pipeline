@@ -41,7 +41,7 @@ jobs:
       - name: Results
         run: |
           echo "### Lighthouse Results :thumbsup:" >> $GITHUB_STEP_SUMMARY
-          echo "URL1 Performance: ${{ fromJSON(steps.lighthouse-ci.outputs.manifest)[0].summary.performance }}" >> $GITHUB_STEP_SUMMARY
+          echo "URL1 Performance: ${{ fromJSON(steps.lighthouse-ci.outputs.manifest)[0].summary.performance || 'error' }}" >> $GITHUB_STEP_SUMMARY
           echo "URL1 Accessibility: ${{ fromJSON(steps.lighthouse-ci.outputs.manifest)[0].summary.accessibility }}" >> $GITHUB_STEP_SUMMARY
           echo "URL1 Best Practices: ${{ fromJSON(steps.lighthouse-ci.outputs.manifest)[0].summary.best-practices }}" >> $GITHUB_STEP_SUMMARY
           echo "URL1 SEO: ${{ fromJSON(steps.lighthouse-ci.outputs.manifest)[0].summary.seo }}" >> $GITHUB_STEP_SUMMARY
@@ -60,7 +60,7 @@ jobs:
       - name: Test for public javascript library vulnerabilities 
         uses: lirantal/is-website-vulnerable@main
         with:
-          scan-url: "https://www.andredreyer.com/slides/version.html"
+          scan-url: "https://www.andredreyer.com/revealmd/slides/version.html"
 
 ### Results of checks send to workflow outputs
 
