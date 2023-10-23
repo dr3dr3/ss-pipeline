@@ -7,7 +7,7 @@ on:
       target-deploy:
         required: true
         type: string
-      site_url:
+      site-url:
         required: true
         type: string
 
