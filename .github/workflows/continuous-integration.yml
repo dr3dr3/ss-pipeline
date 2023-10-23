@@ -67,7 +67,7 @@ jobs:
 
       - name: Send IFTTT message that build successful
         run: |
-          curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_build_green/json/with/key/${{ secrets.IFTTT }}
+          curl -X POST -H 'Content-Type: application/json' -d '{"phase":"build", "outcome":"success"}' https://maker.ifttt.com/trigger/gha_build_green/json/with/key/${{ secrets.IFTTT }}
 
   builds-failed:
     name: Builds 👎
@@ -81,7 +81,7 @@ jobs:
 
       - name: Send IFTTT message that build successful
         run: |
-          curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_build_red/json/with/key/${{ secrets.IFTTT }}
+          curl -X POST -H 'Content-Type: application/json' -d '{"phase":"build", "outcome":"fail"}' https://maker.ifttt.com/trigger/gha_build_red/json/with/key/${{ secrets.IFTTT }}
 
   # Merge PR if using short-lived feature branchs
   # GitHub is setup to delete SLFB after merge completed.
@@ -154,7 +154,7 @@ jobs:
 
       - name: Send IFTTT message that CI successful
         run: |
-          curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_ci_green/json/with/key/${{ secrets.IFTTT }}
+          curl -X POST -H 'Content-Type: application/json' -d '{"phase":"ci", "outcome":"success"}' https://maker.ifttt.com/trigger/gha_ci_green/json/with/key/${{ secrets.IFTTT }}
 
   ci-failed:
     name: CI Failed 👎
@@ -168,7 +168,7 @@ jobs:
 
       - name: Send IFTTT message that Ci failed
         run: |
-          curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_ci_red/json/with/key/${{ secrets.IFTTT }}
+          curl -X POST -H 'Content-Type: application/json' -d '{"phase":"ci", "outcome":"fail"}' https://maker.ifttt.com/trigger/gha_ci_red/json/with/key/${{ secrets.IFTTT }}
 
   # Set target build in GitOps config (to be used in continuous deployment)
   # BUG: .deploy.ci.revealmd doesnt exist in builds.yml config file (nor for landing solution)
