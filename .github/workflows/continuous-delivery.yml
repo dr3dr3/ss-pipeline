@@ -82,7 +82,8 @@ jobs:
 
       - name: Update aboslute links for relevant environments
         run: |
-          sed -i 's/https://stg.andredreyer.com/${{ inputs.site-url }} /g' _site/*
+          cd _site
+          grep -rl stg.andredreyer.com . | xargs sed -i 's@https://stg.andredreyer.com@${{ inputs.site-url }}@g'
 
 #      - name: Rename index.html from Reveal-MD
 #        run: rsync -avh _site/index.html _site/slides.html
