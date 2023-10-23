@@ -1,0 +1,48 @@
+# Send relevant notifications to IFTTT webhook
+name: IFTTT
+run-name: IFTTT Notification
+
+on:
+  workflow_call:
+    inputs:
+      phase:
+        required: true
+        type: string
+      outcome:
+        required: true
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: Configuration Item
+        required: true
+        default: 'build'
+        type: choice
+        options:
+        - build
+        - ci
+        - stg
+        - can
+        - prd
+      outcome:
+        description: Configuration Value
+        required: true
+        default: 'default'
+        type: choice
+        options:
+        - default
+        - fail
+        - success
+
+jobs:
+    ifttt-webhook-call:
+        name: IFTTT Webhook Calls
+        timeout-minutes: 10
+        runs-on: ubuntu-latest
+        steps:
+    
+        - name: Build Success
+          if: inputs.phase == 'build' && inputs.outcome == 'fail'
+          run: |
+            curl -X POST -H 'Content-Type: application/json' -d '{"phase":"build", "outcome":"fail"}' https://maker.ifttt.com/trigger/gha_build_red/json/with/key/${{ secrets.IFTTT }}
