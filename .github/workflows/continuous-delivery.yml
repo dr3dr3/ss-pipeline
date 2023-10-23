@@ -7,6 +7,9 @@ on:
       target-deploy:
         required: true
         type: string
+      site_url:
+        required: true
+        type: string
 
 jobs:
 
@@ -76,6 +79,10 @@ jobs:
       - name: List Files
         run: |
           echo "$(cd _site && ls -R)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Update aboslute links for relevant environments
+        run: |
+          sed -i 's/https://stg.andredreyer.com/${{ inputs.site_url }} /g' _site/*
 
 #      - name: Rename index.html from Reveal-MD
 #        run: rsync -avh _site/index.html _site/slides.html
