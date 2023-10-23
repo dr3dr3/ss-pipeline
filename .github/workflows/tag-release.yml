@@ -29,7 +29,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download Build Artefacts
-        # Need to use this in same workflow as create artefacts
+        # Note: Need to use this in same workflow that created the artefacts
         uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.tag }}
@@ -38,10 +38,9 @@ jobs:
       - name: Bundle Artefacts
         run: tar -cvzf build.tar.gz _site
       
-      - name: GitHub Release
+      - name: Do GitHub Release
         run: gh release create "${{ inputs.tag }}" "./build.tar.gz#Build-Artefact" --target "${{ inputs.target-ref }}" --title "${{ inputs.tag }}" --notes "${{ inputs.feature }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
 
-### ADD: Get release notes from related issue (if issue ID in commit message) and put into body of release
+      ### ADD: Get release notes from related issue (if issue ID in commit message) and put into body of release

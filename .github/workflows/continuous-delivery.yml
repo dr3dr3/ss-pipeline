@@ -45,15 +45,12 @@ jobs:
           repo="$(yq '.repositories.solutions.landing.ref' 'repositories.yml')" || 'ERROR'
           echo "REPO=$repo" >> $GITHUB_OUTPUT
 
-      - name: Landing Pages Build Artefact
+      - name: Get Landing Pages Build Artefact
         run: |
           wget "https://github.com/${{ steps.landing.outputs.REPO }}/releases/download/${{ steps.landing.outputs.TARGET }}/build.tar.gz" -O landing.tar.gz
           mkdir landing
           tar -xzvf landing.tar.gz -C landing
           rsync -avh landing/_site/ _site
-
-      - name: Update build on index.html
-        run: sed -i 's/BUILD-PLACEHOLDER/${{ steps.landing.outputs.TARGET }}/g' _site/index.html
 
       ##### Solution: Reveal-MD
 
@@ -114,7 +111,7 @@ jobs:
       artefact-ref: ${{ format('{0}-{1}', 'RC', github.run_id ) }}
     secrets: inherit
 
-  # Do different testing (smoke, PVT, etc)
+  ### Do different testing (smoke, PVT, etc)
 
   # Given successful testing then update the build for this environment in GitOps Config
   config-revealmd:

@@ -62,6 +62,6 @@ jobs:
         with:
           scan-url: "https://www.andredreyer.com/revealmd/slides/version.html"
 
-### Results of checks send to workflow outputs
+    ### Results of checks send to workflow outputs
 
 ### If any checks fail then add issue to pause Prod deployments and alert via IFTTT

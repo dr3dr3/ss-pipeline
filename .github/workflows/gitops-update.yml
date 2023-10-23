@@ -37,6 +37,8 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
+      ### Only allow changes on specific nodes (the 'if' statements below)
+
       - name: Update config of build for continuous integration
         if: ${{ startsWith( inputs.config-item, '.build.' ) }} 
         run: yq -i '${{ inputs.config-item }} = "${{ inputs.config-value }}"' builds.yml

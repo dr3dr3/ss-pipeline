@@ -43,6 +43,9 @@ jobs:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
       solution: ${{ inputs.solution }}
 
+  ### Tests on build above
+
+  # Test for broken hyperlinks
   check-links:
     name: 🔗 Check Links
     needs: [set-tag, build]
@@ -51,12 +54,11 @@ jobs:
     with: 
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
 
-  ##### Tests on build above
+  ### Check builds ok. Is a required check on the PR (setup in GitHub). 
 
-  # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-complete:
     name: Builds 👍
-    needs: [build] ### ADD MORE SOLUTIONS
+    needs: [build, check-links] 
     runs-on: ubuntu-latest 
     steps:
 
@@ -67,7 +69,6 @@ jobs:
         run: |
           curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_build_green/json/with/key/${{ secrets.IFTTT }}
 
-    # Check builds ok. Is a required check on the PR (setup in GitHub). 
   builds-failed:
     name: Builds 👎
     needs: [build, check-links] 
@@ -82,7 +83,8 @@ jobs:
         run: |
           curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_build_red/json/with/key/${{ secrets.IFTTT }}
 
-  # Merge PR. GitHub setup to delete SLFB after merge completed.
+  # Merge PR if using short-lived feature branchs
+  # GitHub is setup to delete SLFB after merge completed.
   pr-merge: 
     name: PR Merge
     needs: [builds-complete]
@@ -122,8 +124,10 @@ jobs:
       config-value: ${{ needs.set-tag.outputs.tag }}
     secrets: inherit
 
-  # Deploy CI to GitHub Pages
-  # Uses artefacts created by build jobs
+  ### Deploy to GitHub Pages in Solution Repo (considered the CI environment)
+
+  # Deploy to GitHub
+  # Note: Uses artefacts created by build jobs above
   deploy-ci:
     name: Deploy CI
     needs: [set-tag, tag-release]
@@ -135,8 +139,10 @@ jobs:
     with:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
 
-  # Run CI Tests here
+  ### Run CI Tests here
 
+  ### Confirm CI Completed
+  
   ci-complete:
     name: CI Complete 👍
     needs: [check-links, tag-release, build-target, deploy-ci] 
@@ -165,6 +171,7 @@ jobs:
           curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_ci_red/json/with/key/${{ secrets.IFTTT }}
 
   # Set target build in GitOps config (to be used in continuous deployment)
+  # BUG: .deploy.ci.revealmd doesnt exist in builds.yml config file (nor for landing solution)
   build-ci:
     name: Set CI Build in Config
     needs: [set-tag, ci-complete]
@@ -174,7 +181,7 @@ jobs:
       config-value: ${{ needs.set-tag.outputs.tag }}
     secrets: inherit
         
-  # Dispatch to Deploy to Stage Environment
+  # Dispatch to trigger deployment to Stage Environment
   dispatch-stg:
     name: Dispatch STG
     needs: [ci-complete]

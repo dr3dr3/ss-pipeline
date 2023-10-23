@@ -24,6 +24,7 @@ jobs:
   deploy:
     name: 🚀 Deploy
     environment:
+      # Ignore lint error regarding name value below. It should be github-pages
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     outputs:

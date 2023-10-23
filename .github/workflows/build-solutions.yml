@@ -97,7 +97,7 @@ jobs:
       - name: Run Reveal-MD build
         run: |
           cd reveal-md
-          reveal-md --static _site --static-dirs=assets --template template.html --glob 'slides/*.md' --absolute-url 'https://www.andredreyer.com'
+          reveal-md --static _site --static-dirs=assets --template template.html --glob 'slides/*.md' --absolute-url 'https://www.replace.com'
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
@@ -106,7 +106,8 @@ jobs:
           path: reveal-md/_site
           retention-days: 1
 
-            # Build static site for landing page(s)
+          
+  # Build static site for landing page(s)
   build-landing:
     name: 🔨 Build Landing Pages
     if: inputs.solution == 'landing'
@@ -121,6 +122,8 @@ jobs:
           ref: ${{ inputs.target-ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Update build on index.html
+        run: sed -i 's/BUILD-PLACEHOLDER/${{ inputs.artefact-ref }}/g' _site/index.html
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3

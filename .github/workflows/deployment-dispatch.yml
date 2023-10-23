@@ -14,7 +14,7 @@ on:
         # 'can' - Canary Environment
         # 'prd' - Production Environment
 
-  # Need to ensure build artefact is here... as "build once, deploy many"
+  # Need to ensure build artefact is here... "build once, deploy many"
   workflow_dispatch:
     inputs:
       target-deploy:
@@ -30,7 +30,7 @@ on:
 jobs:
 
   blocked:
-    name: Check if deployments blocked
+    name: Check if deployments blocked for the environment
     outputs:
       check: ${{ steps.results.outputs.COUNT }}
     runs-on: ubuntu-latest
@@ -76,3 +76,5 @@ jobs:
           --request POST --data '{"event_type": "deploy", "client_payload": {"value": "x"}}' \
           https://api.github.com/repos/${{ github.repository_owner }}/${{ format('{0}-{1}', 'devops-demo', inputs.target-deploy) }}/dispatches
           echo "Success"
+      
+      ### Todo: Any value in adding client_payload
