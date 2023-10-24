@@ -16,7 +16,8 @@ jobs:
   prd-config:
     name: Get Config for PRD
     outputs:
-      rmd: ${{ steps.prd-deploy.outputs.RMD }}    
+      rmd: ${{ steps.rmd-prd-deploy.outputs.RMD }}    
+      lnd: ${{ steps.lnd-prd-deploy.outputs.LND }}    
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -28,36 +29,65 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      - name: Canary Build Version
-        id: can-build
+      ### Reveal-MD
+
+      - name: Canary Build Version for Reveal-MD
+        id: rmd-can-build
         run: |
           value="$(yq '.deploy.can.revealmd' 'builds.yml')" || 'ERROR'
           echo "RMD=$value" >> $GITHUB_OUTPUT
 
-      - name: Production Build Version
-        id: prd-build
+      - name: Production Build Version for Reveal-MD
+        id: rmd-prd-build
         run: |
           value="$(yq '.deploy.prd.revealmd' 'builds.yml')" || 'ERROR'
           echo "RMD=$value" >> $GITHUB_OUTPUT
 
-      - name: Decision on PRD deploy
-        id: prd-deploy
+      - name: Decision on PRD deploy for Reveal-MD
+        id: rmd-prd-deploy
         run: |
-          if [[ ${{ steps.can-build.outputs.RMD }} == ${{ steps.prd-build.outputs.RMD }} ]]; then
+          if [[ ${{ steps.rmd-can-build.outputs.RMD }} == ${{ steps.rmd-prd-build.outputs.RMD }} ]]; then
             echo "RMD=0" >> $GITHUB_OUTPUT
           else
             echo "RMD=1" >> $GITHUB_OUTPUT
           fi
       
-      - name: Decision Output
+      - name: Decision Output for Reveal-MD
         run: |
-          echo "RMD Deploy Decision: ${{ steps.prd-deploy.outputs.RMD }}"
+          echo "Reveal-MD Deploy Decision: ${{ steps.rmd-prd-deploy.outputs.RMD }}"
+
+      ### Landing Page
+
+      - name: Canary Build Version for Landing Page
+        id: lnd-can-build
+        run: |
+          value="$(yq '.deploy.can.landing' 'builds.yml')" || 'ERROR'
+          echo "LND=$value" >> $GITHUB_OUTPUT
+  
+      - name: Production Build Version for Landing Page
+        id: lnd-prd-build
+        run: |
+          value="$(yq '.deploy.prd.landing' 'builds.yml')" || 'ERROR'
+          echo "LND=$value" >> $GITHUB_OUTPUT
+  
+      - name: Decision on PRD deploy for Landing Page
+        id: lnd-prd-deploy
+        run: |
+          if [[ ${{ steps.lnd-can-build.outputs.LND }} == ${{ steps.lnd-prd-build.outputs.LND }} ]]; then
+            echo "LND=0" >> $GITHUB_OUTPUT
+          else
+            echo "LND=1" >> $GITHUB_OUTPUT
+          fi
+        
+      - name: Decision Output for Landing Page
+        run: |
+          echo "Landing Deploy Decision: ${{ steps.lnd-prd-deploy.outputs.LND }}"
 
   # Scheduled dispatch to Production
   scheduled-deploy-production:
     name: Scheduled Deploy to Production
     needs: [prd-config]
-    if: ${{ needs.prd-config.outputs.rmd >= 1 }}
+    if: needs.prd-config.outputs.rmd == 1 || needs.prd-config.outputs.lnd == 1
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
       target-deploy: 'prd'
