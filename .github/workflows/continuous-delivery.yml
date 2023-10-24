@@ -180,5 +180,5 @@ jobs:
     secrets: inherit
     with:
       phase: ${{ inputs.target-deploy }}
-      outcome: success
+      outcome: fail
       

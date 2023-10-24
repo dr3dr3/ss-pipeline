@@ -64,7 +64,7 @@ jobs:
         - name: CI Success
           if: inputs.phase == 'ci' && inputs.outcome == 'success' || inputs.phase == 'test'
           run: |
-            curl -X POST -H 'Content-Type: application/json' -d '{"phase":"ci", "outcome":"success"}' https://maker.ifttt.com/trigger/gha_ci_red/json/with/key/${{ secrets.IFTTT }}
+            curl -X POST -H 'Content-Type: application/json' -d '{"phase":"ci", "outcome":"success"}' https://maker.ifttt.com/trigger/gha_ci_green/json/with/key/${{ secrets.IFTTT }}
             sleep 5
     
         - name: STG Fail
