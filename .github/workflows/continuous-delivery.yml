@@ -154,9 +154,14 @@ jobs:
       - name: Ready message
         run: echo "### Acceptance Completed :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
-      - name: Send IFTTT message that deploy successful
-        run: |
-          curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_${{ inputs.target-deploy }}_green/json/with/key/${{ secrets.IFTTT }}
+  ifttt-ci-success:
+    name: IFTTT CI Success
+    needs: [acceptance-complete]
+    uses: ./.github/workflows/notification-ifttt.yml
+    secrets: inherit
+    with:
+      phase: ${{ inputs.target-deploy }}
+      outcome: success
 
   acceptance-failed:
     name: Acceptance 👎
@@ -168,6 +173,12 @@ jobs:
       - name: Ready message
         run: echo "### Acceptance Failed :thumbsdown:" >> $GITHUB_STEP_SUMMARY
 
-      - name: Send IFTTT message that deploy failed
-        run: |
-          curl -X POST -H 'Content-Type: application/json' https://maker.ifttt.com/trigger/gha_${{ inputs.target-deploy }}_red/json/with/key/${{ secrets.IFTTT }}
+  ifttt-ci-fail:
+    name: IFTTT CI Fail
+    needs: [acceptance-failed]
+    uses: ./.github/workflows/notification-ifttt.yml
+    secrets: inherit
+    with:
+      phase: ${{ inputs.target-deploy }}
+      outcome: success
+      
