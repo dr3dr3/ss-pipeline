@@ -139,7 +139,7 @@ jobs:
     if: needs.get-build-artefacts.outputs.current-landing != needs.get-build-artefacts.outputs.target-landing
     uses: ./.github/workflows/gitops-update.yml
     with:
-      config-item: '.builds.${{ inputs.target-deploy }}.landing'
+      config-item: '.deploy.${{ inputs.target-deploy }}.landing'
       config-value: ${{ needs.get-build-artefacts.outputs.target-landing }}
     secrets: inherit
 

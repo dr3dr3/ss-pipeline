@@ -191,7 +191,6 @@ jobs:
       outcome: fail
         
   # Set target build in GitOps config (to be used in continuous deployment)
-  # BUG: .deploy.ci.revealmd doesnt exist in builds.yml config file (nor for landing solution)
   build-ci:
     name: Set CI Build in Config
     needs: [set-tag, ci-complete]
