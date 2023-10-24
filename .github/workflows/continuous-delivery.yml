@@ -154,8 +154,8 @@ jobs:
       - name: Ready message
         run: echo "### Acceptance Completed :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
-  ifttt-ci-success:
-    name: IFTTT CI Success
+  ifttt-success:
+    name: IFTTT Success
     needs: [acceptance-complete]
     uses: ./.github/workflows/notification-ifttt.yml
     secrets: inherit
@@ -173,8 +173,8 @@ jobs:
       - name: Ready message
         run: echo "### Acceptance Failed :thumbsdown:" >> $GITHUB_STEP_SUMMARY
 
-  ifttt-ci-fail:
-    name: IFTTT CI Fail
+  ifttt-fail:
+    name: IFTTT Fail
     needs: [acceptance-failed]
     uses: ./.github/workflows/notification-ifttt.yml
     secrets: inherit
