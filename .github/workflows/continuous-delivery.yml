@@ -156,7 +156,8 @@ jobs:
 
   ifttt-success:
     name: IFTTT Success
-    needs: [acceptance-complete]
+    needs: [get-build-artefacts, check-links, deploy-to-github-pages, config-revealmd, config-landing] ### ADD ALL CHECKS
+    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     uses: ./.github/workflows/notification-ifttt.yml
     secrets: inherit
     with:
