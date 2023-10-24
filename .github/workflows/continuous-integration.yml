@@ -183,7 +183,7 @@ jobs:
 
   ifttt-ci-fail:
     name: IFTTT CI Failed
-    needs: [ci-complete]
+    needs: [ci-failed]
     uses: ./.github/workflows/notification-ifttt.yml
     secrets: inherit
     with:
