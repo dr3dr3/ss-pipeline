@@ -74,7 +74,7 @@ jobs:
       phase: build
       outcome: success
 
-  builds-failed:
+  build-failed:
     name: Builds 👎
     needs: [build, check-links] 
     if: always() && (needs.build.result == 'failure' || needs.check-links.result == 'failure')
@@ -84,9 +84,14 @@ jobs:
       - name: Ready message
         run: echo "### Builds Failed :thumbsdown:" >> $GITHUB_STEP_SUMMARY
 
-      - name: Send IFTTT message that build successful
-        run: |
-          curl -X POST -H 'Content-Type: application/json' -d '{"phase":"build", "outcome":"fail"}' https://maker.ifttt.com/trigger/gha_build_red/json/with/key/${{ secrets.IFTTT }}
+  ifttt-build-fail:
+    name: IFTTT Build Fail
+    needs: [build-failed]
+    uses: ./.github/workflows/notification-ifttt.yml
+    secrets: inherit
+    with:
+      phase: build
+      outcome: fail
 
   # Merge PR if using short-lived feature branchs
   # GitHub is setup to delete SLFB after merge completed.
@@ -157,9 +162,14 @@ jobs:
       - name: Ready message
         run: echo "### Continuous Integration Completed :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
-      - name: Send IFTTT message that CI successful
-        run: |
-          curl -X POST -H 'Content-Type: application/json' -d '{"phase":"ci", "outcome":"success"}' https://maker.ifttt.com/trigger/gha_ci_green/json/with/key/${{ secrets.IFTTT }}
+  ifttt-ci-success:
+    name: IFTTT CI Success
+    needs: [ci-complete]
+    uses: ./.github/workflows/notification-ifttt.yml
+    secrets: inherit
+    with:
+      phase: ci
+      outcome: success
 
   ci-failed:
     name: CI Failed 👎
@@ -171,10 +181,15 @@ jobs:
       - name: Ready message
         run: echo "### Continuous Integration Failed :thumbsdown:" >> $GITHUB_STEP_SUMMARY
 
-      - name: Send IFTTT message that Ci failed
-        run: |
-          curl -X POST -H 'Content-Type: application/json' -d '{"phase":"ci", "outcome":"fail"}' https://maker.ifttt.com/trigger/gha_ci_red/json/with/key/${{ secrets.IFTTT }}
-
+  ifttt-ci-fail:
+    name: IFTTT CI Failed
+    needs: [ci-complete]
+    uses: ./.github/workflows/notification-ifttt.yml
+    secrets: inherit
+    with:
+      phase: ci
+      outcome: fail
+        
   # Set target build in GitOps config (to be used in continuous deployment)
   # BUG: .deploy.ci.revealmd doesnt exist in builds.yml config file (nor for landing solution)
   build-ci:
