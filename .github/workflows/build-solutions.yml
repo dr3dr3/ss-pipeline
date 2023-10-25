@@ -97,7 +97,7 @@ jobs:
       - name: Run Reveal-MD build
         run: |
           cd reveal-md
-          reveal-md --static _site --static-dirs=assets --template template.html --glob 'slides/*.md' --absolute-url 'https://www.replace.com'
+          reveal-md --static _site --static-dirs=assets --listing-template index.html --template template.html --glob 'slides/*.md' --absolute-url 'https://www.replace.com'
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
