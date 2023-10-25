@@ -32,7 +32,7 @@ jobs:
       - name: Setup Node.JS
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       # https://github.com/JustinBeckwith/linkinator
       - name: Install Linkinator
