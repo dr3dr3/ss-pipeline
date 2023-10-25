@@ -43,7 +43,7 @@ jobs:
         id: results-js
         run: |
           echo "### Linkinator .JS" >> $GITHUB_STEP_SUMMARY
-          count="$(ls -l **/*.js 2>/dev/null | wc -l)"
+          count="$(ls -l ./_site/**/*.js 2>/dev/null | wc -l)"
           if [[ $count != 0 ]]; then
             echo $(npx linkinator "**/*.js" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
             echo $(npx linkinator "**/*.js" --config "./config/linkinator.config.json") >> links-js.json
@@ -61,7 +61,8 @@ jobs:
         id: results-html
         run: |
           echo "### Linkinator .HTML" >> $GITHUB_STEP_SUMMARY
-          count="$(ls -l **/*.html 2>/dev/null | wc -l)"
+          count="$(ls -l ./_site/**/*.html 2>/dev/null | wc -l)"
+          echo $count
           if [[ $count != 0 ]]; then
             echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
             echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> links-html.json
@@ -79,7 +80,7 @@ jobs:
         id: results-css
         run: |
           echo "### Linkinator .CSS" >> $GITHUB_STEP_SUMMARY
-          count="$(ls -l **/*.css 2>/dev/null | wc -l)"
+          count="$(ls -l ./_site/**/*.css 2>/dev/null | wc -l)"
           if [[ $count != 0 ]]; then
             echo $(npx linkinator "**/*.css" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
             echo $(npx linkinator "**/*.css" --config "./config/linkinator.config.json") >> links-css.json
