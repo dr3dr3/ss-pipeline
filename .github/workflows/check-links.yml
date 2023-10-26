@@ -38,15 +38,17 @@ jobs:
       - name: Install Linkinator
         run: |
           npm install linkinator
+          ls
 
       - name: Check links 
         id: check-links
         run: |
           echo "### Linkinator" >> $GITHUB_STEP_SUMMARY
-          npx linkinator "./_site" --config "./config/linkinator.config.json"
-          echo $(npx linkinator "./_site" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
+          cd _site
+          npx linkinator "**/*" --config "../config/linkinator.config.json"
+          echo $(npx linkinator "**/*" --config "../config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
           echo "Done: GitHub Step Summary"
-          echo $(npx linkinator "./_site" --config "./config/linkinator.config.json") >> links-html.json
+          echo $(npx linkinator "**/*" --config "../config/linkinator.config.json") >> links-html.json
           echo "Done: Create links-html.json"
           echo 'RESULT='$(jq '.passed' links-html.json) >> $GITHUB_OUTPUT
           echo "Done: Set HTML variable"
