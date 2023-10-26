@@ -38,13 +38,13 @@ jobs:
       - name: Install Linkinator
         run: |
           npm install linkinator
-          ls
 
       - name: Check links 
         id: check-links
         run: |
           echo "### Linkinator" >> $GITHUB_STEP_SUMMARY
           cd _site
+          ls
           npx linkinator "**/*" --config "../config/linkinator.config.json"
           echo $(npx linkinator "**/*" --config "../config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
           echo "Done: GitHub Step Summary"
