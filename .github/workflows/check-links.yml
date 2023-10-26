@@ -56,5 +56,5 @@ jobs:
           echo "Done: Set HTML variable"
 
       - name: Fail workflow - HTML
-        if: steps.check-links.outputs.RESULT != 'true'
+        if: steps.check-links.outputs.RESULT != 'true' || inputs.artefact-ref == 'x'
         run: exit 1
