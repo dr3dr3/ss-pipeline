@@ -63,6 +63,7 @@ jobs:
         id: results-html
         run: |
           echo "### Linkinator .HTML" >> $GITHUB_STEP_SUMMARY
+          npx linkinator "**/*.html" --config "./config/linkinator.config.json
           echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
           echo "Done: GitHub Step Summary"
           echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> links-html.json
