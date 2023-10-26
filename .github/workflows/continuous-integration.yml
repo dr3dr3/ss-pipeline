@@ -17,6 +17,27 @@ on:
 
 jobs:
 
+  cicd-toggles:
+    name: Toggles
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    outputs:
+      check-links: ${{ steps.setoutput.outputs.LINKS }}
+    steps:
+
+    - name: Checkout GitOps
+      uses: actions/checkout@v3
+      with:
+        repository: 'dr3dr3/ss-gitops'
+        ref: 'main'
+        token: ${{ secrets.GHA_PAT }}
+
+    - name: Output Toggle
+      id: setoutput
+      run: |
+        target="$(yq '.toggles.cicd.check-links.build' 'toggles.yml')" || 'ERROR'
+        echo "LINKS=$target" >> $GITHUB_OUTPUT
+
   set-tag:
     name: 🔖 Set Tag
     timeout-minutes: 10
@@ -25,12 +46,12 @@ jobs:
       tag: ${{ steps.setoutput.outputs.TAG }}
     steps:
       
-      - name: Output Tag
-        id: setoutput
-        run: |
-          build="BUILD-$(date '+%Y.%m.%d.%H.%M')" || 'ERROR'
-          echo "$build"
-          echo "TAG=$build" >> $GITHUB_OUTPUT          
+    - name: Output Tag
+      id: setoutput
+      run: |
+        build="BUILD-$(date '+%Y.%m.%d.%H.%M')" || 'ERROR'
+        echo "$build"
+        echo "TAG=$build" >> $GITHUB_OUTPUT          
 
   # Build for specific solution
   build:
@@ -48,11 +69,12 @@ jobs:
   # Test for broken hyperlinks
   check-links:
     name: 🔗 Check Links
-    needs: [set-tag, build]
+    needs: [ cicd-toggles, set-tag, build]
     uses: ./.github/workflows/check-links.yml
     secrets: inherit
     with: 
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
+      toggle: ${{ needs.cicd-toggles.outputs.check-links }}
 
   ### Check builds ok. Is a required check on the PR (setup in GitHub). 
 
