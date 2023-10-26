@@ -41,6 +41,7 @@ jobs:
 
       - name: Check links 
         id: check-links
+        if: inputs.artefact-ref == 'x'
         run: |
           echo "### Linkinator" >> $GITHUB_STEP_SUMMARY
           cd _site
@@ -54,5 +55,5 @@ jobs:
           echo "Done: Set HTML variable"
 
       - name: Fail workflow - HTML
-        if: ${{ steps.check-links.outputs.RESULT != 'true' }}
+        if: steps.check-links.outputs.RESULT != 'true'
         run: exit 1
