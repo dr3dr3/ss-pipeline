@@ -60,7 +60,7 @@ jobs:
         run: rsync -avh build-files/template.html reveal-md
         
       - name: Copy slide template to Reveal-MD
-        run: rsync -avh build-files/index.html reveal-md
+        run: rsync -avh build-files/listing.html reveal-md
         
       - name: Copy version slide to Reveal-MD
         run: rsync -avh build-files/version.md reveal-md/slides/version.md

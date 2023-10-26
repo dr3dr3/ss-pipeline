@@ -41,7 +41,6 @@ jobs:
 
       - name: Check links 
         id: check-links
-        if: inputs.artefact-ref == 'x'
         run: |
           echo "### Linkinator" >> $GITHUB_STEP_SUMMARY
           cd _site
