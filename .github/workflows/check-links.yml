@@ -48,11 +48,10 @@ jobs:
         run: |
           echo "### Linkinator" >> $GITHUB_STEP_SUMMARY
           cd _site
-          ls
-          npx linkinator "**/*" --config "../config/linkinator.config.json"
-          echo $(npx linkinator "**/*" --config "../config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
+          npx linkinator "**/*.html" --config "../config/linkinator.config.json"
+          echo $(npx linkinator "**/*.html" --config "../config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
           echo "Done: GitHub Step Summary"
-          echo $(npx linkinator "**/*" --config "../config/linkinator.config.json") >> links-html.json
+          echo $(npx linkinator "**/*.html" --config "../config/linkinator.config.json") >> links-html.json
           echo "Done: Create links-html.json"
           echo 'RESULT='$(jq '.passed' links-html.json) >> $GITHUB_OUTPUT
           echo "Done: Set HTML variable"

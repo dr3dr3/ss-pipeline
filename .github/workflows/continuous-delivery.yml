@@ -20,7 +20,7 @@ jobs:
       current-revealmd: ${{ steps.revealmd.outputs.CURRENT }}
       target-landing: ${{ steps.landing.outputs.TARGET }}
       current-landing: ${{ steps.landing.outputs.CURRENT }}
-      check-links: ${{ steps.setoutput.outputs.LINKS }}
+      check-links: ${{ steps.toggles.outputs.LINKS }}
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -32,8 +32,8 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      - name: Output Toggle
-        id: setoutput
+      - name: Output Toggles
+        id: toggles
         run: |
           value="$(yq '.toggles.cicd.check-links.${{ inputs.target-deploy }}' 'toggles.yml')" || 'ERROR'
           echo "LINKS=$value" >> $GITHUB_OUTPUT
@@ -125,9 +125,9 @@ jobs:
       contents: read
       pages: write
       id-token: write
+    secrets: inherit
     with:
       artefact-ref: ${{ format('{0}-{1}', 'RC', github.run_id ) }}
-    secrets: inherit
 
   ### Do different testing (smoke, PVT, etc)
 
