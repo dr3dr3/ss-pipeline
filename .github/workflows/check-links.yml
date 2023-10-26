@@ -67,8 +67,11 @@ jobs:
           echo $count
           if [[ $count != 0 ]]; then
             echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
+            echo "Done: GitHub Step Summary"
             echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> links-html.json
+            echo "Done: Create links-html.json"
             echo 'HTML='$(jq '.passed' links-html.json) >> $GITHUB_OUTPUT
+            echo "Done: Set HTML variable"
           else
             echo "No .HTML files found" >> $GITHUB_STEP_SUMMARY
             echo 'HTML=true' >> $GITHUB_OUTPUT
