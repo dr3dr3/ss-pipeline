@@ -59,24 +59,24 @@ jobs:
         if: ${{ steps.results-js.outputs.JS != 'true' }}
         run: exit 1
 
-#      - name: Check links to HTML files
-#        id: results-html
-#        run: |
-#          echo "### Linkinator .HTML" >> $GITHUB_STEP_SUMMARY
-#          count="$(ls -l ./_site/**/*.html 2>/dev/null | wc -l)"
-#          echo $count
-#          if [[ $count != 0 ]]; then
-#            echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
-#            echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> links-html.json
-#            echo 'HTML='$(jq '.passed' links-html.json) >> $GITHUB_OUTPUT
-#          else
-#            echo "No .HTML files found" >> $GITHUB_STEP_SUMMARY
-#            echo 'HTML=true' >> $GITHUB_OUTPUT
-#          fi
+      - name: Check links to HTML files
+        id: results-html
+        run: |
+          echo "### Linkinator .HTML" >> $GITHUB_STEP_SUMMARY
+          count="$(ls -l ./_site/**/*.html 2>/dev/null | wc -l)"
+          echo $count
+          if [[ $count != 0 ]]; then
+            echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> $GITHUB_STEP_SUMMARY
+            echo $(npx linkinator "**/*.html" --config "./config/linkinator.config.json") >> links-html.json
+            echo 'HTML='$(jq '.passed' links-html.json) >> $GITHUB_OUTPUT
+          else
+            echo "No .HTML files found" >> $GITHUB_STEP_SUMMARY
+            echo 'HTML=true' >> $GITHUB_OUTPUT
+          fi
 
-#      - name: Fail workflow - HTML
-#        if: ${{ steps.results-html.outputs.HTML != 'true' }}
-#        run: exit 1
+      - name: Fail workflow - HTML
+        if: ${{ steps.results-html.outputs.HTML != 'true' }}
+        run: exit 1
 
       - name: Check links to CSS files
         id: results-css
