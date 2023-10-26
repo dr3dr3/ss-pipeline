@@ -35,8 +35,8 @@ jobs:
     - name: Output Toggle
       id: setoutput
       run: |
-        target="$(yq '.toggles.cicd.check-links.build' 'toggles.yml')" || 'ERROR'
-        echo "LINKS=$target" >> $GITHUB_OUTPUT
+        value="$(yq '.toggles.cicd.check-links.build' 'toggles.yml')" || 'ERROR'
+        echo "LINKS=$value" >> $GITHUB_OUTPUT
 
   set-tag:
     name: 🔖 Set Tag

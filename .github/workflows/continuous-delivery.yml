@@ -16,10 +16,11 @@ jobs:
   get-build-artefacts:
     name: Get Build Artefacts
     outputs:
-      target-revealmd: ${{ steps.revealmd.outputs.TARGET }}   
-      current-revealmd: ${{ steps.revealmd.outputs.CURRENT }}   
-      target-landing: ${{ steps.landing.outputs.TARGET }}   
-      current-landing: ${{ steps.landing.outputs.CURRENT }}   
+      target-revealmd: ${{ steps.revealmd.outputs.TARGET }}
+      current-revealmd: ${{ steps.revealmd.outputs.CURRENT }}
+      target-landing: ${{ steps.landing.outputs.TARGET }}
+      current-landing: ${{ steps.landing.outputs.CURRENT }}
+      check-links: ${{ steps.setoutput.outputs.LINKS }}
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -31,6 +32,12 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
+      - name: Output Toggle
+        id: setoutput
+        run: |
+          value="$(yq '.toggles.cicd.check-links.${{ inputs.target-deploy }}' 'toggles.yml')" || 'ERROR'
+          echo "LINKS=$value" >> $GITHUB_OUTPUT
+          
       - name: Create directory
         run: mkdir _site
 
@@ -107,6 +114,7 @@ jobs:
     secrets: inherit
     with: 
       artefact-ref: ${{ format('{0}-{1}', 'RC', github.run_id ) }}
+      toggle: ${{ needs.get-build-artefacts.outputs.check-links }}
 
   # Deploy to GitHub Page
   deploy-to-github-pages:
