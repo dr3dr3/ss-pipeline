@@ -9,7 +9,7 @@ on:
         type: string
       toggle:
         required: true
-        type: boolean
+        type: string
 
 jobs:
 
