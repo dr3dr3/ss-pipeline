@@ -215,7 +215,7 @@ jobs:
   # Set target build in GitOps config (to be used in continuous deployment)
   build-ci:
     name: Set CI Build in Config
-    if: inputs.solution != 'feature-flags'
+    if: inputs.solution != 'featurevisor'
     needs: [set-tag, ci-complete]
     uses: ./.github/workflows/gitops-update.yml
     with:
@@ -226,7 +226,7 @@ jobs:
   # Dispatch to trigger deployment to Stage Environment
   dispatch-stg:
     name: Dispatch STG
-    if: inputs.solution != 'feature-flags'
+    if: inputs.solution != 'featurevisor'
     needs: [ci-complete]
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
