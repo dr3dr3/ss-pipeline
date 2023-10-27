@@ -134,3 +134,48 @@ jobs:
           name: ${{ inputs.artefact-ref }}
           path: _site
           retention-days: 1
+
+  # Build feature flag data files and admin static site
+  build-featurevisor:
+    name: 🔨 Build FeatureVisor
+    if: inputs.solution == 'featurevisor'
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Soln Repo
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ inputs.target-ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.JS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install 
+        run: npm install
+
+      - name: Lint 
+        run: npm run lint
+
+      - name: Test 
+        run: npm run test
+
+      - name: Build 
+        # Includes data files for feature flags 
+        run: |
+          npm run build
+          npm run export
+
+      - name: Copy markdown files to Reveal-MD
+        run: rsync -avh ff/out/ _site
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.artefact-ref }}
+          path: _site
+          retention-days: 1
