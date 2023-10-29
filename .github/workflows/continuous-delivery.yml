@@ -94,9 +94,6 @@ jobs:
           cd _site
           grep -rl www.replace.com . | xargs sed -i 's@https://www.replace.com@${{ inputs.site-url }}@g'
 
-#      - name: Rename index.html from Reveal-MD
-#        run: rsync -avh _site/index.html _site/slides.html
-
       ##### Upload Deployable Artifact
 
       - name: Upload Build Artifacts

@@ -64,7 +64,7 @@ jobs:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
       solution: ${{ inputs.solution }}
 
-  ### Tests on build above
+  ### Post-build tests on the package from build above
 
   # Test for broken hyperlinks
   check-links:
@@ -149,6 +149,7 @@ jobs:
   # Set target build in GitOps config (to be used in continuous deployment)
   build-target:
     name: Set Target Build in Config
+    if: inputs.solution != 'featurevisor'
     needs: [set-tag, build-complete]
     uses: ./.github/workflows/gitops-update.yml
     with:

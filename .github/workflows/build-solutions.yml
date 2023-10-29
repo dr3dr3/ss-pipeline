@@ -126,7 +126,27 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update build on index.html
-        run: sed -i 's/BUILD-PLACEHOLDER/${{ inputs.artefact-ref }}/g' _site/index.html
+        run: sed -i 's/BUILD-PLACEHOLDER/${{ inputs.artefact-ref }}/g' build/App.js
+
+      # If linting fails will fail this job
+      - name: Run linter 
+        run: npm run lint
+
+      # If this tests fail the NPM error will fail this job
+      - name: Run tests 
+        run: npm run test
+
+      - name: GitHub Step Summary for Test
+        run: |
+          echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "$(npm run test)" >> $GITHUB_STEP_SUMMARY
+
+      # Build
+      - name: Run build 
+        run: npm run build
+
+      - name: Copy build output to _site folder
+        run: rsync -avh build/ _site
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
@@ -170,7 +190,7 @@ jobs:
           npm run build
           npm run export
 
-      - name: Copy markdown files to Reveal-MD
+      - name: Copy build output to _site folder
         run: rsync -avh ff/out/ _site
 
       - name: Upload Build Artifacts
