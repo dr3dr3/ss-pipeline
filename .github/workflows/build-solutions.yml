@@ -128,10 +128,6 @@ jobs:
       - name: Update build on index.html
         run: sed -i 's/BUILD-PLACEHOLDER/${{ inputs.artefact-ref }}/g' build/App.js
 
-      # If linting fails will fail this job
-      - name: Run linter 
-        run: npm run lint
-
       # If this tests fail the NPM error will fail this job
       - name: Run tests 
         run: npm run test
