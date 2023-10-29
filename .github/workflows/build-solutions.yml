@@ -126,7 +126,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update build on index.html
-        run: sed -i 's/BUILD-PLACEHOLDER/${{ inputs.artefact-ref }}/g' build/App.js
+        run: sed -i 's/BUILD-PLACEHOLDER/${{ inputs.artefact-ref }}/g' src/App.js
 
       # If this tests fail the NPM error will fail this job
       - name: Run tests 
