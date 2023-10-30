@@ -92,7 +92,7 @@ jobs:
       - name: Update aboslute links for relevant environments
         run: |
           cd _site
-          grep -rl www.replace.com . | xargs sed -i 's@https://www.replace.com@${{ inputs.site-url }}@g'
+          grep -rl www.localhost.com . | xargs sed -i 's@http://www.localhost.com@${{ inputs.site-url }}@g'
 
       ##### Upload Deployable Artifact
 
