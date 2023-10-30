@@ -15,10 +15,9 @@ on:
 
 jobs:
 
-  # Build static site using Reveal-MD
-  build-revealmd:
+  # Build static sites
+  build-static-site:
     name: 🔨 Build Reveal-MD
-    if: inputs.solution == 'revealmd'
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -35,166 +34,64 @@ jobs:
         with:
           node-version: 18
 
-      - name: Clone Reveal-MD
-        run: git clone https://github.com/webpro/reveal-md.git
+      ### All static solutions should use package.json and have lint, test, build as commands
+      - name: Install
+        run: npm install
 
-      - name: Install Reveal-MD
+      - name: Add version and build date for Reveal-MD
+        if: inputs.solution == 'revealmd'
         run: |
-          cd reveal-md
-          npm install -g reveal-md
-          npm install --only=dev
-          cd ..
+          echo -e "${{ inputs.artefact-ref }} \n" >> slides/version.md
 
-      - name: Copy markdown files to Reveal-MD
-        run: rsync -avh slides reveal-md
-
-      - name: Copy featured-slide.jpg to Reveal-MD
-        run: |
-          mkdir reveal-md/assets
-          rsync -avh build-files/featured-slide.jpg reveal-md/assets/featured-slide.jpg
-
-      - name: Copy favicon to Reveal-MD
-        run: rsync -avh build-files/favicon.ico reveal-md
-
-      - name: Copy slide template to Reveal-MD
-        run: rsync -avh build-files/template.html reveal-md
-        
-      - name: Copy slide template to Reveal-MD
-        run: rsync -avh build-files/listing.html reveal-md
-        
-      - name: Copy version slide to Reveal-MD
-        run: rsync -avh build-files/version.md reveal-md/slides/version.md
-
-      - name: Add version and build date
-        run: |
-          echo -e "${{ inputs.artefact-ref }} \n" >> reveal-md/slides/version.md
+      - name: Update build-placeholder
+        if: inputs.solution == 'landing'
+        run: sed -i 's/BUILD-PLACEHOLDER/${{ inputs.artefact-ref }}/g' src/App.js
 
       # If linting fails will fail this job
-      - name: Run linter from Reveal-MD
+      - name: Run linter 
         run: npm run lint
 
       # If this tests fail the NPM error will fail this job
-      - name: Run tests from Reveal-MD
-        run: npm run test
-
-      - name: GitHub Step Summary for Test
+      - name: Run tests 
         run: |
-          cd reveal-md
+          npm run test
           echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
           echo "$(npm run test)" >> $GITHUB_STEP_SUMMARY
-          cd ..
 
       ### NOTE: Reveal.json and Reveal-md.json not passing tests but still working (so run these steps post reveal-md tests)
 
       - name: Copy reveal.json (configuration) to Reveal-MD
+        if: inputs.solution == 'revealmd'
         run: rsync -avh build-files/reveal.json reveal-md
 
       - name: Copy reveal-md.json (configuration) to Reveal-MD
+        if: inputs.solution == 'revealmd'
         run: rsync -avh build-files/reveal-md.json reveal-md
 
-      - name: Update reveal-md.json
-        run: | 
-          jq '.theme = "simple"' reveal-md/reveal-md.json > reveal-md.json
-          rsync -avh reveal-md.json reveal-md
+      #- name: Update reveal-md.json
+      #  run: | 
+      #    jq '.theme = "simple"' reveal-md/reveal-md.json > reveal-md.json
+      #    rsync -avh reveal-md.json reveal-md
 
-      - name: Run Reveal-MD build
-        run: |
-          cd reveal-md
-          reveal-md --static _site --static-dirs=assets --listing-template listing.html --template template.html --glob 'slides/*.md' --absolute-url 'https://www.replace.com'
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ inputs.artefact-ref }}
-          path: reveal-md/_site
-          retention-days: 1
-
-          
-  # Build static site for landing page(s)
-  build-landing:
-    name: 🔨 Build Landing Pages
-    if: inputs.solution == 'landing'
-    timeout-minutes: 10
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Checkout Soln Repo
-        uses: actions/checkout@v3
-        with:
-          repository: ${{ github.repository }}
-          ref: ${{ inputs.target-ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install
-        run: npm i
-
-      - name: Update build-placeholder
-        run: sed -i 's/BUILD-PLACEHOLDER/${{ inputs.artefact-ref }}/g' src/App.js
-
-      # If this tests fail the NPM error will fail this job
-      - name: Run tests 
-        run: npm run test
-
-      - name: GitHub Step Summary for Test
-        run: |
-          echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
-          echo "$(npm run test)" >> $GITHUB_STEP_SUMMARY
-
-      # Build
-      - name: Run build 
+      - name: 🔨 Run build
         run: npm run build
 
-      - name: Copy build output to _site folder
+      - name: Export command needed for Featurevisor
+        if: inputs.solution == 'featurevisor'
+        run: npm run export
+
+      - name: Copy build output to _site folder (Landing)
+        if: inputs.solution == 'landing'
         run: rsync -avh build/ _site
 
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ inputs.artefact-ref }}
-          path: _site
-          retention-days: 1
-
-  # Build feature flag data files and admin static site
-  build-featurevisor:
-    name: 🔨 Build FeatureVisor
-    if: inputs.solution == 'featurevisor'
-    timeout-minutes: 10
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Checkout Soln Repo
-        uses: actions/checkout@v3
-        with:
-          repository: ${{ github.repository }}
-          ref: ${{ inputs.target-ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Node.JS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install 
-        run: npm install
-
-      - name: Lint 
-        run: npm run lint
-
-      - name: Test 
-        run: npm run test
-
-      - name: Build 
-        # Includes data files for feature flags 
-        run: |
-          npm run build
-          npm run export
-
-      - name: Copy build output to _site folder
+      - name: Copy build output to _site folder (Featurevisor)
+        if: inputs.solution == 'featurevisor'
         run: rsync -avh out/ _site
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artefact-ref }}
+          ### Output of build should be in _site folder. Maybe make this configurable?
           path: _site
           retention-days: 1
