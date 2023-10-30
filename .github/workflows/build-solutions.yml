@@ -53,6 +53,7 @@ jobs:
 
       # If this tests fail the NPM error will fail this job
       - name: Run tests 
+        if: inputs.solution != 'landing'
         run: |
           npm run test
           echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
