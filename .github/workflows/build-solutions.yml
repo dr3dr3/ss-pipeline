@@ -190,7 +190,7 @@ jobs:
           npm run export
 
       - name: Copy build output to _site folder
-        run: rsync -avh build/ _site
+        run: rsync -avh out/ _site
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
