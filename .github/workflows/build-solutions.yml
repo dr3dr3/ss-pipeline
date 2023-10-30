@@ -9,6 +9,9 @@ on:
       artefact-ref:
         required: true
         type: string
+      feature:
+        required: true
+        type: string
       solution:
           required: true
           type: string 
@@ -43,9 +46,13 @@ jobs:
         run: |
           echo -e "${{ inputs.artefact-ref }} \n" >> slides/version.md
 
-      - name: Update build-placeholder
+      - name: Update BUILD-PLACEHOLDER
         if: inputs.solution == 'landing'
         run: sed -i 's/BUILD-PLACEHOLDER/${{ inputs.artefact-ref }}/g' src/App.js
+
+      - name: Update COMMIT-MESSAGE-PLACEHOLDER
+        if: inputs.solution == 'landing'
+        run: sed -i 's/COMMIT-MESSAGE-PLACEHOLDER/${{ inputs.feature }}/g' src/latestChange.js
 
       # If linting fails will fail this job
       - name: Run linter 
