@@ -68,13 +68,13 @@ jobs:
 
       ### NOTE: Reveal.json and Reveal-md.json not passing tests but still working (so run these steps post reveal-md tests)
 
-      - name: Copy reveal.json (configuration) to Reveal-MD
-        if: inputs.solution == 'revealmd'
-        run: rsync -avh build-files/reveal.json reveal-md
+      # - name: Copy reveal.json (configuration) to Reveal-MD
+      #   if: inputs.solution == 'revealmd'
+      #   run: rsync -avh build-files/reveal.json reveal-md
 
-      - name: Copy reveal-md.json (configuration) to Reveal-MD
-        if: inputs.solution == 'revealmd'
-        run: rsync -avh build-files/reveal-md.json reveal-md
+      # - name: Copy reveal-md.json (configuration) to Reveal-MD
+      #   if: inputs.solution == 'revealmd'
+      #   run: rsync -avh build-files/reveal-md.json reveal-md
 
       #- name: Update reveal-md.json
       #  run: | 
