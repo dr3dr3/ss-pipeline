@@ -11,12 +11,14 @@ on:
         default: 'stg'
         # string must be one of:
         # 'stg' - Stage Environment
-        # 'can' - Canary Environment
-        # 'prd' - Production Environment
+        # 'blue' - Production (Blue) Environment
+        # 'green' - Production (Green) Environment
       site-url:
         required: true
         type: string
-        default: 'https://stg.andredreyer.com'
+      target-repo:
+        required: true
+        type: string
 
 jobs:
 
@@ -65,7 +67,7 @@ jobs:
           curl -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.GHA_PAT }}" \
           --request POST --data '{"event_type": "deploy", "client_payload": {"target-deploy": "${{ inputs.target-deploy }}","site-url":"${{ inputs.site-url }}"}}' \
-          https://api.github.com/repos/${{ github.repository_owner }}/ss-pipeline/dispatches
+          https://api.github.com/repos/${{ github.repository_owner }}/${{ inputs.target-repo }}/dispatches
           echo "Success"
       
       ### Todo: Any value in adding client_payload

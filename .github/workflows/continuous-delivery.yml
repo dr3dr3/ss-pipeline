@@ -1,9 +1,15 @@
 name: CONTINUOUS-DELIVERY
 
 on:
-  # Runs on pushes targeting the default branch
-  repository_dispatch:
-    types: [deploy]
+
+  workflow_call:
+    inputs:
+      target-deploy:
+        required: true
+        type: string
+      site-url:
+        required: true
+        type: string
 
 jobs:
 
@@ -29,7 +35,7 @@ jobs:
       - name: Output Toggles
         id: toggles
         run: |
-          value="$(yq '.toggles.cicd.check-links.${{ github.event.client_payload.target-deploy }}' 'toggles.yml')" || 'ERROR'
+          value="$(yq '.toggles.cicd.check-links.${{ inputs.target-deploy }}' 'toggles.yml')" || 'ERROR'
           echo "LINKS=$value" >> $GITHUB_OUTPUT
           
       - name: Create directory
@@ -43,7 +49,7 @@ jobs:
           target="$(yq '.build.landing' 'builds.yml')" || 'ERROR'
           echo "TARGET=$target" >> $GITHUB_OUTPUT
           echo "Target = $target"
-          current="$(yq '.deploy.${{ github.event.client_payload.target-deploy }}.landing' 'builds.yml')" || 'ERROR'
+          current="$(yq '.deploy.${{ inputs.target-deploy }}.landing' 'builds.yml')" || 'ERROR'
           echo "CURRENT=$current" >> $GITHUB_OUTPUT
           echo "Current = $current"
           repo="$(yq '.repositories.solutions.landing.ref' 'repositories.yml')" || 'ERROR'
@@ -64,7 +70,7 @@ jobs:
           target="$(yq '.build.revealmd' 'builds.yml')" || 'ERROR'
           echo "TARGET=$target" >> $GITHUB_OUTPUT
           echo "Target = $target"
-          current="$(yq '.deploy.${{ github.event.client_payload.target-deploy }}.revealmd' 'builds.yml')" || 'ERROR'
+          current="$(yq '.deploy.${{ inputs.target-deploy }}.revealmd' 'builds.yml')" || 'ERROR'
           echo "CURRENT=$current" >> $GITHUB_OUTPUT
           echo "Current = $current"
           repo="$(yq '.repositories.solutions.revealmd.ref' 'repositories.yml')" || 'ERROR'
@@ -86,12 +92,12 @@ jobs:
       - name: Update aboslute links for relevant environments
         run: |
           cd _site
-          grep -rl localhost . | xargs sed -i 's@http://localhost@${{ github.event.client_payload.site_url }}@g'
+          grep -rl localhost . | xargs sed -i 's@http://localhost@${{ inputs.site-url }}@g'
 
       - name: Update links to feature flags
         run: |
           cd _site
-          grep -rl datafile-tag-all.json . | xargs sed -i 's@datafiles/ci/datafile-tag-all.json@datafiles/${{ github.event.client_payload.target-deploy }}/datafile-tag-all.json@g'
+          grep -rl datafile-tag-all.json . | xargs sed -i 's@datafiles/ci/datafile-tag-all.json@datafiles/${{ inputs.target-deploy }}/datafile-tag-all.json@g'
 
       ##### Upload Deployable Artifact
 
@@ -102,6 +108,8 @@ jobs:
           path: _site
           retention-days: 1
   
+  ### Pre-Deployment Tests
+
   # Check links working in compiled deploy artefact
   check-links:
     name: Check Links
@@ -112,11 +120,34 @@ jobs:
       artefact-ref: ${{ format('{0}-{1}', 'RC', github.run_id ) }}
       toggle: ${{ needs.get-build-artefacts.outputs.check-links }}
 
-  # Deploy to GitHub Page
-  deploy-to-github-pages:
+  config-deploy:
+    name: Get config for full site deployment
+    needs: [get-build-artefacts, check-links]
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    outputs:
+      deploy-to: ${{ steps.setoutput.outputs.TARGET }}
+    steps:
+
+    - name: Checkout GitOps
+      uses: actions/checkout@v3
+      with:
+        repository: 'dr3dr3/ss-gitops'
+        ref: 'main'
+        token: ${{ secrets.GHA_PAT }}
+
+    - name: Output Config
+      id: setoutput
+      run: |
+        value="$(yq '.repositories.deployment.${{ inputs.target-deploy }}.deploy-to' 'repositories.yml')" || 'ERROR'
+        echo "TARGET=$value" >> $GITHUB_OUTPUT
+
+  # Deploy to Static Site Host
+  # WIP: If config = GHP
+  deploy-static-site:
     name: Deploy GHP
-    needs: [get-build-artefacts]
-    uses: ./.github/workflows/deploy-github-pages.yml
+    needs: [get-build-artefacts, config-deploy]
+    uses: ./.github/workflows/deploy-static-site.yml
     permissions:
       contents: read
       pages: write
@@ -124,35 +155,45 @@ jobs:
     secrets: inherit
     with:
       artefact-ref: ${{ format('{0}-{1}', 'RC', github.run_id ) }}
+      deploy-to: ${{ needs.config-deploy.outputs.deploy-to }}
 
-  ### Do different testing (smoke, PVT, etc)
+  ### Post-deployment Tests (smoke, PVT, etc)
+  
+  post-deploy-test:
+    name: Echo
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Echo
+        run: echo "Placeholder for post-deploy test"
 
   # Given successful testing then update the build for this environment in GitOps Config
   config-revealmd:
     name: Actual Build for Reveal-MD
-    needs: [get-build-artefacts]
+    needs: [get-build-artefacts, post-deploy-test]
     if: needs.get-build-artefacts.outputs.current-revealmd != needs.get-build-artefacts.outputs.target-revealmd
     uses: ./.github/workflows/gitops-update.yml
     with:
-      config-item: '.deploy.${{ github.event.client_payload.target-deploy }}.revealmd'
+      config-item: '.deploy.${{ inputs.target-deploy }}.revealmd'
       config-value: ${{ needs.get-build-artefacts.outputs.target-revealmd }}
     secrets: inherit
 
   # Given successful testing then update the build for this environment in GitOps Config
   config-landing:
     name: Actual Build for Landing
-    needs: [get-build-artefacts]
+    needs: [get-build-artefacts, post-deploy-test]
     if: needs.get-build-artefacts.outputs.current-landing != needs.get-build-artefacts.outputs.target-landing
     uses: ./.github/workflows/gitops-update.yml
     with:
-      config-item: '.deploy.${{ github.event.client_payload.target-deploy }}.landing'
+      config-item: '.deploy.${{ inputs.target-deploy }}.landing'
       config-value: ${{ needs.get-build-artefacts.outputs.target-landing }}
     secrets: inherit
 
   # Check all acceptance completed
   acceptance-complete:
     name: Acceptance 👍
-    needs: [get-build-artefacts, check-links, deploy-to-github-pages, config-revealmd, config-landing] ### ADD ALL CHECKS
+    needs: [get-build-artefacts, check-links, deploy-static-site, post-deploy-test, config-revealmd, config-landing] ### ADD ALL CHECKS
     if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest 
     steps:
@@ -162,17 +203,17 @@ jobs:
 
   ifttt-success:
     name: IFTTT Success
-    needs: [get-build-artefacts, check-links, deploy-to-github-pages, config-revealmd, config-landing] ### ADD ALL CHECKS
+    needs: [get-build-artefacts, check-links, deploy-static-site, post-deploy-test, config-revealmd, config-landing] ### ADD ALL CHECKS
     if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     uses: ./.github/workflows/notification-ifttt.yml
     secrets: inherit
     with:
-      phase: ${{ github.event.client_payload.target-deploy }}
+      phase: ${{ inputs.target-deploy }}
       outcome: success
 
   acceptance-failed:
     name: Acceptance 👎
-    needs: [get-build-artefacts, check-links, deploy-to-github-pages, config-revealmd, config-landing] ### ADD ALL CHECKS
+    needs: [get-build-artefacts, check-links, deploy-static-site, post-deploy-test, config-revealmd, config-landing] ### ADD ALL CHECKS
     if: always() && ( contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') )
     runs-on: ubuntu-latest 
     steps:
@@ -182,12 +223,10 @@ jobs:
 
   ifttt-fail:
     name: IFTTT Fail
-    needs: [get-build-artefacts, check-links, deploy-to-github-pages, config-revealmd, config-landing] ### ADD ALL CHECKS
+    needs: [get-build-artefacts, check-links, deploy-static-site, post-deploy-test, config-revealmd, config-landing] ### ADD ALL CHECKS
     if: always() && ( contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') )
     uses: ./.github/workflows/notification-ifttt.yml
     secrets: inherit
     with:
-      phase: ${{ github.event.client_payload.target-deploy }}
+      phase: ${{ inputs.target-deploy }}
       outcome: fail
-
-  ### Add dispatch for PRD (blue/green)
