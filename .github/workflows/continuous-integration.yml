@@ -187,7 +187,6 @@ jobs:
   deploy-ci:
     name: Deploy CI
     needs: [set-tag, ci-config-deploy]
-    if: needs.ci-config-deploy.outputs.deploy-to == 'GHP'
     uses: ./.github/workflows/deploy-static-site.yml
     permissions:
       contents: write
