@@ -158,20 +158,44 @@ jobs:
       config-value: ${{ needs.set-tag.outputs.tag }}
     secrets: inherit
 
+  ci-config-deploy:
+    name: Get config for CI deployment
+    needs: [set-tag, tag-release]
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    outputs:
+      deploy-to: ${{ steps.setoutput.outputs.CI }}
+    steps:
+
+    - name: Checkout GitOps
+      uses: actions/checkout@v3
+      with:
+        repository: 'dr3dr3/ss-gitops'
+        ref: 'main'
+        token: ${{ secrets.GHA_PAT }}
+
+    - name: Output Config
+      id: setoutput
+      run: |
+        value="$(yq '.repositories.solution.${{ inputs.solution }}.ci-deploy-to' 'repositories.yml')" || 'ERROR'
+        echo "CI=$value" >> $GITHUB_OUTPUT
+
   ### Deploy to GitHub Pages in Solution Repo (considered the CI environment)
 
   # Deploy to GitHub Pages
   # Note: Uses artefacts created by build jobs above
   deploy-ci:
     name: Deploy CI
-    needs: [set-tag, tag-release]
-    uses: ./.github/workflows/deploy-github-pages.yml
+    needs: [set-tag, ci-config-deploy]
+    if: needs.ci-config-deploy.outputs.deploy-to == 'GHP'
+    uses: ./.github/workflows/deploy-static-site.yml
     permissions:
       contents: write
       pages: write
       id-token: write
     with:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
+      deploy-to: ${{ needs.ci-config-deploy.outputs.deploy-to }}
 
   ### Run CI Tests here
 
@@ -180,6 +204,7 @@ jobs:
   ci-complete:
     name: CI Complete 👍
     needs: [check-links, tag-release, build-target, deploy-ci] 
+    if: always()
     runs-on: ubuntu-latest 
     steps:
 

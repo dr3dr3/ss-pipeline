@@ -1,0 +1,46 @@
+# Deploy static site to Surge.sh
+name: DEPLOY-sURGE
+
+on:
+  workflow_call:
+    inputs:
+      artefact-ref:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+# Allow one concurrent deployment
+concurrency:
+  group: "deploy-surge"
+  cancel-in-progress: false
+
+jobs:
+
+  deploy:
+    name: 🚀 Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Surge.SH CLI
+        run: npm install surge
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artefact-ref }}
+          path: _site
+
+      - name: Upload Pages artifacts
+        run: npx surge ./_site ${{ secrets.SURGE_DOMAIN }} --token ${{ secrets.SURGE_TOKEN }}
+
+      - name: Summary
+        run: |
+          echo "### Deploy complete! :green_apple:" >> $GITHUB_STEP_SUMMARY
+          echo "Deployed to Surge.SH" >> $GITHUB_STEP_SUMMARY
