@@ -177,7 +177,7 @@ jobs:
     - name: Output Config
       id: setoutput
       run: |
-        value="$(yq '.repositories.solution.${{ inputs.solution }}.ci-deploy-to' 'repositories.yml')" || 'ERROR'
+        value="$(yq '.repositories.solutions.${{ inputs.solution }}.ci-deploy-to' 'repositories.yml')" || 'ERROR'
         echo "CI=$value" >> $GITHUB_OUTPUT
 
   ### Deploy to GitHub Pages in Solution Repo (considered the CI environment)

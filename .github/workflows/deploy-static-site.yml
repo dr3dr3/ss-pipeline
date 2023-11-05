@@ -24,6 +24,15 @@ concurrency:
 
 jobs:
 
+  echo:
+    name: Echo
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Echo
+        run: Echo "Starting deploy"
+
   deploy-ghp:
     name: 🚀 Deploy GHP
     if: inputs.deploy-to == 'GHP'
