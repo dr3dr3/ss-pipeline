@@ -257,4 +257,5 @@ jobs:
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
       target-deploy: 'stg'
+      site-url: 'https://stg.andredreyer.com'
     secrets: inherit

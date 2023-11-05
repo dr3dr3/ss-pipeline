@@ -1,15 +1,9 @@
 name: CONTINUOUS-DELIVERY
 
 on:
-
-  workflow_call:
-    inputs:
-      target-deploy:
-        required: true
-        type: string
-      site-url:
-        required: true
-        type: string
+  # Runs on pushes targeting the default branch
+  repository_dispatch:
+    types: [deploy]
 
 jobs:
 
@@ -35,7 +29,7 @@ jobs:
       - name: Output Toggles
         id: toggles
         run: |
-          value="$(yq '.toggles.cicd.check-links.${{ inputs.target-deploy }}' 'toggles.yml')" || 'ERROR'
+          value="$(yq '.toggles.cicd.check-links.${{ github.event.client_payload.target-deploy }}' 'toggles.yml')" || 'ERROR'
           echo "LINKS=$value" >> $GITHUB_OUTPUT
           
       - name: Create directory
@@ -49,7 +43,7 @@ jobs:
           target="$(yq '.build.landing' 'builds.yml')" || 'ERROR'
           echo "TARGET=$target" >> $GITHUB_OUTPUT
           echo "Target = $target"
-          current="$(yq '.deploy.${{ inputs.target-deploy }}.landing' 'builds.yml')" || 'ERROR'
+          current="$(yq '.deploy.${{ github.event.client_payload.target-deploy }}.landing' 'builds.yml')" || 'ERROR'
           echo "CURRENT=$current" >> $GITHUB_OUTPUT
           echo "Current = $current"
           repo="$(yq '.repositories.solutions.landing.ref' 'repositories.yml')" || 'ERROR'
@@ -70,7 +64,7 @@ jobs:
           target="$(yq '.build.revealmd' 'builds.yml')" || 'ERROR'
           echo "TARGET=$target" >> $GITHUB_OUTPUT
           echo "Target = $target"
-          current="$(yq '.deploy.${{ inputs.target-deploy }}.revealmd' 'builds.yml')" || 'ERROR'
+          current="$(yq '.deploy.${{ github.event.client_payload.target-deploy }}.revealmd' 'builds.yml')" || 'ERROR'
           echo "CURRENT=$current" >> $GITHUB_OUTPUT
           echo "Current = $current"
           repo="$(yq '.repositories.solutions.revealmd.ref' 'repositories.yml')" || 'ERROR'
@@ -92,12 +86,12 @@ jobs:
       - name: Update aboslute links for relevant environments
         run: |
           cd _site
-          grep -rl localhost . | xargs sed -i 's@http://localhost@${{ inputs.site-url }}@g'
+          grep -rl localhost . | xargs sed -i 's@http://localhost@${{ github.event.client_payload.site_url }}@g'
 
       - name: Update links to feature flags
         run: |
           cd _site
-          grep -rl datafile-tag-all.json . | xargs sed -i 's@datafiles/ci/datafile-tag-all.json@datafiles/${{ inputs.target-deploy }}/datafile-tag-all.json@g'
+          grep -rl datafile-tag-all.json . | xargs sed -i 's@datafiles/ci/datafile-tag-all.json@datafiles/${{ github.event.client_payload.target-deploy }}/datafile-tag-all.json@g'
 
       ##### Upload Deployable Artifact
 
@@ -140,7 +134,7 @@ jobs:
     if: needs.get-build-artefacts.outputs.current-revealmd != needs.get-build-artefacts.outputs.target-revealmd
     uses: ./.github/workflows/gitops-update.yml
     with:
-      config-item: '.deploy.${{ inputs.target-deploy }}.revealmd'
+      config-item: '.deploy.${{ github.event.client_payload.target-deploy }}.revealmd'
       config-value: ${{ needs.get-build-artefacts.outputs.target-revealmd }}
     secrets: inherit
 
@@ -151,7 +145,7 @@ jobs:
     if: needs.get-build-artefacts.outputs.current-landing != needs.get-build-artefacts.outputs.target-landing
     uses: ./.github/workflows/gitops-update.yml
     with:
-      config-item: '.deploy.${{ inputs.target-deploy }}.landing'
+      config-item: '.deploy.${{ github.event.client_payload.target-deploy }}.landing'
       config-value: ${{ needs.get-build-artefacts.outputs.target-landing }}
     secrets: inherit
 
@@ -173,7 +167,7 @@ jobs:
     uses: ./.github/workflows/notification-ifttt.yml
     secrets: inherit
     with:
-      phase: ${{ inputs.target-deploy }}
+      phase: ${{ github.event.client_payload.target-deploy }}
       outcome: success
 
   acceptance-failed:
@@ -193,6 +187,7 @@ jobs:
     uses: ./.github/workflows/notification-ifttt.yml
     secrets: inherit
     with:
-      phase: ${{ inputs.target-deploy }}
+      phase: ${{ github.event.client_payload.target-deploy }}
       outcome: fail
-      
+
+  ### Add dispatch for PRD (blue/green)

@@ -13,19 +13,10 @@ on:
         # 'stg' - Stage Environment
         # 'can' - Canary Environment
         # 'prd' - Production Environment
-
-  # Need to ensure build artefact is here... "build once, deploy many"
-  workflow_dispatch:
-    inputs:
-      target-deploy:
-        description: 'Deployment Target'
+      site-url:
         required: true
-        default: 'stg'
-        type: choice
-        options:
-        - stg
-        - can
-        - prd
+        type: string
+        default: 'https://stg.andredreyer.com'
 
 jobs:
 
@@ -73,8 +64,8 @@ jobs:
         run: |
           curl -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.GHA_PAT }}" \
-          --request POST --data '{"event_type": "deploy", "client_payload": {"value": "x"}}' \
-          https://api.github.com/repos/${{ github.repository_owner }}/${{ format('{0}-{1}', 'devops-demo', inputs.target-deploy) }}/dispatches
+          --request POST --data '{"event_type": "deploy", "client_payload": {"target-deploy": "${{ inputs.target-deploy }}","site-url":"${{ inputs.site-url }}"}}' \
+          https://api.github.com/repos/${{ github.repository_owner }}/ss-pipeline/dispatches
           echo "Success"
       
       ### Todo: Any value in adding client_payload
