@@ -1,18 +1,17 @@
 name: DEPLOYMENT-DISPATCH
-run-name: Continuous Deployment Dispatch to ${{ inputs.target-deploy }}
+run-name: Continuous Deployment Dispatch - ${{ inputs.site-url }}
 
 on:
 
   workflow_call:
     inputs:
-      target-deploy:
+      blue-green:
         required: true
         type: string
-        default: 'stg'
+        default: 'blue'
         # string must be one of:
-        # 'stg' - Stage Environment
-        # 'blue' - Production (Blue) Environment
-        # 'green' - Production (Green) Environment
+        # 'blue' - Blue Environment
+        # 'green' - Green Environment
       site-url:
         required: true
         type: string
@@ -66,7 +65,7 @@ jobs:
         run: |
           curl -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.GHA_PAT }}" \
-          --request POST --data '{"event_type": "deploy", "client_payload": {"target-deploy": "${{ inputs.target-deploy }}","site-url":"${{ inputs.site-url }}"}}' \
+          --request POST --data '{"event_type": "deploy", "client_payload": {"blue-green": "${{ inputs.blue-green }}","site-url":"${{ inputs.site-url }}"}}' \
           https://api.github.com/repos/${{ inputs.target-repo }}/dispatches
           echo "Success"
       

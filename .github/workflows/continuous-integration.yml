@@ -268,7 +268,7 @@ jobs:
     needs: [ci-complete, ci-config-deploy]
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
-      target-deploy: 'stg'
+      blue-green: 'blue'
       site-url: ${{ needs.ci-config-deploy.outputs.site-url }}
       target-repo: ${{ needs.ci-config-deploy.outputs.stage-repo }}
     secrets: inherit

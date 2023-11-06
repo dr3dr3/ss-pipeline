@@ -98,7 +98,7 @@ jobs:
       - name: Summary
         run: |
           echo "### Deploy complete! :green_apple:" >> $GITHUB_STEP_SUMMARY
-          echo "Deployed to Surge.SH here: ${{ inputs.site-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "Deployed to Surge.SH here: https://${{ inputs.site-url }}" >> $GITHUB_STEP_SUMMARY
 
   deploy-vercel:
     name: 🚀 Vercel

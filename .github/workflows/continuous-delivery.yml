@@ -10,6 +10,9 @@ on:
       site-url:
         required: true
         type: string
+      blue-green:
+        required: true
+        type: string
 
 jobs:
 
@@ -139,11 +142,10 @@ jobs:
     - name: Output Config
       id: setoutput
       run: |
-        value="$(yq '.repositories.deployment.${{ inputs.target-deploy }}.deploy-to' 'repositories.yml')" || 'ERROR'
+        value="$(yq '.repositories.deployment.${{ inputs.target-deploy }}.${{ inputs.blue-green }}-deploy-to' 'repositories.yml')" || 'ERROR'
         echo "TARGET=$value" >> $GITHUB_OUTPUT
 
   # Deploy to Static Site Host
-  # WIP: If config = GHP
   deploy-static-site:
     name: Deploy GHP
     needs: [get-build-artefacts, config-deploy]

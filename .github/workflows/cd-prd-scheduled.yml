@@ -31,10 +31,10 @@ jobs:
 
       ### Reveal-MD
 
-      - name: Canary Build Version for Reveal-MD
-        id: rmd-can-build
+      - name: Stage Build Version for Reveal-MD
+        id: rmd-stg-build
         run: |
-          value="$(yq '.deploy.can.revealmd' 'builds.yml')" || 'ERROR'
+          value="$(yq '.deploy.stg.revealmd' 'builds.yml')" || 'ERROR'
           echo "RMD=$value" >> $GITHUB_OUTPUT
 
       - name: Production Build Version for Reveal-MD
@@ -46,7 +46,7 @@ jobs:
       - name: Decision on PRD deploy for Reveal-MD
         id: rmd-prd-deploy
         run: |
-          if [[ ${{ steps.rmd-can-build.outputs.RMD }} == ${{ steps.rmd-prd-build.outputs.RMD }} ]]; then
+          if [[ ${{ steps.rmd-stg-build.outputs.RMD }} == ${{ steps.rmd-prd-build.outputs.RMD }} ]]; then
             echo "RMD=0" >> $GITHUB_OUTPUT
           else
             echo "RMD=1" >> $GITHUB_OUTPUT
@@ -58,10 +58,10 @@ jobs:
 
       ### Landing Page
 
-      - name: Canary Build Version for Landing Page
-        id: lnd-can-build
+      - name: Stage Build Version for Landing Page
+        id: lnd-stg-build
         run: |
-          value="$(yq '.deploy.can.landing' 'builds.yml')" || 'ERROR'
+          value="$(yq '.deploy.stg.landing' 'builds.yml')" || 'ERROR'
           echo "LND=$value" >> $GITHUB_OUTPUT
   
       - name: Production Build Version for Landing Page
@@ -73,7 +73,7 @@ jobs:
       - name: Decision on PRD deploy for Landing Page
         id: lnd-prd-deploy
         run: |
-          if [[ ${{ steps.lnd-can-build.outputs.LND }} == ${{ steps.lnd-prd-build.outputs.LND }} ]]; then
+          if [[ ${{ steps.lnd-stg-build.outputs.LND }} == ${{ steps.lnd-prd-build.outputs.LND }} ]]; then
             echo "LND=0" >> $GITHUB_OUTPUT
           else
             echo "LND=1" >> $GITHUB_OUTPUT
@@ -104,9 +104,9 @@ jobs:
     - name: Output Config
       id: setoutput
       run: |
-        ref="$(yq '.repositories.deployment.green.ref' 'repositories.yml')" || 'ERROR'
+        ref="$(yq '.repositories.deployment.prd.ref' 'repositories.yml')" || 'ERROR'
         echo "REF=$ref" >> $GITHUB_OUTPUT
-        url="$(yq '.repositories.deployment.green.site-url' 'repositories.yml')" || 'ERROR'
+        url="$(yq '.repositories.deployment.prd.site-url' 'repositories.yml')" || 'ERROR'
         echo "URL=$url" >> $GITHUB_OUTPUT
 
   # Scheduled dispatch to Production
@@ -116,7 +116,7 @@ jobs:
     if: needs.prd-config.outputs.rmd == 1 || needs.prd-config.outputs.lnd == 1
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
-      target-deploy: 'green'
+      blue-green: 'green'
       site-url: ${{ needs.config-deploy.outputs.site-url }}
       target-repo: ${{ needs.config-deploy.outputs.stage-repo }}
     secrets: inherit
