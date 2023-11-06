@@ -123,11 +123,14 @@ jobs:
           name: ${{ inputs.artefact-ref }}
           path: _site
       
+      - name: Change Dir
+        run: cd _site
+
       - name: Vercel Pull
         run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Vercel Build
-        run: npx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }} --cwd _site
+        run: npx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Vercel Deploy
         run: npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
