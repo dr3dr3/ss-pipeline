@@ -156,6 +156,7 @@ jobs:
     with:
       artefact-ref: ${{ format('{0}-{1}', 'RC', github.run_id ) }}
       deploy-to: ${{ needs.config-deploy.outputs.deploy-to }}
+      site-url: ${{ inputs.site-url }}
 
   ### Post-deployment Tests (smoke, PVT, etc)
   
