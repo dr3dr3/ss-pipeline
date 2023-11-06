@@ -92,7 +92,7 @@ jobs:
       - name: Update aboslute links for relevant environments
         run: |
           cd _site
-          grep -rl localhost . | xargs sed -i 's@http://localhost@${{ inputs.site-url }}@g'
+          grep -rl localhost . | xargs sed -i 's@http://localhost@https://${{ inputs.site-url }}@g'
 
       - name: Update links to feature flags
         run: |

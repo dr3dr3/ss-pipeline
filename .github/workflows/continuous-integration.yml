@@ -216,7 +216,6 @@ jobs:
   ci-complete:
     name: CI Complete 👍
     needs: [check-links, tag-release, build-target, deploy-ci] 
-    if: always()
     runs-on: ubuntu-latest 
     steps:
 
