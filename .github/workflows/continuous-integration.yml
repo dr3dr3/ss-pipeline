@@ -165,6 +165,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       deploy-to: ${{ steps.setoutput.outputs.CI }}
+      stage-repo: ${{ steps.setoutput.outputs.REF }}
+      site-url: ${{ steps.setoutput.outputs.URL }}
     steps:
 
     - name: Checkout GitOps
@@ -179,6 +181,10 @@ jobs:
       run: |
         value="$(yq '.repositories.solutions.${{ inputs.solution }}.ci-deploy-to' 'repositories.yml')" || 'ERROR'
         echo "CI=$value" >> $GITHUB_OUTPUT
+        ref="$(yq '.repositories.deployment.stg.ref' 'repositories.yml')" || 'ERROR'
+        echo "REF=$ref" >> $GITHUB_OUTPUT
+        url="$(yq '.repositories.deployment.stg.site-url' 'repositories.yml')" || 'ERROR'
+        echo "URL=$url" >> $GITHUB_OUTPUT
 
   ### Deploy to GitHub Pages in Solution Repo (considered the CI environment)
 
@@ -253,10 +259,10 @@ jobs:
   dispatch-stg:
     name: Dispatch STG
     if: inputs.solution != 'featurevisor'
-    needs: [ci-complete]
+    needs: [ci-complete, ci-config-deploy]
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
       target-deploy: 'stg'
-      site-url: 'https://stg.andredreyer.com'
-      target-repo: 'devops-demo-stg'
+      site-url: ${{ needs.ci-config-deploy.outputs.site-url }}
+      target-repo: ${{ needs.ci-config-deploy.outputs.stage-repo }}
     secrets: inherit

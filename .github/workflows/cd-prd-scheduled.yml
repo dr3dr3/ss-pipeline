@@ -83,12 +83,40 @@ jobs:
         run: |
           echo "Landing Deploy Decision: ${{ steps.lnd-prd-deploy.outputs.LND }}"
 
+
+  config-deploy:
+    name: Get config for CI deployment
+    needs: [prd-config]
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    outputs:
+      stage-repo: ${{ steps.setoutput.outputs.REF }}
+      site-url: ${{ steps.setoutput.outputs.URL }}
+    steps:
+
+    - name: Checkout GitOps
+      uses: actions/checkout@v3
+      with:
+        repository: 'dr3dr3/ss-gitops'
+        ref: 'main'
+        token: ${{ secrets.GHA_PAT }}
+
+    - name: Output Config
+      id: setoutput
+      run: |
+        ref="$(yq '.repositories.deployment.green.ref' 'repositories.yml')" || 'ERROR'
+        echo "REF=$ref" >> $GITHUB_OUTPUT
+        url="$(yq '.repositories.deployment.green.site-url' 'repositories.yml')" || 'ERROR'
+        echo "URL=$url" >> $GITHUB_OUTPUT
+
   # Scheduled dispatch to Production
   scheduled-deploy-production:
     name: Scheduled Deploy to Production
-    needs: [prd-config]
+    needs: [prd-config,config-deploy]
     if: needs.prd-config.outputs.rmd == 1 || needs.prd-config.outputs.lnd == 1
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
       target-deploy: 'prd'
+      site-url: ${{ needs.config-deploy.outputs.site-url }}
+      target-repo: ${{ needs.config-deploy.outputs.stage-repo }}
     secrets: inherit
