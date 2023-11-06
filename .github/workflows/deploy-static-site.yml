@@ -34,7 +34,7 @@ jobs:
     steps:
 
       - name: Echo
-        run: echo "Starting deploy to ${{ inputs.deploy-to }}"
+        run: echo "Starting deploy to ${{ inputs.deploy-to }} for ${{ inputs.site-url }}"
 
   deploy-ghp:
     name: 🚀 GHP
