@@ -116,7 +116,7 @@ jobs:
     if: needs.prd-config.outputs.rmd == 1 || needs.prd-config.outputs.lnd == 1
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
-      target-deploy: 'prd'
+      target-deploy: 'green'
       site-url: ${{ needs.config-deploy.outputs.site-url }}
       target-repo: ${{ needs.config-deploy.outputs.stage-repo }}
     secrets: inherit

@@ -16,6 +16,13 @@ on:
         type: string 
 
 jobs:
+  ifttt-started:
+    name: IFTTT CD Started
+    uses: ./.github/workflows/notification-ifttt.yml
+    secrets: inherit
+    with:
+      phase: start
+      outcome: success
 
   cicd-toggles:
     name: Toggles
