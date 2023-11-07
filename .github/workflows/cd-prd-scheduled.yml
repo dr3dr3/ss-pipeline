@@ -13,7 +13,7 @@ on:
 
 jobs:
 
-  prd-config:
+  config-prd:
     name: Get Config for PRD
     outputs:
       blue: ${{ steps.build-blue.outputs.BLUE }}    
@@ -62,8 +62,8 @@ jobs:
           echo "Reveal-MD Deploy Decision: ${{ steps.deploy-decision.outputs.DECISION }}"
 
   config-deploy:
-    name: Get config for CI deployment
-    needs: [prd-config]
+    name: Get deployment config
+    needs: [config-prd]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     outputs:
@@ -89,8 +89,8 @@ jobs:
   # Scheduled dispatch to Production
   scheduled-deploy-production:
     name: Scheduled Deploy to Production
-    needs: [prd-config,config-deploy]
-    if: needs.prd-config.outputs.decision == 'YES'
+    needs: [config-prd,config-deploy]
+    if: needs.config-prd.outputs.decision == 'YES'
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
       blue-green: 'green'
