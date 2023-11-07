@@ -107,7 +107,7 @@ jobs:
 
       # Set deploy host to help identify blue/green
       - name: Update DEPLOY-HOST-PLACEHOLDER
-        run: grep -rl localhost . | xargs sed -i 's@DEPLOY-HOST-PLACEHOLDER@${{ steps.deployment-config.outputs.DEPLOY }}@g'
+        run: grep -rl DEPLOY-HOST-PLACEHOLDER . | xargs sed -i 's@DEPLOY-HOST-PLACEHOLDER@${{ steps.deployment-config.outputs.DEPLOY }}@g'
 
       ##### Upload Deployable Artifact
 
