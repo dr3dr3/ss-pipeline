@@ -16,8 +16,9 @@ jobs:
   prd-config:
     name: Get Config for PRD
     outputs:
-      rmd: ${{ steps.rmd-prd-deploy.outputs.RMD }}    
-      lnd: ${{ steps.lnd-prd-deploy.outputs.LND }}    
+      blue: ${{ steps.build-blue.outputs.BLUE }}    
+      green: ${{ steps.build-green.outputs.GREEN }}   
+      decision: ${{ steps.deploy-decision.outputs.DECISION }} 
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -29,60 +30,30 @@ jobs:
           ref: 'main'
           token: ${{ secrets.GHA_PAT }}
 
-      ### Reveal-MD
-
-      - name: Stage Build Version for Reveal-MD
-        id: rmd-stg-build
+      - name: Build for Production (Blue)
+        id: build-blue
         run: |
-          value="$(yq '.deploy.stg.revealmd' 'builds.yml')" || 'ERROR'
-          echo "RMD=$value" >> $GITHUB_OUTPUT
+          value="$(yq '.deploy.prd.blue' 'builds.yml')" || 'ERROR'
+          echo "BLUE=$value" >> $GITHUB_OUTPUT
 
-      - name: Production Build Version for Reveal-MD
-        id: rmd-prd-build
+      - name: Build for Production (Green)
+        id: build-green
         run: |
-          value="$(yq '.deploy.prd.revealmd' 'builds.yml')" || 'ERROR'
-          echo "RMD=$value" >> $GITHUB_OUTPUT
+          value="$(yq '.deploy.prd.green' 'builds.yml')" || 'ERROR'
+          echo "GREEN=$value" >> $GITHUB_OUTPUT
 
-      - name: Decision on PRD deploy for Reveal-MD
-        id: rmd-prd-deploy
+      - name: Decision if deploy to PRD GREEN
+        id: deploy-decision
         run: |
-          if [[ ${{ steps.rmd-stg-build.outputs.RMD }} == ${{ steps.rmd-prd-build.outputs.RMD }} ]]; then
-            echo "RMD=0" >> $GITHUB_OUTPUT
+          if [[ ${{ steps.build-blue.outputs.BLUE }} == ${{ steps.build-green.outputs.GREEN }} ]]; then
+            echo "DECISION=NO" >> $GITHUB_OUTPUT
           else
-            echo "RMD=1" >> $GITHUB_OUTPUT
+            echo "DECISION=YES" >> $GITHUB_OUTPUT
           fi
       
-      - name: Decision Output for Reveal-MD
+      - name: Decision Decision
         run: |
-          echo "Reveal-MD Deploy Decision: ${{ steps.rmd-prd-deploy.outputs.RMD }}"
-
-      ### Landing Page
-
-      - name: Stage Build Version for Landing Page
-        id: lnd-stg-build
-        run: |
-          value="$(yq '.deploy.stg.landing' 'builds.yml')" || 'ERROR'
-          echo "LND=$value" >> $GITHUB_OUTPUT
-  
-      - name: Production Build Version for Landing Page
-        id: lnd-prd-build
-        run: |
-          value="$(yq '.deploy.prd.landing' 'builds.yml')" || 'ERROR'
-          echo "LND=$value" >> $GITHUB_OUTPUT
-  
-      - name: Decision on PRD deploy for Landing Page
-        id: lnd-prd-deploy
-        run: |
-          if [[ ${{ steps.lnd-stg-build.outputs.LND }} == ${{ steps.lnd-prd-build.outputs.LND }} ]]; then
-            echo "LND=0" >> $GITHUB_OUTPUT
-          else
-            echo "LND=1" >> $GITHUB_OUTPUT
-          fi
-        
-      - name: Decision Output for Landing Page
-        run: |
-          echo "Landing Deploy Decision: ${{ steps.lnd-prd-deploy.outputs.LND }}"
-
+          echo "Reveal-MD Deploy Decision: ${{ steps.deploy-decision.outputs.DECISION }}"
 
   config-deploy:
     name: Get config for CI deployment
@@ -113,7 +84,7 @@ jobs:
   scheduled-deploy-production:
     name: Scheduled Deploy to Production
     needs: [prd-config,config-deploy]
-    if: needs.prd-config.outputs.rmd == 1 || needs.prd-config.outputs.lnd == 1
+    if: needs.prd-config.outputs.decision == 'YES'
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
       blue-green: 'green'
