@@ -33,13 +33,19 @@ jobs:
       - name: Build for Production (Blue)
         id: build-blue
         run: |
-          value="$(yq '.deploy.prd.blue' 'builds.yml')" || 'ERROR'
+          revealmd="$(yq '.deploy.prd.blue.revealmd' 'builds.yml')" || 'ERROR'
+          landing="$(yq '.deploy.prd.blue.landing' 'builds.yml')" || 'ERROR'
+          value="${revealmd}.${landing}"
+          echo $value
           echo "BLUE=$value" >> $GITHUB_OUTPUT
 
       - name: Build for Production (Green)
         id: build-green
         run: |
-          value="$(yq '.deploy.prd.green' 'builds.yml')" || 'ERROR'
+          revealmd="$(yq '.deploy.prd.green.revealmd' 'builds.yml')" || 'ERROR'
+          landing="$(yq '.deploy.prd.green.landing' 'builds.yml')" || 'ERROR'
+          value="${revealmd}.${landing}"
+          echo $value
           echo "GREEN=$value" >> $GITHUB_OUTPUT
 
       - name: Decision if deploy to PRD GREEN
