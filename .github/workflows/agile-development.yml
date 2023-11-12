@@ -27,7 +27,7 @@ jobs:
       - name: Setup SLFB
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh issue comment ${{github.event.issue.number}} --body "GitHub Action - Short-Lived Feature Branch ( ${{ steps.slfb-name.outputs.SLFB }} ) already exists" || gh issue develop ${{github.event.issue.number}} --base main --name "${{ steps.slfb-name.outputs.SLFB }}"
+        run: gh issue develop ${{github.event.issue.number}} --base main --name "${{ steps.slfb-name.outputs.SLFB }}" || gh issue comment ${{github.event.issue.number}} --body "GitHub Action - Short-Lived Feature Branch ( ${{ steps.slfb-name.outputs.SLFB }} ) already exists"
 
       - name: Comment for Branch Checkout
         env:
