@@ -72,7 +72,7 @@ jobs:
       feature: ${{ inputs.feature }}
       solution: ${{ inputs.solution }}
 
-  ### Post-build tests on the package from build above
+  ### Pre-deployment tests on the package from build above
 
   # Test for broken hyperlinks
   check-links:
@@ -209,8 +209,10 @@ jobs:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
       deploy-to: ${{ needs.ci-config-deploy.outputs.deploy-to }}
 
-  ### Run CI Tests here
+  ### Run CI Post-Deployment Tests here
 
+  
+  
   ### Confirm CI Completed
   
   ci-complete:

@@ -1,4 +1,4 @@
-name: CONTINUOUS-DELIVERY
+name: CONTINUOUS-DEPLOYMENT
 
 on:
 
@@ -105,6 +105,10 @@ jobs:
       - name: Update links to feature flags
         run: grep -rl datafile-tag-all.json . | xargs sed -i 's@datafiles/ci/datafile-tag-all.json@datafiles/${{ inputs.target-deploy }}/datafile-tag-all.json@g'
 
+      # Set whether deployment is blue/green
+      - name: Update DEPLOY-BLUE-GREEN
+        run: grep -rl DEPLOY-BLUE-GREEN . | xargs sed -i 's@DEPLOY-BLUE-GREEN@${{ inputs.blue-green }}@g'
+
       # Set deploy host to help identify blue/green
       - name: Update DEPLOY-HOST-PLACEHOLDER
         run: grep -rl DEPLOY-HOST-PLACEHOLDER . | xargs sed -i 's@DEPLOY-HOST-PLACEHOLDER@${{ steps.deployment-config.outputs.DEPLOY }}@g'
@@ -130,6 +134,8 @@ jobs:
       artefact-ref: ${{ format('{0}-{1}', 'RC', github.run_id ) }}
       toggle: ${{ needs.get-build-artefacts.outputs.check-links }}
 
+  ### Deployment
+  
   # Deploy to Static Site Host
   deploy-static-site:
     name: Deploy GHP
