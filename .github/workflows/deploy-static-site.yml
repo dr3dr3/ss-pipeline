@@ -92,7 +92,7 @@ jobs:
           name: ${{ inputs.artefact-ref }}
           path: _site
 
-      - name: Upload Pages artifacts
+      - name: Upload to Surge.SH
         run: npx surge ./_site --domain ${{ inputs.site-url }}.surge.sh --token ${{ secrets.SURGE_TOKEN }}
 
       - name: Summary
