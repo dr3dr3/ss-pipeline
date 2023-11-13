@@ -218,7 +218,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}    
         run: |
-          str = "echo ${{ inputs.feature }} | sed 's@^[^0-9]*\([0-9]\+\).*@\1@'"
+          str=$(echo ${{ inputs.feature }} | sed 's@^[^0-9]*\([0-9]\+\).*@\1@')
           gh issue comment ${str} --body "### Ephemeral SBX deployment 
           Available at https://${{ inputs.feature }}.surge.sh"
 

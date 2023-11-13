@@ -35,7 +35,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           comment="
-          ### Check out SLFB in your Dev environment
+          ### Checkout SLFB in your Dev environment
 
           \`\`\`
           git fetch origin
