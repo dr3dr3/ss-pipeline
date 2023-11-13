@@ -210,14 +210,16 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Comment on PR
-        run: gh pr comment ${{ github.event.pull_request.number }} -b "Ephemeral SBX deployment available at https://${{ inputs.feature }}.surge.sh"
         env:
           GH_TOKEN: ${{ github.token }}    
+        run: gh pr comment ${{ github.event.pull_request.number }} -b "Ephemeral SBX deployment available at https://${{ inputs.feature }}.surge.sh"
 
       - name: Comment on Issue
-        run: gh issue comment ${{ inputs.feature }} --body "Ephemeral SBX deployment available at https://${{ inputs.feature }}.surge.sh"
         env:
           GH_TOKEN: ${{ github.token }}    
+        run: |
+          gh issue comment ${{ inputs.feature }} --body "### Ephemeral SBX deployment 
+          Available at https://${{ inputs.feature }}.surge.sh"
 
   # Note: Uses artefacts created by build jobs above
   deploy-ci:

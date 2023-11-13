@@ -30,6 +30,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.CREATE_CODESPACES }}
 
+      - name: Add Issue Comment
+        run: gh issue comment ${{github.event.issue.number}} --body "### Created Codespace for SLFB. Access here https://codespaces.new/dr3dr3/devops-demo?quickstart=1"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Message Codespace
         run: echo "### Codespace Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
   
