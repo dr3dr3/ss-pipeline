@@ -146,6 +146,7 @@ jobs:
   ## TAG RELEASE
   tag-release:
     name: Tag and Release
+    if: ${{ github.event_name == 'push' }}
     needs: [set-tag, build-complete]
     uses: ./.github/workflows/tag-release.yml
     with:
@@ -157,7 +158,7 @@ jobs:
   # Set target build in GitOps config (to be used in continuous deployment)
   build-target:
     name: Set Target Build in Config
-    if: inputs.solution != 'featurevisor'
+    if: ${{ inputs.solution != 'featurevisor' }}
     needs: [set-tag, build-complete]
     uses: ./.github/workflows/gitops-update.yml
     with:
@@ -165,13 +166,14 @@ jobs:
       config-value: ${{ needs.set-tag.outputs.tag }}
     secrets: inherit
 
-  ci-config-deploy:
-    name: Get config for CI deployment
+  config-deploy:
+    name: Get config for SBX/CI deployment
     needs: [set-tag, tag-release]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     outputs:
-      deploy-to: ${{ steps.setoutput.outputs.CI }}
+      deploy-sbx: ${{ steps.setoutput.outputs.SBX }}
+      deploy-ci: ${{ steps.setoutput.outputs.CI }}
       stage-repo: ${{ steps.setoutput.outputs.REF }}
       site-url: ${{ steps.setoutput.outputs.URL }}
     steps:
@@ -186,8 +188,10 @@ jobs:
     - name: Output Config
       id: setoutput
       run: |
-        value="$(yq '.repositories.solutions.${{ inputs.solution }}.ci-deploy-to' 'repositories.yml')" || 'ERROR'
-        echo "CI=$value" >> $GITHUB_OUTPUT
+        sbx="$(yq '.repositories.solutions.${{ inputs.solution }}.sbx-deploy-to' 'repositories.yml')" || 'ERROR'
+        echo "SBX=$sbx" >> $GITHUB_OUTPUT
+        ci="$(yq '.repositories.solutions.${{ inputs.solution }}.ci-deploy-to' 'repositories.yml')" || 'ERROR'
+        echo "CI=$ci" >> $GITHUB_OUTPUT
         ref="$(yq '.repositories.deployment.stg.ref' 'repositories.yml')" || 'ERROR'
         echo "REF=$ref" >> $GITHUB_OUTPUT
         url="$(yq '.repositories.deployment.stg.site-url' 'repositories.yml')" || 'ERROR'
@@ -195,11 +199,11 @@ jobs:
 
   ### Deploy to GitHub Pages in Solution Repo (considered the CI environment)
 
-  # Deploy to GitHub Pages
   # Note: Uses artefacts created by build jobs above
-  deploy-ci:
-    name: Deploy CI
-    needs: [set-tag, ci-config-deploy]
+  deploy-sbx:
+    name: Deploy SBX
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: [set-tag, config-deploy]
     uses: ./.github/workflows/deploy-static-site.yml
     permissions:
       contents: write
@@ -207,7 +211,22 @@ jobs:
       id-token: write
     with:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
-      deploy-to: ${{ needs.ci-config-deploy.outputs.deploy-to }}
+      deploy-to: ${{ needs.config-deploy.outputs.deploy-sbx }}
+      site-url: ${{ inputs.feature }}
+
+      # Note: Uses artefacts created by build jobs above
+  deploy-ci:
+    name: Deploy CI
+    if: ${{ github.event_name == 'push' }}
+    needs: [set-tag, config-deploy]
+    uses: ./.github/workflows/deploy-static-site.yml
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    with:
+      artefact-ref: ${{ needs.set-tag.outputs.tag }}
+      deploy-to: ${{ needs.config-deploy.outputs.deploy-ci }}
 
   ### Run CI Post-Deployment Tests here
 
@@ -255,7 +274,7 @@ jobs:
   # Set target build in GitOps config (to be used in continuous deployment)
   build-ci:
     name: Set CI Build in Config
-    if: inputs.solution != 'featurevisor'
+    if: ${{ inputs.solution != 'featurevisor' }}
     needs: [set-tag, ci-complete]
     uses: ./.github/workflows/gitops-update.yml
     with:
@@ -266,11 +285,11 @@ jobs:
   # Dispatch to trigger deployment to Stage Environment
   dispatch-stg:
     name: Dispatch STG
-    if: inputs.solution != 'featurevisor'
-    needs: [ci-complete, ci-config-deploy]
+    if: ${{ inputs.solution != 'featurevisor' }}
+    needs: [ci-complete, config-deploy]
     uses: ./.github/workflows/deployment-dispatch.yml
     with:
       blue-green: 'blue'
-      site-url: ${{ needs.ci-config-deploy.outputs.site-url }}
-      target-repo: ${{ needs.ci-config-deploy.outputs.stage-repo }}
+      site-url: ${{ needs.config-deploy.outputs.site-url }}
+      target-repo: ${{ needs.config-deploy.outputs.stage-repo }}
     secrets: inherit

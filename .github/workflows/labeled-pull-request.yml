@@ -38,3 +38,5 @@ jobs:
 
       - name: Message PR
         run: echo "### Pull Request Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
+      
+      ### Add request to configured approver (GitOps)

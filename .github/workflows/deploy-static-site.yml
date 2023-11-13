@@ -1,5 +1,5 @@
-# Deploy static site to GitHub Pages
-name: DEPLOY-GITHUB-PAGES
+# Deploy static site to configured host
+name: DEPLOY-STATIC-SITE
 
 on:
   workflow_call:
@@ -74,7 +74,7 @@ jobs:
 
   deploy-surge:
     name: 🚀 Surge.sh
-    if: inputs.deploy-to == 'SURGE'
+    if: ${{ inputs.deploy-to == 'SURGE' && inputs.site-url != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -93,12 +93,12 @@ jobs:
           path: _site
 
       - name: Upload Pages artifacts
-        run: npx surge ./_site --domain ${{ inputs.site-url }} --token ${{ secrets.SURGE_TOKEN }}
+        run: npx surge ./_site --domain ${{ inputs.site-url }}.surge.sh --token ${{ secrets.SURGE_TOKEN }}
 
       - name: Summary
         run: |
           echo "### Deploy complete! :green_apple:" >> $GITHUB_STEP_SUMMARY
-          echo "Deployed to Surge.SH here: https://${{ inputs.site-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "Deployed to Surge.SH here: https://${{ inputs.site-url }}.surge.sh" >> $GITHUB_STEP_SUMMARY
 
   deploy-vercel:
     name: 🚀 Vercel
