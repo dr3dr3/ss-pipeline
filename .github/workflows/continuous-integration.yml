@@ -123,26 +123,6 @@ jobs:
       phase: build
       outcome: fail
 
-  # Merge PR if using short-lived feature branchs
-  # GitHub is setup to delete SLFB after merge completed.
-  pr-merge: 
-    name: PR Merge
-    needs: [build-complete]
-    if: ${{ github.event_name == 'ON-PR-APPROVED' }}
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Checkout Feature Branch
-        uses: actions/checkout@v3
-
-      - name: Merge Pull Request
-        run: gh pr merge ${{ inputs.feature }} --squash --subject "${{ inputs.feature }}" --body "Short-lived feature branch ${{ inputs.feature }} automerged by GitHub Action" --auto
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: GitHub Step Summary
-        run: echo "### PR Merge Success! :thumbsup:" >> $GITHUB_STEP_SUMMARY
-
   ## TAG RELEASE
   tag-release:
     name: Tag and Release
@@ -216,7 +196,7 @@ jobs:
       # Note: Only using Surge.SH for SBX (can use as ephemeral environments)
     secrets: inherit
 
-  pr-comment:
+  add-comments:
     name: Comment on PR
     if: ${{ github.event_name == 'pull_request' }}
     needs: [deploy-sbx]
@@ -229,8 +209,13 @@ jobs:
       - name: Checkout Main Branch
         uses: actions/checkout@v3
 
-      - name: Comment
-        run: gh pr comment ${{ github.event.pull_request.number }} -b "Ephemeral SBX deployment available at https://${{ inputs.feature}}.surge.sh"
+      - name: Comment on PR
+        run: gh pr comment ${{ github.event.pull_request.number }} -b "Ephemeral SBX deployment available at https://${{ inputs.feature }}.surge.sh"
+        env:
+          GH_TOKEN: ${{ github.token }}    
+
+      - name: Comment on Issue
+        run: gh issue comment ${{ inputs.feature }} --body "Ephemeral SBX deployment available at https://${{ inputs.feature }}.surge.sh"
         env:
           GH_TOKEN: ${{ github.token }}    
 
