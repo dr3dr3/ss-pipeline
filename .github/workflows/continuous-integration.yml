@@ -212,10 +212,29 @@ jobs:
     with:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
       deploy-to: ${{ needs.config-deploy.outputs.deploy-sbx }}
-      site-url: ${{ inputs.feature }}
+      site-url: ${{ inputs.feature }}.surge.sh
+      # Note: Only using Surge.SH for SBX (can use as ephemeral environments)
     secrets: inherit
 
-      # Note: Uses artefacts created by build jobs above
+  pr-comment:
+    name: Comment on PR
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: [deploy-sbx]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps: 
+
+      - name: Checkout Main Branch
+        uses: actions/checkout@v3
+
+      - name: Comment
+        run: gh pr comment ${{ github.event.pull_request.number }} -b "Ephemeral SBX deployment available at https://${{ inputs.feature}}.surge.sh"
+        env:
+          GH_TOKEN: ${{ github.token }}    
+
+  # Note: Uses artefacts created by build jobs above
   deploy-ci:
     name: Deploy CI
     if: ${{ github.event_name == 'push' }}

@@ -93,12 +93,12 @@ jobs:
           path: _site
 
       - name: Upload to Surge.SH
-        run: npx surge ./_site --domain ${{ inputs.site-url }}.surge.sh --token ${{ secrets.SURGE_TOKEN }}
+        run: npx surge ./_site --domain ${{ inputs.site-url }} --token ${{ secrets.SURGE_TOKEN }}
 
       - name: Summary
         run: |
           echo "### Deploy complete! :green_apple:" >> $GITHUB_STEP_SUMMARY
-          echo "Deployed to Surge.SH here: https://${{ inputs.site-url }}.surge.sh" >> $GITHUB_STEP_SUMMARY
+          echo "Deployed to Surge.SH here: https://${{ inputs.site-url }}" >> $GITHUB_STEP_SUMMARY
 
   deploy-vercel:
     name: 🚀 Vercel
