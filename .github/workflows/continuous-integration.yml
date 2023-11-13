@@ -168,7 +168,7 @@ jobs:
 
   config-deploy:
     name: Get config for SBX/CI deployment
-    needs: [set-tag, tag-release]
+    needs: [set-tag, build-complete]
     timeout-minutes: 10
     runs-on: ubuntu-latest
     outputs:
