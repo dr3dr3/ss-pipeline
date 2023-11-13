@@ -1,0 +1,40 @@
+name: CREATE-NEW-PULL-REQUEST
+
+on:
+
+  workflow_call:
+
+jobs: 
+
+  pull-request:
+    name: Setup PR for SLFB
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+
+      - name: Checkout Main Branch
+        uses: actions/checkout@v3
+
+      - name: Set SLFB Name
+        id: slfb-name
+        run: |
+          name=$(echo ${{ github.event.issue.title }} | tr " " "-")
+          slfb=$(echo "${{github.event.issue.number}}-${name}" )
+          echo "${slfb}"
+          echo "SLFB=$slfb" >> $GITHUB_OUTPUT
+
+      - name: Checkout SLFB
+        run: | 
+          git fetch origin
+          git checkout -b ${{ steps.slfb-name.outputs.SLFB }}
+        
+      - name: Create/Reopen Pull Request
+        run: gh pr create -t ${{ steps.slfb-name.outputs.SLFB }} -b "Created by Github Action (AGILE-DEVELOPMENT)" --base main --head $(git branch --show-current) || gh pr edit ${{ steps.slfb-name.outputs.SLFB }} -b "Reopened by Github action" -t ${{ steps.slfb-name.outputs.SLFB }} && gh pr reopen ${{ steps.slfb-name.outputs.SLFB }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Message PR
+        run: echo "### Pull Request Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
