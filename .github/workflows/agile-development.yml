@@ -57,12 +57,12 @@ jobs:
 #      - name: Message Codespace
 #        run: echo "### Codespace Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
-#      - name: Checkout SLFB
-#        run: | 
-#          git fetch origin
-#          git checkout -b ${{ steps.slfb-name.outputs.SLFB }}
+      - name: Checkout SLFB
+        run: | 
+          git fetch origin
+          git checkout -b ${{ steps.slfb-name.outputs.SLFB }}
         
       - name: Create/Reopen Pull Request
-        run: gh pr create -t ${{ steps.slfb-name.outputs.SLFB }} -b "Created by Github Action (AGILE-DEVELOPMENT)" || gh pr edit ${{ steps.slfb-name.outputs.SLFB }} -b "Reopened by Github action" -t ${{ steps.slfb-name.outputs.SLFB }} && gh pr reopen ${{ steps.slfb-name.outputs.SLFB }}
+        run: gh pr create -t ${{ steps.slfb-name.outputs.SLFB }} -b "Created by Github Action (AGILE-DEVELOPMENT)" --base main --head $(git branch --show-current) || gh pr edit ${{ steps.slfb-name.outputs.SLFB }} -b "Reopened by Github action" -t ${{ steps.slfb-name.outputs.SLFB }} && gh pr reopen ${{ steps.slfb-name.outputs.SLFB }}
         env:
           GH_TOKEN: ${{ github.token }}
