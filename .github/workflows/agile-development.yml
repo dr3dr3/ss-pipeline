@@ -63,6 +63,6 @@ jobs:
           git checkout -b ${{ steps.slfb-name.outputs.SLFB }}
         
       - name: Create/Reopen Pull Request
-        run: gh pr edit ${{ steps.slfb-name.outputs.SLFB }} -b "Reopened by Github action" -t ${{ steps.slfb-name.outputs.SLFB }} && gh pr reopen ${{ steps.slfb-name.outputs.SLFB }} || gh pr create -t ${{ steps.slfb-name.outputs.SLFB }} -b "Created by Github Action (AGILE-DEVELOPMENT)"
+        run: gh pr create -t ${{ steps.slfb-name.outputs.SLFB }} -b "Created by Github Action (AGILE-DEVELOPMENT)" || gh pr edit ${{ steps.slfb-name.outputs.SLFB }} -b "Reopened by Github action" -t ${{ steps.slfb-name.outputs.SLFB }} && gh pr reopen ${{ steps.slfb-name.outputs.SLFB }}
         env:
           GH_TOKEN: ${{ github.token }}
