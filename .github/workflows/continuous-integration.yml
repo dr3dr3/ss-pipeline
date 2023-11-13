@@ -213,6 +213,7 @@ jobs:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
       deploy-to: ${{ needs.config-deploy.outputs.deploy-sbx }}
       site-url: ${{ inputs.feature }}
+    secrets: inherit
 
       # Note: Uses artefacts created by build jobs above
   deploy-ci:
@@ -227,6 +228,7 @@ jobs:
     with:
       artefact-ref: ${{ needs.set-tag.outputs.tag }}
       deploy-to: ${{ needs.config-deploy.outputs.deploy-ci }}
+    secrets: inherit
 
   ### Run CI Post-Deployment Tests here
 
