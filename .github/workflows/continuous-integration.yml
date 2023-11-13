@@ -218,7 +218,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}    
         run: |
-          gh issue comment ${{ inputs.feature }} --body "### Ephemeral SBX deployment 
+          str = "echo ${{ inputs.feature }} | sed 's@^[^0-9]*\([0-9]\+\).*@\1@'"
+          gh issue comment ${str} --body "### Ephemeral SBX deployment 
           Available at https://${{ inputs.feature }}.surge.sh"
 
   # Note: Uses artefacts created by build jobs above
