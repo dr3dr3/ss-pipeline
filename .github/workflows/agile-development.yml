@@ -22,6 +22,7 @@ jobs:
         run: |
           name=$(echo ${{ github.event.issue.title }} | tr " " "-")
           slfb=$(echo "${{github.event.issue.number}}-${name}" )
+          echo "${slfb}"
           echo "SLFB=$slfb" >> $GITHUB_OUTPUT
 
       - name: Setup SLFB
@@ -38,7 +39,7 @@ jobs:
 
           \`\`\`
           git fetch origin
-          git checkout ${{ steps.slfb-name.outputs.SLFB }}
+          git checkout -b ${{ steps.slfb-name.outputs.SLFB }}
           \`\`\`
 
           "
@@ -57,7 +58,9 @@ jobs:
 #        run: echo "### Codespace Created :thumbsup:" >> $GITHUB_STEP_SUMMARY
 
       - name: Checkout SLFB
-        run: git checkout -b ${{ steps.slfb-name.outcome.SLFB }}
+        run: | 
+          git fetch origin
+          git checkout -b ${{ steps.slfb-name.outputs.SLFB }}
         
       - name: Create/Reopen Pull Request
         run: gh pr edit ${{ steps.slfb-name.outputs.SLFB }} -b "Reopened by Github action" -t ${{ steps.slfb-name.outputs.SLFB }} && gh pr reopen ${{ steps.slfb-name.outputs.SLFB }} || gh pr create -t ${{ steps.slfb-name.outputs.SLFB }} -b "Created by Github Action (AGILE-DEVELOPMENT)"
